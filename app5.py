@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-?? PortfÛlio Profissional - Raphael Pires
-Analista de Dados & BI
+üéØ Portf√≥lio Profissional - Raphael Pires
+Analista de Dados & Business Intelligence
 GitHub: github.com/raphaelcaxias/curriculo
 """
 
@@ -15,22 +14,21 @@ import requests
 from io import BytesIO
 
 # =============================================================================
-# CONFIGURA«√O DA P¡GINA
+# CONFIGURA√á√ÉO DA P√ÅGINA
 # =============================================================================
 st.set_page_config(
     page_title="Raphael Pires | Analista de Dados & BI",
-    page_icon="??",
+    page_icon="üìä",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # =============================================================================
-# CSS PERSONALIZADO AVAN«ADO
+# CSS PERSONALIZADO
 # =============================================================================
 def inject_custom_css():
     st.markdown("""
     <style>
-        /* Vari·veis de cor - Tema Corporativo */
         :root {
             --primary: #1e3a5f;
             --secondary: #2c5282;
@@ -39,16 +37,10 @@ def inject_custom_css():
             --text-dark: #1a202c;
             --text-gray: #4a5568;
             --border: #e2e8f0;
-            --success: #38a169;
         }
         
-        /* Reset e base */
-        .stApp {
-            background: var(--bg-light);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        .stApp { background: var(--bg-light); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
-        /* Hero Section Premium */
         .hero-section {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             padding: 2.5rem;
@@ -57,201 +49,62 @@ def inject_custom_css():
             margin-bottom: 2rem;
             box-shadow: 0 10px 30px rgba(30, 58, 95, 0.2);
         }
+        .hero-name { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.5px; }
+        .hero-title { font-size: 1.4rem; color: #cbd5e1; margin-bottom: 1rem; font-weight: 500; }
+        .hero-location { font-size: 1rem; color: #a0aec0; margin-bottom: 1.5rem; }
         
-        .hero-name {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.5px;
-        }
-        
-        .hero-title {
-            font-size: 1.4rem;
-            color: #cbd5e1;
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-        
-        .hero-location {
-            font-size: 1rem;
-            color: #a0aec0;
-            margin-bottom: 1.5rem;
-        }
-        
-        /* Botıes personalizados */
         .stButton > button {
-            background: white;
-            color: var(--secondary);
-            border: 2px solid var(--secondary);
-            border-radius: 8px;
-            font-weight: 600;
-            padding: 0.5rem 1.5rem;
-            transition: all 0.3s;
+            background: white; color: var(--secondary); border: 2px solid var(--secondary);
+            border-radius: 8px; font-weight: 600; padding: 0.5rem 1.5rem; transition: all 0.3s;
         }
         .stButton > button:hover {
-            background: var(--secondary);
-            color: white;
-            transform: translateY(-2px);
+            background: var(--secondary); color: white; transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(44, 82, 130, 0.4);
         }
         
-        /* Cards de mÈtricas */
         .metric-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            border-left: 5px solid var(--accent);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            text-align: center;
-            height: 100%;
-            transition: transform 0.2s;
+            background: white; padding: 1.5rem; border-radius: 12px; border-left: 5px solid var(--accent);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; height: 100%; transition: transform 0.2s;
         }
-        .metric-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-        }
-        .metric-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            display: block;
-        }
-        .metric-label {
-            font-size: 0.9rem;
-            color: var(--text-gray);
-            margin-top: 0.5rem;
-            display: block;
-        }
+        .metric-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+        .metric-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); display: block; }
+        .metric-label { font-size: 0.9rem; color: var(--text-gray); margin-top: 0.5rem; display: block; }
         
-        /* Cards de projetos */
         .project-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
-            transition: all 0.3s;
+            background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;
+            border: 1px solid var(--border); transition: all 0.3s;
         }
-        .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-            border-color: var(--accent);
-        }
-        .project-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 0.8rem;
-        }
-        .project-stack {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin: 0.8rem 0;
-        }
+        .project-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.15); border-color: var(--accent); }
+        .project-title { font-size: 1.3rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.8rem; }
+        .project-stack { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.8rem 0; }
         .stack-tag {
-            background: #ebf4ff;
-            color: var(--secondary);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            background: #ebf4ff; color: var(--secondary); padding: 0.3rem 0.8rem; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 600;
         }
         
-        /* Timeline de experiÍncia */
         .exp-item {
-            position: relative;
-            padding-left: 2rem;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid var(--accent);
-            padding-bottom: 1rem;
+            position: relative; padding-left: 2rem; margin-bottom: 1.5rem; border-left: 4px solid var(--accent); padding-bottom: 1rem;
         }
         .exp-item::before {
-            content: '';
-            position: absolute;
-            left: -11px;
-            top: 4px;
-            width: 18px;
-            height: 18px;
-            background: var(--secondary);
-            border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            content: ''; position: absolute; left: -11px; top: 4px; width: 18px; height: 18px;
+            background: var(--secondary); border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-        .exp-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .exp-company {
-            font-weight: 700;
-            color: var(--text-dark);
-            font-size: 1.1rem;
-        }
-        .exp-role {
-            color: var(--accent);
-            font-weight: 500;
-        }
-        .exp-period {
-            background: #ebf8ff;
-            color: var(--secondary);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
+        .exp-header { display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .exp-company { font-weight: 700; color: var(--text-dark); font-size: 1.1rem; }
+        .exp-role { color: var(--accent); font-weight: 500; }
+        .exp-period { background: #ebf8ff; color: var(--secondary); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
         
-        /* Tech Stack */
-        .tech-category {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-        .tech-category strong {
-            color: var(--primary);
-            margin-right: 0.5rem;
-            font-size: 0.95rem;
-        }
+        .tech-category { margin-bottom: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid var(--border); }
+        .tech-category strong { color: var(--primary); margin-right: 0.5rem; font-size: 0.95rem; }
         .tech-badge {
-            display: inline-block;
-            background: white;
-            border: 1px solid var(--border);
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            margin: 0.2rem;
-            font-size: 0.85rem;
-            color: var(--text-gray);
-            transition: all 0.2s;
+            display: inline-block; background: white; border: 1px solid var(--border); padding: 0.4rem 0.8rem;
+            border-radius: 6px; margin: 0.2rem; font-size: 0.85rem; color: var(--text-gray); transition: all 0.2s;
         }
-        .tech-badge:hover {
-            background: var(--secondary);
-            color: white;
-            border-color: var(--secondary);
-        }
+        .tech-badge:hover { background: var(--secondary); color: white; border-color: var(--secondary); }
         
-        /* Links */
-        a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
+        a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        a:hover { text-decoration: underline; }
         
-        /* Sidebar */
-        .sidebar-section {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        /* Responsividade */
         @media (max-width: 768px) {
             .hero-name { font-size: 2rem; }
             .hero-title { font-size: 1.2rem; }
@@ -267,100 +120,91 @@ inject_custom_css()
 # =============================================================================
 @st.cache_data
 def load_image():
-    """Carrega a imagem do perfil"""
+    """Carrega a imagem do perfil com fallback"""
     try:
-        # Tenta carregar do repositÛrio GitHub
         img_url = "https://raw.githubusercontent.com/raphaelcaxias/curriculo/main/rapha.jpeg"
         response = requests.get(img_url)
         if response.status_code == 200:
             return Image.open(BytesIO(response.content))
-    except:
+    except Exception:
         pass
     
-    # Fallback para arquivo local
     if os.path.exists("rapha.jpeg"):
         return Image.open("rapha.jpeg")
     elif os.path.exists("assets/rapha.jpeg"):
         return Image.open("assets/rapha.jpeg")
-    
     return None
 
 @st.cache_data
 def load_cv():
-    """Carrega o currÌculo em PDF"""
+    """Carrega o curr√≠culo PDF com fallback"""
     try:
-        # Tenta carregar do repositÛrio GitHub
         pdf_url = "https://raw.githubusercontent.com/raphaelcaxias/curriculo/main/Curriculo_Raphael_Premium_Final.pdf"
         response = requests.get(pdf_url)
         if response.status_code == 200:
             return response.content
-    except:
+    except Exception:
         pass
     
-    # Fallback para arquivo local
     if os.path.exists("Curriculo_Raphael_Premium_Final.pdf"):
         with open("Curriculo_Raphael_Premium_Final.pdf", "rb") as f:
             return f.read()
     elif os.path.exists("assets/Curriculo_Raphael_Premium_Final.pdf"):
         with open("assets/Curriculo_Raphael_Premium_Final.pdf", "rb") as f:
             return f.read()
-    
     return None
 
-# Carrega os arquivos
 profile_image = load_image()
 cv_pdf = load_cv()
 
 # =============================================================================
-# SIDEBAR - NAVEGA«√O
+# SIDEBAR
 # =============================================================================
 with st.sidebar:
-    # Foto de perfil
     if profile_image:
         st.image(profile_image, width=150, use_column_width=True)
     else:
         st.image("https://via.placeholder.com/150x150/1e3a5f/ffffff?text=RP", width=150)
     
-    st.markdown("### ?? NavegaÁ„o R·pida")
+    st.markdown("###  Navega√ß√£o R√°pida")
     st.markdown("""
-    - [?? InÌcio](#topo)
-    - [?? Projetos](#projetos)
-    - [?? ExperiÍncia](#experiencia)
-    - [?? FormaÁ„o](#formacao)
-    - [?? Contato](#contato)
+    - [üè† In√≠cio](#topo)
+    - [üìÅ Projetos](#projetos)
+    - [ Experi√™ncia](#experiencia)
+    - [üéì Forma√ß√£o](#formacao)
+    - [üì¨ Contato](#contato)
     """)
     
     st.markdown("---")
-    st.markdown("### ?? Download")
+    st.markdown("### üì• Download")
     
-    # Bot„o de download do CV
     if cv_pdf:
         st.download_button(
-            label="?? Baixar CV (PDF)",
+            label="üìÑ Baixar CV (PDF)",
             data=cv_pdf,
             file_name="Curriculo_Raphael_Premium_Final.pdf",
             mime="application/pdf",
             use_container_width=True
         )
     else:
-        st.warning("?? PDF n„o encontrado")
+        st.warning("üìÅ PDF n√£o encontrado. Verifique o nome do arquivo.")
     
     st.markdown("---")
-    st.markdown("### ?? Conecte-se")
+    st.markdown("### üîó Conecte-se")
     st.markdown("""
-    [?? LinkedIn](https://linkedin.com/in/raphael-pires-caxias)  
-    [?? GitHub](https://github.com/raphaelcaxias)  
-    [?? Email](mailto:raphael_caxias@hotmail.com)
+    [üîó LinkedIn](https://linkedin.com/in/raphael-pires-caxias)  
+    [üíª GitHub](https://github.com/raphaelcaxias)  
+    [üìß Email](mailto:raphael_caxias@hotmail.com)
     """)
     
     st.markdown("---")
     st.markdown("*Portfolio atualizado em 2026*")
 
 # =============================================================================
-# CONTE⁄DO PRINCIPAL
+# CONTE√öDO PRINCIPAL
 # =============================================================================
 
-# 1. HERO SECTION
+# 1. HERO
 st.markdown('<a id="topo"></a>', unsafe_allow_html=True)
 st.markdown("""
 <div class="hero-section">
@@ -368,33 +212,33 @@ st.markdown("""
         <div style="flex: 1; min-width: 300px;">
             <div class="hero-name">Raphael Fernando da Silva Pires</div>
             <div class="hero-title">Analista de Dados & Business Intelligence</div>
-            <div class="hero-location">?? Volta Redonda ñ RJ | ?? Trabalho Remoto</div>
+            <div class="hero-location">üìç Volta Redonda ‚Äì RJ | üíª Trabalho Remoto</div>
             <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem;">
-                <a href="https://linkedin.com/in/raphael-pires-caxias" target="_blank" style="background: white; color: #1e3a5f; padding: 0.7rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">?? LinkedIn</a>
-                <a href="https://github.com/raphaelcaxias" target="_blank" style="background: rgba(255,255,255,0.15); color: white; padding: 0.7rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; border: 2px solid white;">?? GitHub</a>
+                <a href="https://linkedin.com/in/raphael-pires-caxias" target="_blank" style="background: white; color: #1e3a5f; padding: 0.7rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">üîó LinkedIn</a>
+                <a href="https://github.com/raphaelcaxias" target="_blank" style="background: rgba(255,255,255,0.15); color: white; padding: 0.7rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; border: 2px solid white;">üíª GitHub</a>
             </div>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# 2. PERFIL PROFISSIONAL
-st.markdown("### ?? Sobre Mim")
+# 2. PERFIL
+st.markdown("### üë§ Sobre Mim")
 st.markdown("""
 <div style="background: white; padding: 1.5rem; border-radius: 12px; border-left: 5px solid #2c5282; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-> Analista de Dados com experiÍncia em operaÁıes comerciais reais, atuando na construÁ„o de aplicaÁıes analÌticas, automaÁ„o de processos e exploraÁ„o de dados para tomada de decis„o. ExperiÍncia pr·tica com SQL, Python/Pandas, Power BI e dashboards publicados em nuvem.
+> Analista de Dados com experi√™ncia em opera√ß√µes comerciais reais, atuando na constru√ß√£o de aplica√ß√µes anal√≠ticas, automa√ß√£o de processos e explora√ß√£o de dados para tomada de decis√£o. Experi√™ncia pr√°tica com SQL, Python/Pandas, Power BI e dashboards publicados em nuvem.
 </div>
 """, unsafe_allow_html=True)
 st.markdown("---")
 
-# 3. M…TRICAS EM DESTAQUE
-st.markdown("### ?? Impacto e Resultados")
+# 3. M√âTRICAS
+st.markdown("###  Impacto e Resultados")
 col1, col2, col3, col4 = st.columns(4)
 
 metrics = [
-    {"value": "70%", "label": "ReduÁ„o operacional<br><small>(Banco do Brasil)</small>"},
-    {"value": "2h ? 15min", "label": "ReduÁ„o no ciclo<br>de an·lise"},
-    {"value": "3", "label": "AplicaÁıes analÌticas<br>publicadas"},
+    {"value": "70%", "label": "Redu√ß√£o operacional<br><small>(Banco do Brasil)</small>"},
+    {"value": "2h ‚Üí 15min", "label": "Redu√ß√£o no ciclo<br>de an√°lise"},
+    {"value": "3", "label": "Aplica√ß√µes anal√≠ticas<br>publicadas"},
     {"value": "213K+", "label": "Registros<br>processados"}
 ]
 
@@ -406,133 +250,106 @@ for i, metric in enumerate(metrics):
             <span class="metric-label">{metric['label']}</span>
         </div>
         """, unsafe_allow_html=True)
-
 st.markdown("---")
 
 # 4. TECH STACK
-st.markdown("### ??? CompetÍncias TÈcnicas")
+st.markdown("### Ô∏è Compet√™ncias T√©cnicas")
 col_tech1, col_tech2 = st.columns(2)
 
 with col_tech1:
     st.markdown("""
     <div class="tech-category">
-        <strong>?? BANCO DE DADOS & ETL</strong><br>
-        <span class="tech-badge">SQL</span>
-        <span class="tech-badge">PostgreSQL</span>
-        <span class="tech-badge">Pandas</span>
-        <span class="tech-badge">NumPy</span>
-        <span class="tech-badge">ETL</span>
+        <strong>üìä BANCO DE DADOS & ETL</strong><br>
+        <span class="tech-badge">SQL</span> <span class="tech-badge">PostgreSQL</span> <span class="tech-badge">Pandas</span> <span class="tech-badge">NumPy</span> <span class="tech-badge">ETL</span>
     </div>
     <div class="tech-category">
-        <strong>?? BI & VISUALIZA«√O</strong><br>
-        <span class="tech-badge">Power BI</span>
-        <span class="tech-badge">Looker Studio</span>
-        <span class="tech-badge">Plotly</span>
-        <span class="tech-badge">Streamlit</span>
+        <strong>üìà BI & VISUALIZA√á√ÉO</strong><br>
+        <span class="tech-badge">Power BI</span> <span class="tech-badge">Looker Studio</span> <span class="tech-badge">Plotly</span> <span class="tech-badge">Streamlit</span>
     </div>
     """, unsafe_allow_html=True)
 
 with col_tech2:
     st.markdown("""
     <div class="tech-category">
-        <strong>?? AN¡LISE & ESTATÕSTICA</strong><br>
-        <span class="tech-badge">KPIs</span>
-        <span class="tech-badge">Statsmodels</span>
-        <span class="tech-badge">An·lise ExploratÛria</span>
+        <strong>üîç AN√ÅLISE & ESTAT√çSTICA</strong><br>
+        <span class="tech-badge">KPIs</span> <span class="tech-badge">Statsmodels</span> <span class="tech-badge">An√°lise Explorat√≥ria</span>
     </div>
     <div class="tech-category">
-        <strong>?? FERRAMENTAS</strong><br>
-        <span class="tech-badge">Excel/VBA</span>
-        <span class="tech-badge">Git</span>
-        <span class="tech-badge">IA Generativa</span>
-        <span class="tech-badge">AutomaÁ„o</span>
+        <strong>‚öôÔ∏è FERRAMENTAS</strong><br>
+        <span class="tech-badge">Excel/VBA</span> <span class="tech-badge">Git</span> <span class="tech-badge">IA Generativa</span> <span class="tech-badge">Automa√ß√£o</span>
     </div>
     """, unsafe_allow_html=True)
-
 st.markdown("---")
 
-# 5. PROJETOS EM DESTAQUE
+# 5. PROJETOS
 st.markdown('<a id="projetos"></a>', unsafe_allow_html=True)
-st.markdown("### ?? Projetos em Destaque")
+st.markdown("### üöÄ Projetos em Destaque")
 
 projects = [
     {
-        "title": "???? Desenrola Brasil - Dashboard Executivo",
+        "title": "üáßüá∑ Desenrola Brasil - Dashboard Executivo",
         "stack": ["Python", "Pandas", "Plotly", "Streamlit", "PostgreSQL"],
-        "desc": "Dashboard interativo com dados oficiais do Banco Central sobre o programa Desenrola Brasil. Inclui KPIs, segmentaÁ„o analÌtica por regi„o/valor, identificaÁ„o de padrıes em renegociaÁ„o de dÌvidas e visualizaÁıes interativas para tomada de decis„o.",
+        "desc": "Dashboard interativo com dados oficiais do Banco Central sobre o programa Desenrola Brasil. Inclui KPIs, segmenta√ß√£o anal√≠tica por regi√£o/valor, identifica√ß√£o de padr√µes em renegocia√ß√£o de d√≠vidas e visualiza√ß√µes interativas para tomada de decis√£o.",
         "app": "https://desenrolabrasil.streamlit.app",
         "github": "https://github.com/raphaelcaxias/DESENROLA_BRASIL"
     },
     {
-        "title": "?? CNPq Analytics - An·lise de Investimentos",
+        "title": "üî¨ CNPq Analytics - An√°lise de Investimentos",
         "stack": ["Python", "PostgreSQL", "Plotly", "Streamlit", "ETL"],
-        "desc": "Pipeline ETL completo e an·lise exploratÛria de 213 mil registros p˙blicos do CNPq. Mapeamento de investimentos em pesquisa cientÌfica, identificaÁ„o de desigualdades regionais e padrıes de financiamento no Brasil.",
+        "desc": "Pipeline ETL completo e an√°lise explorat√≥ria de 213 mil registros p√∫blicos do CNPq. Mapeamento de investimentos em pesquisa cient√≠fica, identifica√ß√£o de desigualdades regionais e padr√µes de financiamento no Brasil.",
         "app": None,
         "github": "https://github.com/raphaelcaxias/cnpq-analytics"
     },
     {
-        "title": "? Dashboard ANP - PreÁos de CombustÌveis",
+        "title": "‚õΩ Dashboard ANP - Pre√ßos de Combust√≠veis",
         "stack": ["Python", "Pandas", "Plotly", "Streamlit"],
-        "desc": "Dashboard com dados p˙blicos da ANP (AgÍncia Nacional do PetrÛleo). Filtros regionais din‚micos, an·lise temporal de preÁos de combustÌveis no varejo brasileiro e comparaÁıes entre estados e municÌpios.",
+        "desc": "Dashboard com dados p√∫blicos da ANP (Ag√™ncia Nacional do Petr√≥leo). Filtros regionais din√¢micos, an√°lise temporal de pre√ßos de combust√≠veis no varejo brasileiro e compara√ß√µes entre estados e munic√≠pios.",
         "app": None,
         "github": "https://github.com/raphaelcaxias/anp-combustiveis-dashboard"
     }
 ]
 
 for proj in projects:
-    with st.container():
-        st.markdown(f"""
-        <div class="project-card">
-            <div class="project-title">{proj['title']}</div>
-            <div class="project-stack">
-                {''.join([f'<span class="stack-tag">{t}</span>' for t in proj['stack']])}
-            </div>
-            <p style="color: var(--text-gray); margin: 1rem 0; line-height: 1.6;">{proj['desc']}</p>
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
-                <a href="{proj['github']}" target="_blank" style="background: #f0f9ff; color: var(--secondary); padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
-                    ?? Ver CÛdigo
-                </a>
-                {f'<a href="{proj["app"]}" target="_blank" style="background: var(--secondary); color: white; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">?? Acessar App</a>' if proj['app'] else ''}
-            </div>
+    st.markdown(f"""
+    <div class="project-card">
+        <div class="project-title">{proj['title']}</div>
+        <div class="project-stack">
+            {''.join([f'<span class="stack-tag">{t}</span>' for t in proj['stack']])}
         </div>
-        """, unsafe_allow_html=True)
-
+        <p style="color: var(--text-gray); margin: 1rem 0; line-height: 1.6;">{proj['desc']}</p>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+            <a href="{proj['github']}" target="_blank" style="background: #f0f9ff; color: var(--secondary); padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">üíª Ver C√≥digo</a>
+            {f'<a href="{proj["app"]}" target="_blank" style="background: var(--secondary); color: white; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">üåê Acessar App</a>' if proj['app'] else ''}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 st.markdown("---")
 
-# 6. EXPERI NCIA PROFISSIONAL
+# 6. EXPERI√äNCIA
 st.markdown('<a id="experiencia"></a>', unsafe_allow_html=True)
-st.markdown("### ?? TrajetÛria Profissional")
+st.markdown("### üíº Trajet√≥ria Profissional")
 
 exp_items = [
     {
-        "empresa": "Jardim do …den",
-        "cargo": "Gest„o Comercial & Dados",
-        "periodo": "2009 ñ Atual",
+        "empresa": "Jardim do √âden", "cargo": "Gest√£o Comercial & Dados", "periodo": "2009 ‚Äì Atual",
         "bullets": [
-            "EstruturaÁ„o de fluxo analÌtico comercial com dashboards que reduziram tempo de an·lise de 2 horas para 15 minutos",
-            "Desenvolvimento de consultas SQL e automaÁ„o de processos para suporte a faturamento, margem de lucro e controle de estoque",
-            "ImplementaÁ„o de IA generativa para automaÁ„o de tarefas operacionais repetitivas",
-            "CriaÁ„o de relatÛrios gerenciais automatizados para tomada de decis„o estratÈgica"
+            "Estrutura√ß√£o de fluxo anal√≠tico comercial com dashboards que reduziram tempo de an√°lise de 2 horas para 15 minutos",
+            "Desenvolvimento de consultas SQL e automa√ß√£o de processos para suporte a faturamento, margem de lucro e controle de estoque",
+            "Implementa√ß√£o de IA generativa para automa√ß√£o de tarefas operacionais repetitivas"
         ]
     },
     {
-        "empresa": "J SintonÌa",
-        "cargo": "Analista de KPIs & OperaÁıes",
-        "periodo": "2014 ñ 2026",
+        "empresa": "J Sinton√≠a", "cargo": "Analista de KPIs & Opera√ß√µes", "periodo": "2014 ‚Äì 2026",
         "bullets": [
-            "Monitoramento contÌnuo de KPIs de vendas, margem de contribuiÁ„o e giro de estoque",
-            "Desenvolvimento de relatÛrios automatizados para gest„o estratÈgica",
-            "An·lise de desempenho comercial e identificaÁ„o de oportunidades de melhoria"
+            "Monitoramento cont√≠nuo de KPIs de vendas, margem de contribui√ß√£o e giro de estoque",
+            "Desenvolvimento de relat√≥rios automatizados para gest√£o estrat√©gica"
         ]
     },
     {
-        "empresa": "Banco do Brasil",
-        "cargo": "AutomaÁ„o & Dados",
-        "periodo": "2008 ñ 2010",
+        "empresa": "Banco do Brasil", "cargo": "Automa√ß√£o & Dados", "periodo": "2008 ‚Äì 2010",
         "bullets": [
-            "AutomaÁ„o de processos em 20 agÍncias utilizando VBA/Excel",
-            "ReduÁ„o de 70% no tempo operacional com implementaÁ„o de macros e planilhas inteligentes",
-            "PadronizaÁ„o de rotinas administrativas e melhoria na qualidade dos dados"
+            "Automa√ß√£o de processos em 20 ag√™ncias utilizando VBA/Excel",
+            "Redu√ß√£o de 70% no tempo operacional com implementa√ß√£o de macros e planilhas inteligentes"
         ]
     }
 ]
@@ -552,124 +369,94 @@ for exp in exp_items:
         </ul>
     </div>
     """, unsafe_allow_html=True)
-
 st.markdown("---")
 
-# 7. FORMA«√O E CURSOS
+# 7. FORMA√á√ÉO
 st.markdown('<a id="formacao"></a>', unsafe_allow_html=True)
 col_form1, col_form2 = st.columns(2)
 
 with col_form1:
-    st.markdown("#### ?? FormaÁ„o AcadÍmica")
+    st.markdown("#### üéì Forma√ß√£o Acad√™mica")
     st.markdown("""
-    **Sistemas de InformaÁ„o**  
-    UniFOA - Centro Universit·rio de Volta Redonda
+    **Sistemas de Informa√ß√£o**  
+    UniFOA - Centro Universit√°rio de Volta Redonda
     
-    **TÈcnico em Inform·tica**  
-    CIBA - Centro de Inform·tica e Business Administration
+    **T√©cnico em Inform√°tica**  
+    CIBA - Centro de Inform√°tica e Business Administration
     """)
 
 with col_form2:
-    st.markdown("#### ?? Cursos & CertificaÁıes")
+    st.markdown("#### üìö Cursos & Certifica√ß√µes")
     st.markdown("""
     **Hashtag Treinamentos:**
-    - ? SQL para An·lise de Dados
-    - ? Power BI Completo (B·sico ao AvanÁado)
-    - ? Python para An·lise de Dados (Pandas)
-    - ? Algoritmos e LÛgica de ProgramaÁ„o
-    - ? IA Aplicada a NegÛcios
-    
-    **Outras formaÁıes:**
-    - Excel AvanÁado e VBA
-    - EstatÌstica Aplicada
+    - ‚úÖ SQL para An√°lise de Dados
+    - ‚úÖ Power BI Completo (B√°sico ao Avan√ßado)
+    - ‚úÖ Python para An√°lise de Dados (Pandas)
+    - ‚úÖ Algoritmos e L√≥gica de Programa√ß√£o
+    - ‚úÖ IA Aplicada a Neg√≥cios
     """)
-
 st.markdown("---")
 
-# 8. CONTATO / RODAP…
+# 8. CONTATO & RODAP√â
 st.markdown('<a id="contato"></a>', unsafe_allow_html=True)
-st.markdown("### ?? Vamos Trabalhar Juntos?")
+st.markdown("### üì¨ Vamos Trabalhar Juntos?")
 
 col_contact1, col_contact2 = st.columns([2, 1])
 
 with col_contact1:
     st.markdown("""
-    Estou aberto a oportunidades como **Analista de Dados**, **Analista de BI** ou projetos freelance de an·lise e automaÁ„o.
+    Estou aberto a oportunidades como **Analista de Dados**, **Analista de BI** ou projetos freelance de an√°lise e automa√ß√£o.
     
-    Se vocÍ busca um profissional com experiÍncia pr·tica em transformar dados em insights acion·veis e automaÁ„o de processos, vamos conversar!
+    Se voc√™ busca um profissional com experi√™ncia pr√°tica em transformar dados em insights acion√°veis, vamos conversar!
     
-    **?? Email:** [raphael_caxias@hotmail.com](mailto:raphael_caxias@hotmail.com)  
-    **?? WhatsApp:** [(24) 99227-5226](https://wa.me/5524992275226)  
-    **?? LocalizaÁ„o:** Volta Redonda ñ RJ | DisponÌvel para trabalho remoto
+    **üìß Email:** [raphael_caxias@hotmail.com](mailto:raphael_caxias@hotmail.com)  
+    **üì± WhatsApp:** [(24) 99227-5226](https://wa.me/5524992275226)  
+    **üìç Localiza√ß√£o:** Volta Redonda ‚Äì RJ | Dispon√≠vel para trabalho remoto
     """)
 
 with col_contact2:
-    st.markdown("### ?? Links Importantes")
+    st.markdown("### üîó Links Importantes")
     st.markdown("""
-    [?? LinkedIn](https://linkedin.com/in/raphael-pires-caxias)  
-    [?? GitHub](https://github.com/raphaelcaxias)  
-    [?? Download CV](#) *(menu lateral)*
+    [üîó LinkedIn](https://linkedin.com/in/raphael-pires-caxias)  
+    [üíª GitHub](https://github.com/raphaelcaxias)  
     
-    **RepositÛrios:**
+    **Reposit√≥rios:**
     - [Desenrola Brasil](https://github.com/raphaelcaxias/DESENROLA_BRASIL)
     - [CNPq Analytics](https://github.com/raphaelcaxias/cnpq-analytics)
     - [Dashboard ANP](https://github.com/raphaelcaxias/anp-combustiveis-dashboard)
     """)
 
-# RodapÈ final
 st.markdown("---")
 st.markdown("""
 <div style="text-align: center; color: #718096; font-size: 0.9rem; padding: 2rem; background: white; border-radius: 12px; margin-top: 2rem;">
     <strong style="color: var(--primary); font-size: 1.1rem;">Raphael Fernando da Silva Pires</strong><br>
     Analista de Dados & Business Intelligence<br>
     <small style="margin-top: 0.5rem; display: block;">
-        Portfolio desenvolvido com Streamlit ï GitHub: 
+        Portfolio desenvolvido com Streamlit ‚Ä¢ GitHub: 
         <a href="https://github.com/raphaelcaxias/curriculo" target="_blank">github.com/raphaelcaxias/curriculo</a><br>
-        © 2026 - Todos os direitos reservados
+        ¬© 2026 - Todos os direitos reservados
     </small>
 </div>
 """, unsafe_allow_html=True)
 
 # =============================================================================
-# AN¡LISE INTERATIVA (DEMONSTRA«√O)
+# DEMONSTRA√á√ÉO INTERATIVA (OPCIONAL)
 # =============================================================================
-with st.expander("?? Ver DemonstraÁ„o de An·lise Interativa", expanded=False):
+with st.expander("üìä Ver Demonstra√ß√£o de An√°lise Interativa", expanded=False):
     st.markdown("Exemplo de dashboard interativo com Plotly:")
     
-    # Dados de exemplo
     df_demo = pd.DataFrame({
-        'MÍs': ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+        'M√™s': ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
         'Vendas': [120, 145, 132, 168, 189, 201],
         'Meta': [130, 140, 145, 160, 180, 200]
     })
     
     fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=df_demo['MÍs'], 
-        y=df_demo['Vendas'], 
-        name='Vendas Realizadas',
-        mode='lines+markers',
-        line=dict(color='#2c5282', width=3),
-        marker=dict(size=8)
-    ))
-    fig.add_trace(go.Scatter(
-        x=df_demo['MÍs'], 
-        y=df_demo['Meta'], 
-        name='Meta',
-        mode='lines',
-        line=dict(color='#38a169', width=2, dash='dash')
-    ))
-    fig.update_layout(
-        title='Acompanhamento de Vendas vs Meta',
-        height=350,
-        margin=dict(t=60, b=0, l=0, r=0),
-        hovermode='x unified',
-        legend=dict(orientation='h', y=1.05)
-    )
+    fig.add_trace(go.Scatter(x=df_demo['M√™s'], y=df_demo['Vendas'], name='Vendas Realizadas', mode='lines+markers', line=dict(color='#2c5282', width=3), marker=dict(size=8)))
+    fig.add_trace(go.Scatter(x=df_demo['M√™s'], y=df_demo['Meta'], name='Meta', mode='lines', line=dict(color='#38a169', width=2, dash='dash')))
+    fig.update_layout(title='Acompanhamento de Vendas vs Meta', height=350, margin=dict(t=60, b=0, l=0, r=0), hovermode='x unified', legend=dict(orientation='h', y=1.05))
     st.plotly_chart(fig, use_container_width=True)
     
     col_a, col_b = st.columns(2)
-    with col_a:
-        st.metric("Crescimento Acumulado", "+67.5%", "+12.3%")
-    with col_b:
-        st.metric("Atingimento da Meta", "100.5%", "+0.5%")
+    with col_a: st.metric("Crescimento Acumulado", "+67.5%", "+12.3%")
+    with col_b: st.metric("Atingimento da Meta", "100.5%", "+0.5%")
