@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 🎯 Portfólio Profissional - Raphael Pires
-Analista de Dados & Business Intelligence
+Analista Operacional de Dados & BI
 GitHub: github.com/raphaelcaxias/curriculo
 """
 
@@ -17,7 +17,7 @@ from io import BytesIO
 # CONFIGURAÇÃO DA PÁGINA
 # =============================================================================
 st.set_page_config(
-    page_title="Raphael Pires | Analista de Dados & BI",
+    page_title="Raphael Pires | Analista Operacional de Dados",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -93,6 +93,7 @@ def inject_custom_css():
         .exp-company { font-weight: 700; color: var(--text-dark); font-size: 1.1rem; }
         .exp-role { color: var(--accent); font-weight: 500; }
         .exp-period { background: #ebf8ff; color: var(--secondary); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .exp-highlight { background: #fef3c7; border-left: 3px solid #f59e0b; padding: 0.5rem 1rem; border-radius: 0 6px 6px 0; margin: 0.5rem 0; font-size: 0.9rem; }
         
         .tech-category { margin-bottom: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid var(--border); }
         .tech-category strong { color: var(--primary); margin-right: 0.5rem; font-size: 0.95rem; }
@@ -204,14 +205,14 @@ with st.sidebar:
 # CONTEÚDO PRINCIPAL
 # =============================================================================
 
-# 1. HERO
+# 1. HERO - Perfil ajustado para "Analista Operacional"
 st.markdown('<a id="topo"></a>', unsafe_allow_html=True)
 st.markdown("""
 <div class="hero-section">
     <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 300px;">
             <div class="hero-name">Raphael Fernando da Silva Pires</div>
-            <div class="hero-title">Analista de Dados & Business Intelligence</div>
+            <div class="hero-title">Analista Operacional de Dados & BI</div>
             <div class="hero-location">📍 Volta Redonda – RJ | 💻 Trabalho Remoto</div>
             <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem;">
                 <a href="https://linkedin.com/in/raphael-pires-caxias" target="_blank" style="background: white; color: #1e3a5f; padding: 0.7rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">🔗 LinkedIn</a>
@@ -222,23 +223,23 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 2. PERFIL
+# 2. PERFIL - Posicionamento realista e defensável
 st.markdown("### 👤 Sobre Mim")
 st.markdown("""
 <div style="background: white; padding: 1.5rem; border-radius: 12px; border-left: 5px solid #2c5282; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-> Analista de Dados com experiência em operações comerciais reais, atuando na construção de aplicações analíticas, automação de processos e exploração de dados para tomada de decisão. Experiência prática com SQL, Python/Pandas, Power BI e dashboards publicados em nuvem.
+> Profissional com <strong>+20 anos de experiência operacional</strong>, especializado em transformar rotinas administrativas em indicadores acionáveis. Atuo na intersecção entre <strong>processo de negócio + dados + automação</strong>, com foco em BI operacional, controle de fluxo e apoio à gestão. Experiência prática com SQL, Python/Pandas, Power BI, Excel/VBA e dashboards publicados em nuvem.
 </div>
 """, unsafe_allow_html=True)
 st.markdown("---")
 
-# 3. MÉTRICAS
+# 3. MÉTRICAS - Inclui experiência de 7 anos na NSM
 st.markdown("### 📈 Impacto e Resultados")
 col1, col2, col3, col4 = st.columns(4)
 
 metrics = [
-    {"value": "70%", "label": "Redução operacional<br><small>(Banco do Brasil)</small>"},
-    {"value": "2h → 15min", "label": "Redução no ciclo<br>de análise"},
-    {"value": "3", "label": "Aplicações analíticas<br>publicadas"},
+    {"value": "7 anos", "label": "Experiência em<br>operação real (NSM)"},
+    {"value": "70%", "label": "Redução de tempo<br>(Banco do Brasil)"},
+    {"value": "2h → 15min", "label": "Ciclo de análise<br>otimizado"},
     {"value": "213K+", "label": "Registros<br>processados"}
 ]
 
@@ -252,36 +253,36 @@ for i, metric in enumerate(metrics):
         """, unsafe_allow_html=True)
 st.markdown("---")
 
-# 4. TECH STACK
+# 4. TECH STACK - Foco em ferramentas operacionais
 st.markdown("### 🛠️ Competências Técnicas")
 col_tech1, col_tech2 = st.columns(2)
 
 with col_tech1:
     st.markdown("""
     <div class="tech-category">
-        <strong>📊 BANCO DE DADOS & ETL</strong><br>
-        <span class="tech-badge">SQL</span> <span class="tech-badge">PostgreSQL</span> <span class="tech-badge">Pandas</span> <span class="tech-badge">NumPy</span> <span class="tech-badge">ETL</span>
+        <strong>📊 DADOS & ETL</strong><br>
+        <span class="tech-badge">SQL</span> <span class="tech-badge">PostgreSQL</span> <span class="tech-badge">Pandas</span> <span class="tech-badge">NumPy</span> <span class="tech-badge">Tratamento de Dados</span>
     </div>
     <div class="tech-category">
-        <strong>📈 BI & VISUALIZAÇÃO</strong><br>
-        <span class="tech-badge">Power BI</span> <span class="tech-badge">Looker Studio</span> <span class="tech-badge">Plotly</span> <span class="tech-badge">Streamlit</span>
+        <strong>📈 BI & RELATÓRIOS</strong><br>
+        <span class="tech-badge">Power BI</span> <span class="tech-badge">Looker Studio</span> <span class="tech-badge">Plotly</span> <span class="tech-badge">Streamlit</span> <span class="tech-badge">Excel Avançado</span>
     </div>
     """, unsafe_allow_html=True)
 
 with col_tech2:
     st.markdown("""
     <div class="tech-category">
-        <strong>🔍 ANÁLISE & ESTATÍSTICA</strong><br>
-        <span class="tech-badge">KPIs</span> <span class="tech-badge">Statsmodels</span> <span class="tech-badge">Análise Exploratória</span>
+        <strong>🔍 ANÁLISE OPERACIONAL</strong><br>
+        <span class="tech-badge">KPIs</span> <span class="tech-badge">Controle de Fluxo</span> <span class="tech-badge">Indicadores de Gestão</span> <span class="tech-badge">Saneamento de Dados</span>
     </div>
     <div class="tech-category">
-        <strong>⚙️ FERRAMENTAS</strong><br>
-        <span class="tech-badge">Excel/VBA</span> <span class="tech-badge">Git</span> <span class="tech-badge">IA Generativa</span> <span class="tech-badge">Automação</span>
+        <strong>⚙️ AUTOMAÇÃO & FERRAMENTAS</strong><br>
+        <span class="tech-badge">Excel/VBA</span> <span class="tech-badge">Git</span> <span class="tech-badge">IA Generativa</span> <span class="tech-badge">Padronização de Processos</span>
     </div>
     """, unsafe_allow_html=True)
 st.markdown("---")
 
-# 5. PROJETOS EM DESTAQUE ✅ LINKS ATUALIZADOS
+# 5. PROJETOS EM DESTAQUE
 st.markdown('<a id="projetos"></a>', unsafe_allow_html=True)
 st.markdown("### 🚀 Projetos em Destaque")
 
@@ -325,31 +326,52 @@ for proj in projects:
     """, unsafe_allow_html=True)
 st.markdown("---")
 
-# 6. EXPERIÊNCIA
+# 6. EXPERIÊNCIA PROFISSIONAL - ATUALIZADA COM NSM E BANCO DO BRASIL
 st.markdown('<a id="experiencia"></a>', unsafe_allow_html=True)
 st.markdown("### 💼 Trajetória Profissional")
 
 exp_items = [
     {
-        "empresa": "Jardim do Éden", "cargo": "Gestão Comercial & Dados", "periodo": "2009 – Atual",
+        "empresa": "NSM Comércio e Serviço",
+        "cargo": "Suporte Operacional & Controle Administrativo",
+        "periodo": "2002 – 2009",
         "bullets": [
-            "Estruturação de fluxo analítico comercial com dashboards que reduziram tempo de análise de 2 horas para 15 minutos",
-            "Desenvolvimento de consultas SQL e automação de processos para suporte a faturamento, margem de lucro e controle de estoque",
-            "Implementação de IA generativa para automação de tarefas operacionais repetitivas"
+            "Centralização e organização de informações operacionais descentralizadas",
+            "Controle de estoque, fluxo administrativo e saneamento de inconsistências",
+            "Suporte à tomada de decisão com registros estruturados e relatórios de acompanhamento",
+            "<strong>7 anos de experiência real em rotina empresarial</strong> — base sólida para atuação em BI operacional"
+        ],
+        "highlight": "🎯 Tratamento operacional de dados antes do termo 'Data Analyst' existir"
+    },
+    {
+        "empresa": "Banco do Brasil",
+        "cargo": "Estagiário de Dados e Automação",
+        "periodo": "2008 – 2010",
+        "bullets": [
+            "Automação de processos em 20 agências utilizando Excel/VBA",
+            "Consolidação e padronização de relatórios operacionais",
+            "Redução de <strong>70% no tempo operacional</strong> com macros e planilhas inteligentes",
+            "Experiência verificável em instituição tradicional — credibilidade instantânea"
+        ],
+        "highlight": "✅ Experiência corporativa real, não apenas cursos online"
+    },
+    {
+        "empresa": "Jardim do Éden",
+        "cargo": "Gestão Comercial & Dados",
+        "periodo": "2009 – Atual",
+        "bullets": [
+            "Estruturação de fluxo analítico comercial com dashboards que reduziram tempo de análise de 2h para 15min",
+            "SQL e automação para suporte a faturamento, margem de lucro e controle de estoque",
+            "IA generativa aplicada à automação de tarefas operacionais repetitivas"
         ]
     },
     {
-        "empresa": "J Sintonía", "cargo": "Analista de KPIs & Operações", "periodo": "2014 – 2026",
+        "empresa": "J Sintonía",
+        "cargo": "Analista de KPIs & Operações",
+        "periodo": "2014 – 2026",
         "bullets": [
             "Monitoramento contínuo de KPIs de vendas, margem de contribuição e giro de estoque",
             "Desenvolvimento de relatórios automatizados para gestão estratégica"
-        ]
-    },
-    {
-        "empresa": "Banco do Brasil", "cargo": "Automação & Dados", "periodo": "2008 – 2010",
-        "bullets": [
-            "Automação de processos em 20 agências utilizando VBA/Excel",
-            "Redução de 70% no tempo operacional com implementação de macros e planilhas inteligentes"
         ]
     }
 ]
@@ -367,11 +389,34 @@ for exp in exp_items:
         <ul style="padding-left: 1.2rem; color: var(--text-gray); line-height: 1.8;">
             {''.join([f'<li>{b}</li>' for b in exp['bullets']])}
         </ul>
+        {f'<div class="exp-highlight">{exp["highlight"]}</div>' if 'highlight' in exp else ''}
     </div>
     """, unsafe_allow_html=True)
 st.markdown("---")
 
-# 7. FORMAÇÃO
+# 7. DIFERENCIAL - Seu posicionamento único
+st.markdown("### 🎯 Meu Diferencial")
+st.markdown("""
+<div style="background: #f0f9ff; border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem;">
+
+**Não sou:**  
+❌ Cientista de dados acadêmico  
+❌ Programador "hardcore" de TI  
+❌ Engenheiro de IA teórico  
+
+**Sou:**  
+✅ Profissional operacional que entende de dados  
+✅ Especialista em indicadores e controle de fluxo  
+✅ Ponte entre operação e tecnologia  
+✅ Foco em **resultado prático**, não em buzzword  
+
+> *"Muitos sabem fazer gráfico bonito. Poucos entenderam a rotina de um estoque, um faturamento ou uma agência bancária. Eu entendi."*
+
+</div>
+""", unsafe_allow_html=True)
+st.markdown("---")
+
+# 8. FORMAÇÃO
 st.markdown('<a id="formacao"></a>', unsafe_allow_html=True)
 col_form1, col_form2 = st.columns(2)
 
@@ -394,10 +439,15 @@ with col_form2:
     - ✅ Python para Análise de Dados (Pandas)
     - ✅ Algoritmos e Lógica de Programação
     - ✅ IA Aplicada a Negócios
+    
+    **Formação prática:**
+    - +20 anos de operação real
+    - Automação com VBA/Excel em ambiente corporativo
+    - BI aplicado a negócios reais
     """)
 st.markdown("---")
 
-# 8. CONTATO & RODAPÉ
+# 9. CONTATO & RODAPÉ
 st.markdown('<a id="contato"></a>', unsafe_allow_html=True)
 st.markdown("### 📬 Vamos Trabalhar Juntos?")
 
@@ -405,9 +455,14 @@ col_contact1, col_contact2 = st.columns([2, 1])
 
 with col_contact1:
     st.markdown("""
-    Estou aberto a oportunidades como **Analista de Dados**, **Analista de BI** ou projetos freelance de análise e automação.
+    Busco oportunidades como **Analista de Dados Operacional**, **BI de Negócio** ou **Consultoria de Automação Administrativa**.
     
-    Se você busca um profissional com experiência prática em transformar dados em insights acionáveis, vamos conversar!
+    Se sua empresa precisa de alguém que:
+    - Entende a rotina operacional (estoque, faturamento, indicadores)
+    - Sabe transformar planilhas em dashboards acionáveis
+    - Entrega resultado prático, não apenas código bonito
+    
+    ...vamos conversar!
     
     **📧 Email:** [raphael_caxias@hotmail.com](mailto:raphael_caxias@hotmail.com)  
     **📱 WhatsApp:** [(24) 99227-5226](https://wa.me/5524992275226)  
@@ -423,13 +478,16 @@ with col_contact2:
     **Projetos Online:**
     - [🇧🇷 Desenrola Brasil](https://desenrolabrasil.streamlit.app/)
     - [🤝 Bolsa Família](https://bolsa-familia-kqrkzbzsrucybh3chpicxt.streamlit.app/)
+    
+    **📄 CV Completo:**  
+    *(use o botão de download na sidebar)*
     """)
 
 st.markdown("---")
 st.markdown("""
 <div style="text-align: center; color: #718096; font-size: 0.9rem; padding: 2rem; background: white; border-radius: 12px; margin-top: 2rem;">
     <strong style="color: var(--primary); font-size: 1.1rem;">Raphael Fernando da Silva Pires</strong><br>
-    Analista de Dados & Business Intelligence<br>
+    Analista Operacional de Dados & Business Intelligence<br>
     <small style="margin-top: 0.5rem; display: block;">
         Portfolio desenvolvido com Streamlit • GitHub: 
         <a href="https://github.com/raphaelcaxias/curriculo" target="_blank">github.com/raphaelcaxias/curriculo</a><br>
