@@ -166,11 +166,11 @@ with st.sidebar:
     else:
         st.image("https://via.placeholder.com/150x150/1e3a5f/ffffff?text=RP", width=150)
     
-    st.markdown("###  Navegação Rápida")
+    st.markdown("### 🧭 Navegação Rápida")
     st.markdown("""
     - [🏠 Início](#topo)
     - [📁 Projetos](#projetos)
-    - [ Experiência](#experiencia)
+    - [💼 Experiência](#experiencia)
     - [🎓 Formação](#formacao)
     - [📬 Contato](#contato)
     """)
@@ -232,7 +232,7 @@ st.markdown("""
 st.markdown("---")
 
 # 3. MÉTRICAS
-st.markdown("###  Impacto e Resultados")
+st.markdown("### 📈 Impacto e Resultados")
 col1, col2, col3, col4 = st.columns(4)
 
 metrics = [
@@ -253,7 +253,7 @@ for i, metric in enumerate(metrics):
 st.markdown("---")
 
 # 4. TECH STACK
-st.markdown("### ️ Competências Técnicas")
+st.markdown("### 🛠️ Competências Técnicas")
 col_tech1, col_tech2 = st.columns(2)
 
 with col_tech1:
@@ -281,7 +281,7 @@ with col_tech2:
     """, unsafe_allow_html=True)
 st.markdown("---")
 
-# 5. PROJETOS
+# 5. PROJETOS EM DESTAQUE ✅ LINKS ATUALIZADOS
 st.markdown('<a id="projetos"></a>', unsafe_allow_html=True)
 st.markdown("### 🚀 Projetos em Destaque")
 
@@ -289,21 +289,21 @@ projects = [
     {
         "title": "🇧🇷 Desenrola Brasil - Dashboard Executivo",
         "stack": ["Python", "Pandas", "Plotly", "Streamlit", "PostgreSQL"],
-        "desc": "Dashboard interativo com dados oficiais do Banco Central sobre o programa Desenrola Brasil. Inclui KPIs, segmentação analítica por região/valor, identificação de padrões em renegociação de dívidas e visualizações interativas para tomada de decisão.",
-        "app": "https://desenrolabrasil.streamlit.app",
+        "desc": "Dashboard interativo com dados oficiais do Banco Central sobre o programa Desenrola Brasil. KPIs, segmentação analítica por região/valor e identificação de padrões em renegociação de dívidas.",
+        "app": "https://desenrolabrasil.streamlit.app/",
         "github": "https://github.com/raphaelcaxias/DESENROLA_BRASIL"
     },
     {
-        "title": "🔬 CNPq Analytics - Análise de Investimentos",
-        "stack": ["Python", "PostgreSQL", "Plotly", "Streamlit", "ETL"],
-        "desc": "Pipeline ETL completo e análise exploratória de 213 mil registros públicos do CNPq. Mapeamento de investimentos em pesquisa científica, identificação de desigualdades regionais e padrões de financiamento no Brasil.",
-        "app": None,
-        "github": "https://github.com/raphaelcaxias/cnpq-analytics"
+        "title": "🤝 Bolsa Família - Análise de Benefícios",
+        "stack": ["Python", "Pandas", "Plotly", "Streamlit", "ETL"],
+        "desc": "Dashboard analítico sobre o programa Bolsa Família. Visualização de distribuição de benefícios por região, faixa etária e valor médio, com filtros interativos para análise estratégica.",
+        "app": "https://bolsa-familia-kqrkzbzsrucybh3chpicxt.streamlit.app/",
+        "github": "https://github.com/raphaelcaxias"
     },
     {
         "title": "⛽ Dashboard ANP - Preços de Combustíveis",
         "stack": ["Python", "Pandas", "Plotly", "Streamlit"],
-        "desc": "Dashboard com dados públicos da ANP (Agência Nacional do Petróleo). Filtros regionais dinâmicos, análise temporal de preços de combustíveis no varejo brasileiro e comparações entre estados e municípios.",
+        "desc": "Dashboard com dados públicos da ANP. Filtros regionais dinâmicos, análise temporal de preços de combustíveis no varejo brasileiro e comparações entre estados e municípios.",
         "app": None,
         "github": "https://github.com/raphaelcaxias/anp-combustiveis-dashboard"
     }
@@ -420,10 +420,9 @@ with col_contact2:
     [🔗 LinkedIn](https://linkedin.com/in/raphael-pires-caxias)  
     [💻 GitHub](https://github.com/raphaelcaxias)  
     
-    **Repositórios:**
-    - [Desenrola Brasil](https://github.com/raphaelcaxias/DESENROLA_BRASIL)
-    - [CNPq Analytics](https://github.com/raphaelcaxias/cnpq-analytics)
-    - [Dashboard ANP](https://github.com/raphaelcaxias/anp-combustiveis-dashboard)
+    **Projetos Online:**
+    - [🇧🇷 Desenrola Brasil](https://desenrolabrasil.streamlit.app/)
+    - [🤝 Bolsa Família](https://bolsa-familia-kqrkzbzsrucybh3chpicxt.streamlit.app/)
     """)
 
 st.markdown("---")
