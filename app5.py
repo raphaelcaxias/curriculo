@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Premium Portfolio - Raphael Pires
-Streamlit App com design customizado, linha do tempo, cards e layout profissional.
+Premium Portfolio - Raphael Pires (Versão Final Corrigida)
+Streamlit App com design customizado, linha do tempo, cards de projetos e layout profissional.
 """
 
 import streamlit as st
@@ -63,11 +63,10 @@ profile_image = load_image()
 cv_pdf = load_cv()
 
 # ------------------------------------------------------------------------------
-# CSS PERSONALIZADO (MODERN TECH MINIMALIST)
+# CSS PERSONALIZADO (MODERN TECH MINIMALIST) - CORRIGIDO
 # ------------------------------------------------------------------------------
 st.markdown("""
 <style>
-/* Reset e importação de fontes */
 @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap');
 
 * {
@@ -338,18 +337,14 @@ body, .stApp {
     line-height: 1.4;
 }
 
-/* Projects cards */
-.projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.8rem;
-}
+/* Projects cards (CORRIGIDO - ESTILO DIRETO) */
 .project-card {
     background: white;
     border-radius: 24px;
     overflow: hidden;
     box-shadow: 0 10px 20px -8px rgba(0,0,0,0.05);
     transition: transform 0.25s, box-shadow 0.25s;
+    margin-bottom: 1.5rem;
 }
 .project-card:hover {
     transform: translateY(-5px);
@@ -357,12 +352,12 @@ body, .stApp {
 }
 .project-img {
     width: 100%;
-    height: 160px;
+    height: 120px;
     background: #eef3f2;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 2.5rem;
 }
 .project-content {
     padding: 1.2rem;
@@ -396,6 +391,9 @@ body, .stApp {
     margin-right: 1rem;
     color: #007BFF;
     text-decoration: none;
+}
+.project-links a:hover {
+    text-decoration: underline;
 }
 
 /* Stack técnica - chips refinados */
@@ -654,7 +652,7 @@ for cat, items in stack_cats.items():
     st.markdown('</div></div>', unsafe_allow_html=True)
 
 # ==============================================================================
-# PROJETOS EM DESTAQUE (CARDS COM MINIATURAS)
+# PROJETOS EM DESTAQUE (CORRIGIDO - SEM ERRO DE HTML)
 # ==============================================================================
 st.markdown('<div id="portfolio" class="section"></div>', unsafe_allow_html=True)
 st.markdown('<div class="section-title">Portfólio de projetos</div>', unsafe_allow_html=True)
@@ -666,10 +664,10 @@ projects = [
         "tech": ["Python", "Pandas", "Plotly", "Streamlit", "PostgreSQL"],
         "app_url": "https://desenrolabrasil.streamlit.app/",
         "code_url": "https://github.com/raphaelcaxias/DESENROLA_BRASIL",
-        "img_char": "📈"
+        "img_char": "📊"
     },
     {
-        "nome": "CNPq Analytics – Investimentos",
+        "nome": "CNPq Analytics – Investimentos em Pesquisa",
         "desc": "Processamento de 213 mil bolsas de pesquisa (R$1,2 bi). Identificação de desigualdades regionais e rankings dinâmicos.",
         "tech": ["Python", "Pandas", "Plotly", "Streamlit", "PostgreSQL"],
         "app_url": "https://cnpq-analytics.streamlit.app/",
@@ -686,24 +684,22 @@ projects = [
     }
 ]
 
-projects_html = '<div class="projects-grid">'
+# Exibir cada projeto como um card usando HTML puro (sem grid duplicado)
 for proj in projects:
-    tech_badges = ''.join(f'<span class="tech-tag">{t}</span>' for t in proj['tech'])
-    app_link = f'<a href="{proj["app_url"]}" target="_blank">🔗 Aplicação</a>' if proj["app_url"] else ''
-    code_link = f'<a href="{proj["code_url"]}" target="_blank">📄 Código</a>'
-    projects_html += f"""
+    tech_tags = ''.join([f'<span class="tech-tag">{t}</span>' for t in proj["tech"]])
+    app_link = f'<a href="{proj["app_url"]}" target="_blank" style="margin-right:1rem;">🔗 Aplicação</a>' if proj["app_url"] else ''
+    code_link = f'<a href="{proj["code_url"]}" target="_blank">📄 Código</a>' if proj["code_url"] else ''
+    st.markdown(f"""
     <div class="project-card">
         <div class="project-img">{proj['img_char']} Dashboard</div>
         <div class="project-content">
             <div class="project-title">{proj['nome']}</div>
             <div class="project-desc">{proj['desc']}</div>
-            <div class="project-tech">{tech_badges}</div>
+            <div class="project-tech">{tech_tags}</div>
             <div class="project-links">{app_link} {code_link}</div>
         </div>
     </div>
-    """
-projects_html += '</div>'
-st.markdown(projects_html, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
 # ==============================================================================
 # FORMAÇÃO & CERTIFICAÇÕES (LAYOUT ALTERNATIVO)
@@ -753,7 +749,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Botão de download do currículo (opcional, discreto)
+# Botão de download do currículo (opcional)
 if cv_pdf:
     st.download_button(
         label="📄 Baixar currículo (PDF)",
