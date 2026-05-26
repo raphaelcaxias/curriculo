@@ -3,6 +3,7 @@
 Premium Personal Product - Raphael Pires
 Transformado de "currículo online" para "produto pessoal"
 Estilo: Linear / Vercel / Stripe / Arc Browser
+Versão: 4.0 - Com portfólio como case incluído
 """
 
 import streamlit as st
@@ -13,8 +14,7 @@ from PIL import Image
 import os
 import requests
 from io import BytesIO
-import time
-from streamlit.components.v1 import html
+import base64
 
 # ------------------------------------------------------------------------------
 # CONFIGURAÇÃO INICIAL
@@ -27,14 +27,14 @@ st.set_page_config(
 )
 
 # ------------------------------------------------------------------------------
-# CARREGAMENTO DE IMAGEM E PDF
+# CARREGAMENTO DE IMAGEM E PDF (CORRIGIDO)
 # ------------------------------------------------------------------------------
 @st.cache_data(show_spinner=False)
 def load_image():
-    if os.path.exists("rapha.jpeg"):
-        return Image.open("rapha.jpeg")
+    # Lista de URLs para tentar (ordem de prioridade)
     urls = [
-        "https://raw.githubusercontent.com/raphaelcaxias/curriculo/main/rapha.jpeg",
+        "https://raw.githubusercontent.com/raphaelcaxias/curriculo/main/rapha.jpeg",  # raw do GitHub
+        "https://raw.githubusercontent.com/raphaelcaxias/curriculo/main/rapha.jpg",
         "https://avatars.githubusercontent.com/raphaelcaxias",
     ]
     for url in urls:
@@ -44,6 +44,19 @@ def load_image():
                 return Image.open(BytesIO(r.content))
         except Exception:
             pass
+    
+    # Tenta arquivo local como fallback
+    for p in ["rapha.jpeg", "rapha.jpg", "assets/rapha.jpeg"]:
+        if os.path.exists(p):
+            return Image.open(p)
+    return None
+
+@st.cache_data(show_spinner=False)
+def get_image_base64(img):
+    if img:
+        buffered = BytesIO()
+        img.save(buffered, format="JPEG")
+        return base64.b64encode(buffered.getvalue()).decode()
     return None
 
 @st.cache_data(show_spinner=False)
@@ -63,6 +76,7 @@ def load_cv():
     return None
 
 profile_image = load_image()
+profile_base64 = get_image_base64(profile_image) if profile_image else None
 cv_pdf = load_cv()
 
 # ------------------------------------------------------------------------------
@@ -72,7 +86,6 @@ st.markdown("""
 <style>
 /* ==================== DESIGN SYSTEM ==================== */
 :root {
-    /* Cores - Tema Claro Premium */
     --bg-primary: #F8FAFC;
     --bg-secondary: #FFFFFF;
     --bg-tertiary: #F1F5F9;
@@ -96,10 +109,8 @@ st.markdown("""
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Tema escuro automático */
 @media (prefers-color-scheme: dark) {
     :root {
         --bg-primary: #0F172A;
@@ -113,759 +124,121 @@ st.markdown("""
     }
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body, .stApp { background-color: var(--bg-primary) !important; font-family: var(--font-sans); color: var(--text-primary); }
+#MainMenu, footer, header, .stDeployButton { display: none !important; }
+.block-container { padding: 0 !important; max-width: 100% !important; }
 
-body, .stApp {
-    background-color: var(--bg-primary) !important;
-    font-family: var(--font-sans);
-    color: var(--text-primary);
-}
+/* Animações */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+@keyframes glowPulse { 0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(5, 150, 105, 0); } 100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); } }
 
-/* Esconde elementos padrão */
-#MainMenu, footer, header, .stDeployButton {
-    display: none !important;
-}
+.fade-in { animation: fadeIn 0.6s ease-out forwards; }
+.slide-in { animation: slideInLeft 0.5s ease-out forwards; }
+.scale-in { animation: scaleIn 0.4s ease-out forwards; }
 
-.block-container {
-    padding: 0 !important;
-    max-width: 100% !important;
-}
+/* Navbar */
+.navbar { position: fixed; top: 0; left: 0; width: 100%; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); padding: 1rem 0; z-index: 1000; }
+@media (prefers-color-scheme: dark) { .navbar { background: rgba(15, 23, 42, 0.8); } }
+.navbar-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.navbar-logo { font-weight: 700; font-size: 1.2rem; color: var(--accent-primary); text-decoration: none; }
+.navbar-links { display: flex; gap: 2rem; flex-wrap: wrap; }
+.navbar-links a { font-weight: 500; font-size: 0.9rem; color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast); position: relative; }
+.navbar-links a:hover { color: var(--accent-primary); }
+.navbar-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--accent-primary); transition: var(--transition-fast); }
+.navbar-links a:hover::after { width: 100%; }
 
-/* ==================== ANIMAÇÕES ==================== */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+/* Container principal */
+.main-container { padding-top: 90px; max-width: 1200px; margin: 0 auto; padding-left: 2rem; padding-right: 2rem; }
+.section { margin-bottom: 5rem; scroll-margin-top: 90px; animation: fadeIn 0.6s ease-out; }
+.section-title { font-size: 2rem; font-weight: 700; margin-bottom: 2rem; letter-spacing: -0.02em; background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; position: relative; display: inline-block; }
+.section-title::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 60px; height: 3px; background: var(--accent-primary); border-radius: 3px; }
 
-@keyframes slideInLeft {
-    from { opacity: 0; transform: translateX(-30px); }
-    to { opacity: 1; transform: translateX(0); }
-}
+/* Hero */
+.hero-grid { display: flex; align-items: center; gap: 3rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.hero-pic { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-primary); box-shadow: var(--shadow-xl); transition: var(--transition-normal); }
+.hero-pic:hover { transform: scale(1.02); box-shadow: 0 25px 35px -12px rgba(5, 150, 105, 0.3); }
+.hero-name { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.02em; background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-title { font-size: 1.25rem; color: var(--accent-primary); font-weight: 500; margin-bottom: 1rem; }
+.hero-description { font-size: 1rem; color: var(--text-secondary); line-height: 1.6; max-width: 600px; margin-bottom: 1.5rem; }
+.hero-stats { display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.hero-stat-number { font-size: 1.5rem; font-weight: 700; color: var(--accent-primary); }
+.hero-stat-label { font-size: 0.7rem; color: var(--text-tertiary); text-transform: uppercase; }
 
-@keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
+/* Botões */
+.btn-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+.btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--accent-primary); color: white; padding: 0.7rem 1.5rem; border-radius: 40px; text-decoration: none; font-weight: 600; transition: var(--transition-fast); }
+.btn-primary:hover { background: var(--accent-primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.btn-secondary { display: inline-flex; align-items: center; gap: 0.5rem; background: transparent; border: 1px solid var(--border-medium); color: var(--text-primary); padding: 0.7rem 1.5rem; border-radius: 40px; text-decoration: none; font-weight: 500; transition: var(--transition-fast); }
+.btn-secondary:hover { border-color: var(--accent-primary); color: var(--accent-primary); transform: translateY(-2px); }
 
-@keyframes glowPulse {
-    0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(5, 150, 105, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
-}
+/* Cards de impacto */
+.impact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+.impact-card { background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); transition: var(--transition-normal); position: relative; overflow: hidden; }
+.impact-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); }
+.impact-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-xl); }
+.impact-number { font-size: 2.5rem; font-weight: 800; color: var(--accent-primary); }
 
-.fade-in {
-    animation: fadeIn 0.6s ease-out forwards;
-}
-
-.slide-in {
-    animation: slideInLeft 0.5s ease-out forwards;
-}
-
-.scale-in {
-    animation: scaleIn 0.4s ease-out forwards;
-}
-
-/* ==================== NAVBAR PREMIUM ==================== */
-.navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(248, 250, 252, 0.8);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-light);
-    padding: 1rem 0;
-    z-index: 1000;
-    transition: var(--transition-normal);
-}
-
-@media (prefers-color-scheme: dark) {
-    .navbar {
-        background: rgba(15, 23, 42, 0.8);
-    }
-}
-
-.navbar-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.navbar-logo {
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: var(--accent-primary);
-    text-decoration: none;
-}
-
-.navbar-links {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
-.navbar-links a {
-    font-weight: 500;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: var(--transition-fast);
-    position: relative;
-}
-
-.navbar-links a:hover {
-    color: var(--accent-primary);
-}
-
-.navbar-links a::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: var(--accent-primary);
-    transition: var(--transition-fast);
-}
-
-.navbar-links a:hover::after {
-    width: 100%;
-}
-
-/* ==================== CONTAINER PRINCIPAL ==================== */
-.main-container {
-    padding-top: 90px;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding-left: 2rem;
-    padding-right: 2rem;
-}
-
-/* ==================== SEÇÕES ==================== */
-.section {
-    margin-bottom: 5rem;
-    scroll-margin-top: 90px;
-    animation: fadeIn 0.6s ease-out;
-}
-
-.section-title {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 2rem;
-    letter-spacing: -0.02em;
-    background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    position: relative;
-    display: inline-block;
-}
-
-.section-title::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    width: 60px;
-    height: 3px;
-    background: var(--accent-primary);
-    border-radius: 3px;
-}
-
-/* ==================== HERO PREMIUM ==================== */
-.hero-grid {
-    display: flex;
-    align-items: center;
-    gap: 3rem;
-    flex-wrap: wrap;
-    margin-bottom: 2rem;
-}
-
-.hero-image {
-    flex-shrink: 0;
-}
-
-.hero-pic {
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--accent-primary);
-    box-shadow: var(--shadow-xl);
-    transition: var(--transition-normal);
-}
-
-.hero-pic:hover {
-    transform: scale(1.02);
-    box-shadow: 0 25px 35px -12px rgba(5, 150, 105, 0.3);
-}
-
-.hero-content {
-    flex: 1;
-}
-
-.hero-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-    color: white;
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.25rem 0.75rem;
-    border-radius: 30px;
-    margin-bottom: 1rem;
-    letter-spacing: 0.02em;
-}
-
-.hero-name {
-    font-size: 3.5rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.5rem;
-    background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.hero-title {
-    font-size: 1.25rem;
-    color: var(--accent-primary);
-    font-weight: 500;
-    margin-bottom: 1rem;
-}
-
-.hero-description {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    max-width: 600px;
-    margin-bottom: 1.5rem;
-}
-
-.hero-stats {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-}
-
-.hero-stat {
-    text-align: center;
-}
-
-.hero-stat-number {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--accent-primary);
-}
-
-.hero-stat-label {
-    font-size: 0.7rem;
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-/* ==================== BOTÕES ==================== */
-.btn-group {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--accent-primary);
-    color: white;
-    padding: 0.7rem 1.5rem;
-    border-radius: 40px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.875rem;
-    transition: var(--transition-fast);
-    border: none;
-    cursor: pointer;
-}
-
-.btn-primary:hover {
-    background: var(--accent-primary-dark);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
-
-.btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: transparent;
-    border: 1px solid var(--border-medium);
-    color: var(--text-primary);
-    padding: 0.7rem 1.5rem;
-    border-radius: 40px;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.875rem;
-    transition: var(--transition-fast);
-}
-
-.btn-secondary:hover {
-    border-color: var(--accent-primary);
-    color: var(--accent-primary);
-    transform: translateY(-2px);
-}
-
-/* ==================== CARDS DE IMPACTO ==================== */
-.impact-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin: 2rem 0;
-}
-
-.impact-card {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    text-align: center;
-    transition: var(--transition-normal);
-    border: 1px solid var(--border-light);
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    overflow: hidden;
-}
-
-.impact-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-}
-
-.impact-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-xl);
-}
-
-.impact-number {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: var(--accent-primary);
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
-}
-
-.impact-text {
-    font-size: 0.8rem;
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    font-weight: 500;
-}
-
-/* ==================== TIMELINE MODERNA ==================== */
-.timeline {
-    position: relative;
-}
-
-.timeline-item {
-    display: flex;
-    margin-bottom: 2rem;
-    position: relative;
-    animation: slideInLeft 0.5s ease-out;
-    animation-fill-mode: both;
-}
-
+/* Timeline */
+.timeline-item { display: flex; margin-bottom: 2rem; position: relative; animation: slideInLeft 0.5s ease-out; animation-fill-mode: both; }
 .timeline-item:nth-child(1) { animation-delay: 0.1s; }
 .timeline-item:nth-child(2) { animation-delay: 0.2s; }
-.timeline-item:nth-child(3) { animation-delay: 0.3s; }
-.timeline-item:nth-child(4) { animation-delay: 0.4s; }
+.timeline-left { width: 120px; flex-shrink: 0; text-align: right; padding-right: 1.5rem; }
+.timeline-year { font-weight: 700; color: var(--accent-primary); }
+.timeline-line { position: relative; width: 2px; background: linear-gradient(180deg, var(--accent-primary), var(--border-light)); margin-right: 1.5rem; }
+.timeline-dot { position: absolute; left: -5px; top: 8px; width: 12px; height: 12px; background: var(--accent-primary); border-radius: 50%; border: 2px solid var(--bg-secondary); transition: var(--transition-fast); }
+.timeline-item:hover .timeline-dot { transform: scale(1.2); box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.3); }
+.timeline-title { font-weight: 700; font-size: 1.1rem; }
+.timeline-company { color: var(--text-tertiary); font-size: 0.85rem; margin-bottom: 0.5rem; }
+.timeline-desc { font-size: 0.85rem; color: var(--text-secondary); margin: 0.3rem 0; padding-left: 1rem; border-left: 2px solid var(--border-light); }
 
-.timeline-left {
-    width: 120px;
-    flex-shrink: 0;
-    text-align: right;
-    padding-right: 1.5rem;
-}
+/* Project cards */
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
+.project-card { background: var(--bg-secondary); border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-light); transition: var(--transition-normal); }
+.project-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-xl); border-color: var(--accent-primary); }
+.project-img { width: 100%; height: 200px; background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary)); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+.project-content { padding: 1.5rem; }
+.project-title { font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem; }
+.project-desc { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem; }
+.project-metrics { display: flex; gap: 1rem; margin-bottom: 1rem; padding: 0.75rem; background: var(--bg-tertiary); border-radius: var(--radius-md); }
+.project-metric { flex: 1; text-align: center; }
+.project-metric-value { font-weight: 700; color: var(--accent-primary); }
+.tech-tag { background: var(--bg-tertiary); padding: 0.25rem 0.75rem; border-radius: 30px; font-size: 0.7rem; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.5rem; }
+.project-links a { font-size: 0.8rem; color: var(--accent-primary); text-decoration: none; margin-right: 1rem; }
 
-.timeline-year {
-    font-weight: 700;
-    color: var(--accent-primary);
-    font-size: 0.9rem;
-}
+/* Stack */
+.stack-category { margin-bottom: 2rem; }
+.stack-title { font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+.stack-chips { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.chip { background: var(--bg-tertiary); padding: 0.5rem 1.2rem; border-radius: 40px; font-size: 0.8rem; transition: var(--transition-fast); }
+.chip:hover { background: var(--accent-primary); color: white; transform: translateY(-2px); }
 
-.timeline-line {
-    position: relative;
-    width: 2px;
-    background: linear-gradient(180deg, var(--accent-primary), var(--border-light));
-    margin-right: 1.5rem;
-}
+/* Metodologia */
+.method-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+.method-card { background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 1.5rem; border: 1px solid var(--border-light); transition: var(--transition-normal); }
+.method-card:hover { transform: translateY(-5px); border-color: var(--accent-primary); }
 
-.timeline-dot {
-    position: absolute;
-    left: -5px;
-    top: 8px;
-    width: 12px;
-    height: 12px;
-    background: var(--accent-primary);
-    border-radius: 50%;
-    border: 2px solid var(--bg-secondary);
-    box-shadow: 0 0 0 2px var(--accent-primary-light);
-    transition: var(--transition-fast);
-}
+/* Footer */
+.footer-impact { background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border-radius: var(--radius-xl); padding: 2.5rem; text-align: center; margin-top: 3rem; border: 1px solid var(--border-light); }
+.footer-links { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin: 1.5rem 0; }
+.footer-links a { color: var(--text-secondary); text-decoration: none; }
+.footer-links a:hover { color: var(--accent-primary); }
 
-.timeline-item:hover .timeline-dot {
-    transform: scale(1.2);
-    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.3);
-}
-
-.timeline-content {
-    flex: 1;
-    padding-bottom: 1rem;
-}
-
-.timeline-title {
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-bottom: 0.25rem;
-}
-
-.timeline-company {
-    color: var(--text-tertiary);
-    margin-bottom: 0.5rem;
-    font-size: 0.85rem;
-}
-
-.timeline-desc {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    margin: 0.3rem 0;
-    line-height: 1.5;
-    padding-left: 1rem;
-    border-left: 2px solid var(--border-light);
-}
-
-/* ==================== PROJECT CARDS (CASES) ==================== */
-.projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 2rem;
-}
-
-.project-card {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    transition: var(--transition-normal);
-    border: 1px solid var(--border-light);
-    cursor: pointer;
-    animation: scaleIn 0.4s ease-out;
-}
-
-.project-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-xl);
-}
-
-.project-img {
-    width: 100%;
-    height: 200px;
-    background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3rem;
-    position: relative;
-    overflow: hidden;
-}
-
-.project-img::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 100%);
-}
-
-.project-content {
-    padding: 1.5rem;
-}
-
-.project-title {
-    font-weight: 700;
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-}
-
-.project-desc {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    margin-bottom: 1rem;
-    line-height: 1.5;
-}
-
-.project-metrics {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-    padding: 0.75rem;
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-md);
-}
-
-.project-metric {
-    flex: 1;
-    text-align: center;
-}
-
-.project-metric-value {
-    font-weight: 700;
-    font-size: 1rem;
-    color: var(--accent-primary);
-}
-
-.project-metric-label {
-    font-size: 0.7rem;
-    color: var(--text-tertiary);
-}
-
-.project-tech {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.tech-tag {
-    background: var(--bg-tertiary);
-    padding: 0.25rem 0.75rem;
-    border-radius: 30px;
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    transition: var(--transition-fast);
-}
-
-.tech-tag:hover {
-    background: var(--accent-primary);
-    color: white;
-}
-
-.project-links {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.project-links a {
-    font-size: 0.8rem;
-    color: var(--accent-primary);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.project-links a:hover {
-    text-decoration: underline;
-}
-
-/* ==================== STACK TÉCNICA INTELIGENTE ==================== */
-.stack-category {
-    margin-bottom: 2rem;
-    animation: fadeIn 0.5s ease-out;
-}
-
-.stack-title {
-    font-weight: 600;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-}
-
-.stack-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-}
-
-.chip {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    padding: 0.5rem 1.2rem;
-    border-radius: 40px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    transition: var(--transition-fast);
-    cursor: pointer;
-    position: relative;
-}
-
-.chip:hover {
-    background: var(--accent-primary);
-    color: white;
-    transform: translateY(-2px);
-}
-
-/* ==================== LABORATÓRIO ==================== */
-.lab-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
-}
-
-.lab-card {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    border: 1px solid var(--border-light);
-    transition: var(--transition-normal);
-    text-align: center;
-}
-
-.lab-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--accent-primary);
-    box-shadow: var(--shadow-lg);
-}
-
-.lab-icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-}
-
-.lab-title {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.lab-status {
-    font-size: 0.7rem;
-    color: var(--accent-primary);
-    margin-top: 0.5rem;
-}
-
-/* ==================== RODAPÉ ==================== */
-.footer-impact {
-    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-    border-radius: var(--radius-xl);
-    padding: 2.5rem;
-    text-align: center;
-    margin-top: 3rem;
-    border: 1px solid var(--border-light);
-}
-
-.footer-impact h3 {
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
-}
-
-.footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-    margin: 1.5rem 0;
-}
-
-.footer-links a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: var(--transition-fast);
-}
-
-.footer-links a:hover {
-    color: var(--accent-primary);
-}
-
-/* ==================== RESPONSIVO ==================== */
+/* Responsivo */
 @media (max-width: 768px) {
-    .main-container {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-    
-    .hero-name {
-        font-size: 2.2rem;
-    }
-    
-    .navbar-container {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .navbar-links {
-        justify-content: center;
-        gap: 1rem;
-    }
-    
-    .timeline-left {
-        width: 80px;
-        padding-right: 1rem;
-    }
-    
-    .projects-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .section-title {
-        font-size: 1.6rem;
-    }
-    
-    .hero-stats {
-        justify-content: center;
-    }
-    
-    .btn-group {
-        justify-content: center;
-    }
-    
-    .hero-content {
-        text-align: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .timeline-item {
-        flex-direction: column;
-    }
-    
-    .timeline-left {
-        text-align: left;
-        width: 100%;
-        margin-bottom: 0.5rem;
-    }
-    
-    .timeline-line {
-        display: none;
-    }
-    
-    .impact-grid {
-        grid-template-columns: 1fr;
-    }
+    .main-container { padding-left: 1rem; padding-right: 1rem; }
+    .hero-name { font-size: 2.2rem; }
+    .navbar-container { flex-direction: column; text-align: center; }
+    .timeline-left { width: 80px; }
+    .projects-grid { grid-template-columns: 1fr; }
 }
 </style>
 """, unsafe_allow_html=True)
 
 # ------------------------------------------------------------------------------
-# NAVBAR COMPONENT
+# NAVBAR
 # ------------------------------------------------------------------------------
 st.markdown("""
 <div class="navbar">
@@ -884,25 +257,26 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Container principal
+# ------------------------------------------------------------------------------
+# MAIN CONTAINER
+# ------------------------------------------------------------------------------
 st.markdown('<div class="main-container">', unsafe_allow_html=True)
 
 # ==============================================================================
-# HERO SECTION PREMIUM
+# HERO SECTION
 # ==============================================================================
 st.markdown('<div id="inicio"></div>', unsafe_allow_html=True)
 
 hero_col1, hero_col2 = st.columns([1, 2], gap="large")
 with hero_col1:
-    if profile_image:
-        st.markdown(f'<div class="hero-image"><img src="data:image/jpeg;base64,{profile_image}" class="hero-pic"></div>', unsafe_allow_html=True)
+    if profile_base64:
+        st.markdown(f'<img src="data:image/jpeg;base64,{profile_base64}" class="hero-pic">', unsafe_allow_html=True)
     else:
-        st.markdown('<div class="hero-image"><div style="width:180px;height:180px;background:var(--bg-tertiary);border-radius:50%;"></div></div>', unsafe_allow_html=True)
+        st.markdown('<div style="width:180px;height:180px;background:var(--bg-tertiary);border-radius:50%;"></div>', unsafe_allow_html=True)
 
 with hero_col2:
     st.markdown("""
     <div class="hero-content fade-in">
-        <span class="hero-badge">⚡ Disponível para oportunidades</span>
         <h1 class="hero-name">Raphael Pires</h1>
         <div class="hero-title">Dados · Automação · Inteligência Operacional</div>
         <div class="hero-description">
@@ -910,10 +284,10 @@ with hero_col2:
         Da automação bancária à gestão de negócio próprio — dados não são teoria, são decisão.
         </div>
         <div class="hero-stats">
-            <div class="hero-stat"><div class="hero-stat-number">15+</div><div class="hero-stat-label">anos operação</div></div>
-            <div class="hero-stat"><div class="hero-stat-number">70%</div><div class="hero-stat-label">redução operacional</div></div>
-            <div class="hero-stat"><div class="hero-stat-number">213k+</div><div class="hero-stat-label">registros</div></div>
-            <div class="hero-stat"><div class="hero-stat-number">3</div><div class="hero-stat-label">dashboards produção</div></div>
+            <div><div class="hero-stat-number">15+</div><div class="hero-stat-label">anos operação</div></div>
+            <div><div class="hero-stat-number">70%</div><div class="hero-stat-label">redução operacional</div></div>
+            <div><div class="hero-stat-number">213k+</div><div class="hero-stat-label">registros</div></div>
+            <div><div class="hero-stat-number">4+</div><div class="hero-stat-label">dashboards produção</div></div>
         </div>
         <div class="btn-group">
             <a class="btn-primary" href="#contato">📬 Vamos conversar</a>
@@ -923,68 +297,40 @@ with hero_col2:
     """, unsafe_allow_html=True)
 
 # ==============================================================================
-# SOBRE + METODOLOGIA
+# METODOLOGIA
 # ==============================================================================
 st.markdown('<div id="sobre" class="section"></div>', unsafe_allow_html=True)
 st.markdown('<div class="section-title">Como penso dados</div>', unsafe_allow_html=True)
 
-col_m1, col_m2, col_m3 = st.columns(3, gap="large")
-with col_m1:
-    st.markdown("""
-    <div style="background:var(--bg-secondary);border-radius:var(--radius-lg);padding:1.5rem;border:1px solid var(--border-light);height:100%;">
-        <div style="font-size:2rem;margin-bottom:1rem;">🔍</div>
-        <h4 style="margin-bottom:0.5rem;">Entendo a operação</h4>
-        <p style="font-size:0.85rem;color:var(--text-secondary);">Antes de qualquer consulta SQL, preciso entender o fluxo real. Estoque, faturamento, margem — números só fazem sentido com contexto.</p>
-    </div>
-    """, unsafe_allow_html=True)
-with col_m2:
-    st.markdown("""
-    <div style="background:var(--bg-secondary);border-radius:var(--radius-lg);padding:1.5rem;border:1px solid var(--border-light);height:100%;">
-        <div style="font-size:2rem;margin-bottom:1rem;">⚙️</div>
-        <h4 style="margin-bottom:0.5rem;">Automatizo o que é repetitivo</h4>
-        <p style="font-size:0.85rem;color:var(--text-secondary);">Planilha que abre em 14 minutos não é dado — é sofrimento. Crio pipelines que entregam análise, não trabalho braçal.</p>
-    </div>
-    """, unsafe_allow_html=True)
-with col_m3:
-    st.markdown("""
-    <div style="background:var(--bg-secondary);border-radius:var(--radius-lg);padding:1.5rem;border:1px solid var(--border-light);height:100%;">
-        <div style="font-size:2rem;margin-bottom:1rem;">📊</div>
-        <h4 style="margin-bottom:0.5rem;">Traduzo para decisão</h4>
-        <p style="font-size:0.85rem;color:var(--text-secondary);">Gráfico bonito não aprova orçamento. Insight claro e acionável sim. Comunicação com negócio é tão importante quanto técnica.</p>
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown("""
+<div class="method-grid">
+    <div class="method-card"><div class="method-icon">🔍</div><h4>Entendo a operação</h4><p style="color:var(--text-secondary);font-size:0.85rem;">Antes de qualquer SQL, preciso entender o fluxo real. Estoque, faturamento, margem — números só fazem sentido com contexto.</p></div>
+    <div class="method-card"><div class="method-icon">⚙️</div><h4>Automatizo o repetitivo</h4><p style="color:var(--text-secondary);font-size:0.85rem;">Planilha que abre em 14 minutos não é dado — é sofrimento. Crio pipelines que entregam análise, não trabalho braçal.</p></div>
+    <div class="method-card"><div class="method-icon">📊</div><h4>Traduzo para decisão</h4><p style="color:var(--text-secondary);font-size:0.85rem;">Gráfico bonito não aprova orçamento. Insight claro e acionável sim. Comunicação com negócio é tão importante quanto técnica.</p></div>
+</div>
+""", unsafe_allow_html=True)
 
 # ==============================================================================
 # IMPACT CARDS
 # ==============================================================================
 st.markdown('<div class="section-title">Impacto mensurável</div>', unsafe_allow_html=True)
-impact_data = [
-    ("-70%", "Tempo operacional · Banco do Brasil"),
-    ("2h → 15min", "Ciclo de análise"),
-    ("20", "Agências automatizadas com VBA"),
-    ("213.735", "Registros processados em projetos públicos")
-]
+impact_data = [("-70%", "Tempo operacional · BB"), ("2h → 15min", "Ciclo de análise"), ("20", "Agências automatizadas"), ("213.735", "Registros processados")]
 cols = st.columns(4)
 for i, (num, desc) in enumerate(impact_data):
     with cols[i]:
-        st.markdown(f"""
-        <div class="impact-card">
-            <div class="impact-number">{num}</div>
-            <div class="impact-text">{desc}</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f'<div class="impact-card"><div class="impact-number">{num}</div><div class="impact-text">{desc}</div></div>', unsafe_allow_html=True)
 
 # ==============================================================================
-# EXPERIÊNCIA - TIMELINE MODERNA
+# EXPERIÊNCIA
 # ==============================================================================
 st.markdown('<div id="experiencia" class="section"></div>', unsafe_allow_html=True)
 st.markdown('<div class="section-title">Trajetória profissional</div>', unsafe_allow_html=True)
 
 experiences = [
-    {"year": "2014 — 2026", "title": "Analista de KPIs & Operações", "company": "J Sintonía", "desc": ["Monitoramento de vendas, margem e giro com dashboards Power BI/Looker", "Criação de relatórios automatizados para gestão estratégica", "SQL e Python para consolidação de bases históricas"]},
-    {"year": "2009 — presente", "title": "Gestão Comercial & Dados", "company": "Jardim do Éden", "desc": ["Redução de 2h para 15min no ciclo de análise com dashboards", "Automação de relatórios com Python e IA generativa", "Estruturação de fluxo analítico para faturamento, margem e estoque"]},
-    {"year": "2008 — 2010", "title": "Estagiário — Automação & Dados", "company": "Banco do Brasil", "desc": ["Automação em 20 agências com Excel/VBA — redução de 70%", "Consolidação e padronização de relatórios gerenciais"]},
-    {"year": "2002 — 2009", "title": "Suporte Operacional", "company": "NSM Comércio", "desc": ["Centralização de dados de 7 unidades, eliminando inconsistências", "Controle de estoque e suporte administrativo"]}
+    {"year": "2014 — 2026", "title": "Analista de KPIs & Operações", "company": "J Sintonía", "desc": ["Monitoramento de vendas, margem e giro com dashboards", "Criação de relatórios automatizados", "SQL e Python para consolidação de bases"]},
+    {"year": "2009 — presente", "title": "Gestão Comercial & Dados", "company": "Jardim do Éden", "desc": ["Redução de 2h para 15min no ciclo de análise", "Automação com Python e IA generativa", "Estruturação de fluxo analítico"]},
+    {"year": "2008 — 2010", "title": "Estagiário — Automação & Dados", "company": "Banco do Brasil", "desc": ["Automação em 20 agências com VBA — redução de 70%", "Consolidação de relatórios gerenciais"]},
+    {"year": "2002 — 2009", "title": "Suporte Operacional", "company": "NSM Comércio", "desc": ["Centralização de dados de 7 unidades", "Controle de estoque e suporte administrativo"]}
 ]
 
 for exp in experiences:
@@ -1001,15 +347,15 @@ for exp in experiences:
     """, unsafe_allow_html=True)
 
 # ==============================================================================
-# PROJETOS - CASES COMPLETOS
+# CASES (INCLUINDO O PRÓPRIO PORTFÓLIO COMO PROTÓTIPO)
 # ==============================================================================
 st.markdown('<div id="portfolio" class="section"></div>', unsafe_allow_html=True)
 st.markdown('<div class="section-title">Cases em destaque</div>', unsafe_allow_html=True)
 
 projects = [
-    {"name": "Desenrola Brasil", "desc": "Dashboard executivo com dados do Banco Central (R$50 bi renegociados). Análise HHI, clusterização K-Means e previsão Holt-Winters.", "tech": ["Python", "Pandas", "Plotly", "Streamlit"], "metrics": [("R$50B", "renegociados"), ("15M", "contratos"), ("700+", "instituições")], "app_url": "https://desenrolabrasil.streamlit.app/", "code_url": "https://github.com/raphaelcaxias/DESENROLA_BRASIL", "icon": "📊"},
-    {"name": "CNPq Analytics", "desc": "Análise de 213 mil bolsas de pesquisa e R$1,2 bi em investimentos públicos. Identificação de desigualdades regionais.", "tech": ["Python", "Pandas", "Plotly", "Streamlit", "PostgreSQL"], "metrics": [("213k+", "bolsas"), ("R$1,2B", "investimento"), ("88k", "pesquisadores")], "app_url": "https://cnpq-analytics.streamlit.app/", "code_url": "https://github.com/raphaelcaxias/CNPq-Analytics", "icon": "🎓"},
-    {"name": "ANP — Preços de Combustíveis", "desc": "Dashboard interativo com dados públicos da ANP para análise temporal e regional de preços.", "tech": ["Python", "Pandas", "Plotly", "Streamlit"], "metrics": [("+50k", "registros"), ("27", "estados"), ("5+", "combustíveis")], "app_url": None, "code_url": "https://github.com/raphaelcaxias/anp-combustiveis-dashboard", "icon": "⛽"}
+    {"name": "Desenrola Brasil", "desc": "Dashboard executivo com dados do Banco Central (R$50 bi renegociados).", "tech": ["Python", "Pandas", "Plotly", "Streamlit"], "metrics": [("R$50B", "renegociados"), ("15M", "contratos")], "app_url": "https://desenrolabrasil.streamlit.app/", "code_url": "https://github.com/raphaelcaxias/DESENROLA_BRASIL", "icon": "📊"},
+    {"name": "CNPq Analytics", "desc": "Análise de 213 mil bolsas e R$1,2 bi em investimentos públicos.", "tech": ["Python", "Pandas", "Plotly", "Streamlit", "PostgreSQL"], "metrics": [("213k+", "bolsas"), ("R$1,2B", "investimento")], "app_url": "https://cnpq-analytics.streamlit.app/", "code_url": "https://github.com/raphaelcaxias/CNPq-Analytics", "icon": "🎓"},
+    {"name": "Portfólio Premium (Este Site)", "desc": "Produto pessoal com design system, animações, responsividade e storytelling de carreira. Incluído como prova de capacidade técnica e de produto.", "tech": ["Streamlit", "Python", "CSS3", "Design System"], "metrics": [("100%", "customizado"), ("5+", "seções"), ("22", "melhorias")], "app_url": None, "code_url": "https://github.com/raphaelcaxias/curriculo", "icon": "⚡"}
 ]
 
 for proj in projects:
@@ -1040,7 +386,7 @@ stack_cats = {
     "📌 Dados & ETL": ["SQL", "PostgreSQL", "Python", "Pandas", "NumPy", "ETL"],
     "📊 BI & Visualização": ["Power BI", "Looker Studio", "Plotly", "Streamlit", "Excel Avançado"],
     "📈 Análise & Indicadores": ["KPIs", "Controle de Fluxo", "Margem & Giro", "Dashboards"],
-    "⚙️ Automação & Ferramentas": ["Excel/VBA", "Git", "IA Generativa", "Processos"]
+    "⚙️ Automação & Ferramentas": ["Excel/VBA", "Git", "IA Generativa", "Design System/CSS"]
 }
 
 for cat, items in stack_cats.items():
@@ -1050,39 +396,39 @@ for cat, items in stack_cats.items():
     st.markdown('</div></div>', unsafe_allow_html=True)
 
 # ==============================================================================
-# LABORATÓRIO
+# LABORATÓRIO (COM DESTAQUE PARA O PORTFÓLIO COMO PROTÓTIPO)
 # ==============================================================================
 st.markdown('<div id="lab" class="section"></div>', unsafe_allow_html=True)
 st.markdown('<div class="section-title">Laboratório</div>', unsafe_allow_html=True)
-st.markdown('<p style="margin-bottom:1.5rem;color:var(--text-secondary);">Experimentos, protótipos e estudos em andamento — evolução contínua.</p>', unsafe_allow_html=True)
+st.markdown('<p style="margin-bottom:1.5rem;color:var(--text-secondary);">Protótipos, experimentos e evolução contínua.</p>', unsafe_allow_html=True)
 
 lab_items = [
-    ("🤖", "IA para automação de relatórios", "Em desenvolvimento"),
-    ("📊", "Dashboard de fluxo de caixa em tempo real", "Prototipado"),
-    ("🔗", "Integração de múltiplas fontes via API", "Estudo"),
-    ("📈", "Análise preditiva para pequenos negócios", "Pesquisa")
+    ("⚡", "Portfólio Premium (Este site)", "✔ Concluído · Design System completo"),
+    ("🤖", "IA para automação de relatórios", "🔄 Em desenvolvimento"),
+    ("📊", "Dashboard de fluxo de caixa em tempo real", "📐 Prototipado"),
+    ("🔗", "Integração de múltiplas fontes via API", "📚 Estudo")
 ]
 
 cols_lab = st.columns(4)
 for i, (icon, title, status) in enumerate(lab_items):
     with cols_lab[i]:
         st.markdown(f"""
-        <div class="lab-card">
-            <div class="lab-icon">{icon}</div>
-            <div class="lab-title">{title}</div>
-            <div class="lab-status">{status}</div>
+        <div class="method-card" style="text-align:center;">
+            <div style="font-size:2rem;">{icon}</div>
+            <div style="font-weight:600; margin:0.5rem 0;">{title}</div>
+            <div style="font-size:0.7rem; color:var(--accent-primary);">{status}</div>
         </div>
         """, unsafe_allow_html=True)
 
 # ==============================================================================
-# FORMAÇÃO E CERTIFICAÇÕES
+# FORMAÇÃO
 # ==============================================================================
 st.markdown('<div class="section-title">Formação & Certificações</div>', unsafe_allow_html=True)
 col_f1, col_f2 = st.columns(2, gap="large")
 with col_f1:
     st.markdown("""
     <div style="background:var(--bg-secondary);border-radius:var(--radius-lg);padding:1.5rem;">
-        <div style="font-size:1.5rem;margin-bottom:0.5rem;">🎓</div>
+        <div style="font-size:1.5rem;">🎓</div>
         <strong>Sistemas de Informação</strong><br>UniFOA — 2010<br><br>
         <strong>Técnico em Informática</strong><br>CIBA — 2005
     </div>
@@ -1090,7 +436,7 @@ with col_f1:
 with col_f2:
     st.markdown("""
     <div style="background:var(--bg-secondary);border-radius:var(--radius-lg);padding:1.5rem;">
-        <div style="font-size:1.5rem;margin-bottom:0.5rem;">📜</div>
+        <div style="font-size:1.5rem;">📜</div>
         <strong>Certificações (Hashtag Treinamentos)</strong><br>
         • SQL para Análise de Dados<br>
         • Power BI Expert<br>
@@ -1100,22 +446,20 @@ with col_f2:
     """, unsafe_allow_html=True)
 
 # ==============================================================================
-# RODAPÉ / CONTATO
+# CONTATO / RODAPÉ
 # ==============================================================================
 st.markdown('<div id="contato" class="section"></div>', unsafe_allow_html=True)
 st.markdown("""
 <div class="footer-impact">
-    <h3>Transformando operações em inteligência acionável</h3>
-    <p style="margin:1rem 0;color:var(--text-secondary);">Disponível para oportunidades remotas ou híbridas</p>
+    <h3 style="margin-bottom:0.5rem;">Transformando operações em inteligência acionável</h3>
+    <p>Disponível para oportunidades remotas ou híbridas</p>
     <div class="footer-links">
         <a href="mailto:raphael_caxias@hotmail.com">📧 raphael_caxias@hotmail.com</a>
         <a href="tel:+5524992275226">📱 (24) 99227-5226</a>
         <a href="https://linkedin.com/in/raphael-pires-caxias" target="_blank">🔗 LinkedIn</a>
         <a href="https://github.com/raphaelcaxias" target="_blank">💻 GitHub</a>
     </div>
-    <div style="font-size:0.75rem;color:var(--text-tertiary);margin-top:1rem;">
-        © 2026 Raphael Pires · Dados com propósito
-    </div>
+    <div style="font-size:0.75rem; margin-top:1rem;">© 2026 Raphael Pires · Dados com propósito</div>
 </div>
 """, unsafe_allow_html=True)
 
