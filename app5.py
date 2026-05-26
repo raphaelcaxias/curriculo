@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Portfolio - Raphael Pires | app5.py
+Analista Operacional de Dados & BI
+GitHub: github.com/raphaelcaxias/curriculo
 """
 
 import streamlit as st
@@ -11,6 +13,7 @@ from PIL import Image
 import os
 import requests
 from io import BytesIO
+import time
 
 st.set_page_config(
     page_title="Raphael Pires | Dados & BI",
@@ -19,7 +22,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ── CSS ───────────────────────────────────────────────────────────────────────
+# ── CSS (mantido + pequenas otimizações) ─────────────────────────────────────
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
@@ -34,7 +37,6 @@ html, body, .stApp { background: var(--paper) !important; }
 #MainMenu, footer, header { visibility: hidden; }
 .block-container { padding-top: 0.5rem !important; max-width: 1060px; }
 
-/* Sidebar */
 [data-testid="stSidebar"] { background: #0d0f14 !important; }
 [data-testid="stSidebar"] * { color: #b0b8c6 !important; font-family: 'DM Sans', sans-serif !important; }
 [data-testid="stSidebar"] a { color: #e2c97e !important; }
@@ -44,9 +46,7 @@ html, body, .stApp { background: var(--paper) !important; }
     font-family: 'DM Mono', monospace !important; font-size: 0.75rem !important;
     letter-spacing: 0.06em; border-radius: 3px !important; width: 100%;
 }
-[data-testid="stSidebar"] img { border-radius: 8px; }
-
-/* Hero */
+[data-testid="stSidebar"] img { border-radius: 8px; object-fit: cover; }
 .hero { border-bottom: 3px double var(--rule); padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
 .hero-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); margin-bottom: 0.6rem; }
 .hero-name { font-family: 'Playfair Display', Georgia, serif; font-size: 3rem; font-weight: 900; line-height: 1.05; color: var(--ink); letter-spacing: -1px; margin-bottom: 0.5rem; }
@@ -56,20 +56,16 @@ html, body, .stApp { background: var(--paper) !important; }
 .cta-dark { background: var(--ink); color: white !important; padding: 0.6rem 1.3rem; text-decoration: none !important; font-weight: 600; font-size: 0.85rem; border-radius: 3px; margin-right: 0.4rem; display: inline-block; }
 .cta-out { background: transparent; color: var(--ink) !important; border: 1.5px solid var(--ink); padding: 0.6rem 1.3rem; text-decoration: none !important; font-weight: 500; font-size: 0.85rem; border-radius: 3px; margin-right: 0.4rem; display: inline-block; }
 
-/* Section header */
 .sec { display: flex; align-items: baseline; gap: 0.6rem; margin: 2rem 0 1rem; border-top: 1px solid var(--rule); padding-top: 0.9rem; }
 .sec-n { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--red); letter-spacing: 0.1em; }
 .sec-t { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--ink); margin: 0; line-height: 1; }
 
-/* About */
 .about-quote { font-family: 'Playfair Display', serif; font-size: 1.05rem; line-height: 1.75; color: var(--ink2); border-left: 4px solid var(--red); padding-left: 1.1rem; background: var(--cream); padding: 1.3rem 1.3rem 1.3rem 1.5rem; border-radius: 0 4px 4px 0; margin-bottom: 0; }
 
-/* KPI */
 .kpi { background: white; border: 1px solid var(--rule); border-top: 3px solid var(--blue); padding: 1.1rem 1rem; text-align: left; }
 .kpi-v { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--ink); line-height: 1; }
 .kpi-d { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--slate); text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.5; margin-top: 0.3rem; }
 
-/* Timeline item */
 .tl-wrap { display: flex; gap: 0; margin-bottom: 0; }
 .tl-left-col { width: 120px; min-width: 120px; text-align: right; padding-top: 0.1rem; padding-right: 1.2rem; }
 .tl-period { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.03em; display: block; margin-bottom: 0.15rem; }
@@ -81,7 +77,6 @@ html, body, .stApp { background: var(--paper) !important; }
 .tl-badge-red { background: #fff4f4; color: var(--red); border: 1px solid #fad2cf; }
 .tl-badge-blue { background: #edf2fb; color: var(--blue); border: 1px solid #c3d4f0; }
 
-/* Project card */
 .proj-card { background: white; border: 1px solid var(--rule); padding: 1.3rem; position: relative; overflow: hidden; margin-bottom: 0.3rem; border-radius: 2px; }
 .proj-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #c8392b, #1a4480); }
 .proj-ghost { background: var(--cream); border: 1px dashed #ccc; }
@@ -93,61 +88,78 @@ html, body, .stApp { background: var(--paper) !important; }
 .proj-btn-d { background: var(--ink); color: white !important; text-decoration: none !important; padding: 0.38rem 0.85rem; border-radius: 3px; font-size: 0.77rem; font-weight: 600; margin-right: 0.35rem; display: inline-block; margin-top: 0.5rem; }
 .proj-btn-o { border: 1.5px solid var(--ink); color: var(--ink) !important; text-decoration: none !important; padding: 0.38rem 0.85rem; border-radius: 3px; font-size: 0.77rem; display: inline-block; margin-top: 0.5rem; }
 
-/* Stack */
 .stack-box { background: white; border: 1px solid var(--rule); padding: 1rem 1.2rem; margin-bottom: 0.7rem; }
 .stack-cat { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--red); margin-bottom: 0.6rem; }
 .stack-tag { font-size: 0.8rem; font-weight: 500; background: var(--cream); color: var(--ink2); padding: 0.28rem 0.65rem; border-radius: 2px; display: inline-block; margin: 0.15rem; }
 
-/* Edu */
 .edu-box { background: var(--cream); padding: 1.3rem; border-radius: 2px; height: 100%; }
 .edu-cat { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--red); margin-bottom: 0.9rem; }
 .edu-ttl { font-weight: 600; font-size: 0.88rem; color: var(--ink); }
 .edu-sub { font-size: 0.77rem; color: var(--slate); margin: 0.1rem 0 0.8rem; }
-.cert-row { font-size: 0.81rem; color: var(--ink2); padding: 0.3rem 0; border-bottom: 1px dashed #ddd; display: flex; gap: 0.4rem; }
-.cert-row:last-child { border-bottom: none; }
+.cert-row { font-size: 0.81rem; color: var(--ink2); padding: 0.3rem 0; border-bottom: 1px dashed #ddd; display: flex; gap: 0.4rem; }.cert-row:last-child { border-bottom: none; }
 
-/* Contact */
 .contact-box { background: var(--ink); color: white; padding: 2rem; border-radius: 3px; }
 .contact-h { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 0.5rem; }
 .contact-sub { color: #8896a7; font-size: 0.85rem; line-height: 1.85; }
 .contact-sub a { color: #e2c97e !important; text-decoration: none; }
 .clink { display: inline-block; background: rgba(255,255,255,0.08); color: white !important; text-decoration: none !important; padding: 0.55rem 1rem; border-radius: 3px; font-size: 0.8rem; font-weight: 500; border: 1px solid rgba(255,255,255,0.12); margin: 0.2rem; }
 
-/* Footer */
 .foot { border-top: 1px solid var(--rule); margin-top: 2.5rem; padding: 1.2rem 0; font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--slate); }
 
-/* Diff list via streamlit */
 div[data-testid="stMarkdownContainer"] ul { padding-left: 0 !important; list-style: none !important; }
 div[data-testid="stMarkdownContainer"] ul li { padding: 0.4rem 0; border-bottom: 1px dashed #e2e5eb; font-size: 0.88rem; color: #2e3340; }
 div[data-testid="stMarkdownContainer"] ul li:last-child { border-bottom: none; }
 </style>
 """, unsafe_allow_html=True)
 
-# ── LOADERS ───────────────────────────────────────────────────────────────────
-@st.cache_data(show_spinner=False)
+# ── LOAD IMAGE CORRIGIDO + ROBUSTO ───────────────────────────────────────────
+@st.cache_data(ttl=3600, show_spinner="Carregando foto...")
 def load_image():
+    """Carrega foto com múltiplos fallbacks e tratamento robusto"""
+    
+    # Lista de URLs em ordem de prioridade
     urls = [
         "https://raw.githubusercontent.com/raphaelcaxias/curriculo/main/rapha.jpeg",
-        "https://avatars.githubusercontent.com/raphaelcaxias",
+        "https://raw.githubusercontent.com/raphaelcaxias/curriculo/main/assets/rapha.jpeg",
+        "https://avatars.githubusercontent.com/u/raphaelcaxias",  # fallback genérico
     ]
+    
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+    
     for url in urls:
         try:
-            r = requests.get(url, timeout=6)
-            if r.status_code == 200:
-                return Image.open(BytesIO(r.content))
-        except Exception:
-            pass
-    for p in ["rapha.jpeg", "assets/rapha.jpeg"]:
-        if os.path.exists(p):
-            return Image.open(p)
-    return None
+            response = requests.get(url, headers=headers, timeout=10)
+            if response.status_code == 200:
+                img = Image.open(BytesIO(response.content))
+                # Converte para RGB se necessário (evita erro com PNG transparency)
+                if img.mode in ('RGBA', 'P', 'LA'):
+                    img = img.convert('RGB')
+                return img
+        except Exception as e:
+            continue  # Tenta próxima URL
+    
+    # Fallback para arquivos locais
+    local_paths = ["rapha.jpeg", "assets/rapha.jpeg", "./rapha.jpeg"]
+    for path in local_paths:
+        if os.path.exists(path):
+            try:
+                img = Image.open(path)
+                if img.mode in ('RGBA', 'P', 'LA'):
+                    img = img.convert('RGB')                return img
+            except Exception:
+                continue
+    
+    return None  # Retorna None se tudo falhar
 
-@st.cache_data(show_spinner=False)
+# ── LOAD CV (mantido com pequena melhoria) ────────────────────────────────────
+@st.cache_data(ttl=3600, show_spinner="Preparando currículo...")
 def load_cv():
     try:
         r = requests.get(
             "https://raw.githubusercontent.com/raphaelcaxias/curriculo/main/Curriculo_Raphael_Premium_Final.pdf",
-            timeout=8)
+            timeout=10,
+            headers={'User-Agent': 'Mozilla/5.0'}
+        )
         if r.status_code == 200:
             return r.content
     except Exception:
@@ -158,22 +170,31 @@ def load_cv():
                 return f.read()
     return None
 
+# Carrega recursos
 profile_image = load_image()
 cv_pdf = load_cv()
 
-# ── SIDEBAR ───────────────────────────────────────────────────────────────────
+# ── SIDEBAR COM FOTO CORRIGIDA ────────────────────────────────────────────────
 with st.sidebar:
+    # Foto com fallback visual elegante
     if profile_image:
-        st.image(profile_image, use_column_width=True)
+        st.image(profile_image, use_column_width=True, caption="📷 Raphael Pires")
     else:
-        # placeholder com iniciais
+        # Placeholder com iniciais + dica de solução
         st.markdown("""
-        <div style="background:#1a4480;border-radius:8px;height:180px;display:flex;
-                    align-items:center;justify-content:center;margin-bottom:0.5rem;">
-            <span style="font-family:Playfair Display,serif;font-size:3rem;
-                         font-weight:900;color:white;letter-spacing:-2px;">RP</span>
+        <div style="background:linear-gradient(135deg,#1a4480,#2c5282);
+                    border-radius:8px;height:180px;display:flex;
+                    align-items:center;justify-content:center;margin-bottom:0.5rem;
+                    border:2px dashed #4a6fa5;">
+            <div style="text-align:center;color:white;">
+                <span style="font-family:'Playfair Display',serif;font-size:3.5rem;
+                             font-weight:900;letter-spacing:-2px;">RP</span><br>
+                <span style="font-size:0.7rem;opacity:0.9;">Foto em carregamento</span>
+            </div>
+        </div>
+        <div style="font-size:0.75rem;color:#8896a7;text-align:center;">
+            💡 Dica: Verifique se <code>rapha.jpeg</code> está na raiz do repositório
         </div>""", unsafe_allow_html=True)
-
     st.markdown("---")
     st.markdown("### 🧭 Ir para")
     st.markdown("""
@@ -209,7 +230,7 @@ with st.sidebar:
     st.caption("Portfolio atualizado · 2026")
 
 # ═══════════════════════════════════════════════════════════════
-# HERO
+# HERO (mantido)
 # ═══════════════════════════════════════════════════════════════
 st.markdown('<a id="inicio"></a>', unsafe_allow_html=True)
 st.markdown('<div class="hero">', unsafe_allow_html=True)
@@ -222,7 +243,6 @@ st.markdown("""<p class="hero-role">
 
 pills = ["SQL · PostgreSQL", "Python · Pandas", "Power BI · Looker Studio", "Excel / VBA", "Streamlit · Plotly", "Remoto ✓"]
 st.markdown("".join(f'<span class="hero-pill">{p}</span>' for p in pills), unsafe_allow_html=True)
-
 st.markdown("""<div style="margin-top:1.1rem;">
     <a class="cta-dark" href="https://linkedin.com/in/raphael-pires-caxias" target="_blank">🔗 LinkedIn</a>
     <a class="cta-out" href="https://github.com/raphaelcaxias" target="_blank">💻 GitHub</a>
@@ -231,7 +251,7 @@ st.markdown("""<div style="margin-top:1.1rem;">
 st.markdown('</div>', unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════
-# KPIs — st.columns nativo (funciona em mobile)
+# KPIs (mantido)
 # ═══════════════════════════════════════════════════════════════
 k1, k2, k3, k4 = st.columns(4)
 for col, val, desc in [
@@ -247,7 +267,7 @@ for col, val, desc in [
         </div>""", unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════
-# SOBRE
+# SOBRE (mantido)
 # ═══════════════════════════════════════════════════════════════
 st.markdown('<a id="sobre"></a>', unsafe_allow_html=True)
 st.markdown('<div class="sec"><span class="sec-n">01 ·</span><h2 class="sec-t">Sobre</h2></div>', unsafe_allow_html=True)
@@ -272,19 +292,15 @@ with col_d:
 - ✅ Disponível 100% remoto
     """)
 
-# ═══════════════════════════════════════════════════════════════
-# EXPERIÊNCIA — loop nativo, sem HTML interno problemático
+# ═══════════════════════════════════════════════════════════════# EXPERIÊNCIA (mantido - estrutura robusta)
 # ═══════════════════════════════════════════════════════════════
 st.markdown('<a id="experiencia"></a>', unsafe_allow_html=True)
 st.markdown('<div class="sec"><span class="sec-n">02 ·</span><h2 class="sec-t">Trajetória Profissional</h2></div>', unsafe_allow_html=True)
 
 experiences = [
     {
-        "period": "2014 — 2026",
-        "company": "J Sintonía",
-        "role": "Analista de KPIs & Operações",
-        "badge": ("● POSIÇÃO ATUAL", "blue"),
-        "current": True,
+        "period": "2014 — 2026", "company": "J Sintonía", "role": "Analista de KPIs & Operações",
+        "badge": ("● POSIÇÃO ATUAL", "blue"), "current": True,
         "items": [
             "Monitoramento contínuo de KPIs de vendas, margem de contribuição e giro de estoque com dashboards em Power BI e Looker Studio",
             "Desenvolvimento de relatórios automatizados para suporte à gestão estratégica e tomada de decisão",
@@ -292,11 +308,8 @@ experiences = [
         ]
     },
     {
-        "period": "2009 — hoje",
-        "company": "Jardim do Éden",
-        "role": "Gestão Comercial & Dados",
-        "badge": None,
-        "current": True,
+        "period": "2009 — hoje", "company": "Jardim do Éden", "role": "Gestão Comercial & Dados",
+        "badge": None, "current": True,
         "items": [
             "Estruturação de fluxo analítico: dashboards reduziram ciclo de análise de **2h para 15 min**",
             "SQL e automação para suporte a faturamento, margem de lucro e controle de estoque",
@@ -304,11 +317,8 @@ experiences = [
         ]
     },
     {
-        "period": "2008 — 2010",
-        "company": "Banco do Brasil",
-        "role": "Estagiário de Dados & Automação",
-        "badge": ("★ EXPERIÊNCIA CORPORATIVA VERIFICÁVEL", "red"),
-        "current": False,
+        "period": "2008 — 2010", "company": "Banco do Brasil", "role": "Estagiário de Dados & Automação",
+        "badge": ("★ EXPERIÊNCIA CORPORATIVA VERIFICÁVEL", "red"), "current": False,
         "items": [
             "Automação de processos em **20 agências** utilizando Excel/VBA",
             "Consolidação e padronização de relatórios operacionais regionais",
@@ -316,11 +326,8 @@ experiences = [
         ]
     },
     {
-        "period": "2002 — 2009",
-        "company": "NSM Comércio e Serviço",
-        "role": "Suporte Operacional & Controle Administrativo",
-        "badge": ("◆ BASE: 7 ANOS DE OPERAÇÃO REAL", "red"),
-        "current": False,
+        "period": "2002 — 2009", "company": "NSM Comércio e Serviço", "role": "Suporte Operacional & Controle Administrativo",
+        "badge": ("◆ BASE: 7 ANOS DE OPERAÇÃO REAL", "red"), "current": False,
         "items": [
             "Centralização e organização de informações operacionais descentralizadas",
             "Controle de estoque, fluxo administrativo e saneamento de inconsistências",
@@ -334,8 +341,6 @@ for exp in experiences:
     dot_size = "10px" if exp["current"] else "8px"
     dot_left = "-6px" if exp["current"] else "-5px"
     border_color = "#1a4480" if exp["current"] else "#e2e5eb"
-
-    # cabeçalho do item
     left_col, right_col = st.columns([1, 4], gap="small")
     with left_col:
         st.markdown(f"""
@@ -359,7 +364,6 @@ for exp in experiences:
             {badge_html}
         </div>""", unsafe_allow_html=True)
 
-        # bullets via markdown nativo (sem HTML interno)
         with st.container():
             for item in exp["items"]:
                 st.markdown(f"<div style='border-left:2px solid {border_color};padding-left:1.2rem;'>"
@@ -368,7 +372,7 @@ for exp in experiences:
             st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════
-# PROJETOS
+# PROJETOS (mantido)
 # ═══════════════════════════════════════════════════════════════
 st.markdown('<a id="projetos"></a>', unsafe_allow_html=True)
 st.markdown('<div class="sec"><span class="sec-n">03 ·</span><h2 class="sec-t">Projetos em Destaque</h2></div>', unsafe_allow_html=True)
@@ -386,8 +390,7 @@ projects = [
     {
         "idx": "Projeto 02 · Análise Social",
         "title": "Bolsa Família — Análise de Benefícios",
-        "desc": "Dashboard analítico sobre distribuição de benefícios por região, faixa etária e valor médio. Filtros interativos para identificação de públicos prioritários.",
-        "tags": ["Python", "Pandas", "Plotly", "Streamlit", "ETL"],
+        "desc": "Dashboard analítico sobre distribuição de benefícios por região, faixa etária e valor médio. Filtros interativos para identificação de públicos prioritários.",        "tags": ["Python", "Pandas", "Plotly", "Streamlit", "ETL"],
         "app": "https://bolsa-familia-kqrkzbzsrucybh3chpicxt.streamlit.app/",
         "code": "https://github.com/raphaelcaxias",
         "ghost": False,
@@ -435,9 +438,8 @@ for i, p in enumerate(projects):
 </div>""", unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════
-# STACK — colunas nativas
-# ═══════════════════════════════════════════════════════════════
-st.markdown('<a id="stack"></a>', unsafe_allow_html=True)
+# STACK (mantido)
+# ═══════════════════════════════════════════════════════════════st.markdown('<a id="stack"></a>', unsafe_allow_html=True)
 st.markdown('<div class="sec"><span class="sec-n">04 ·</span><h2 class="sec-t">Stack Técnica</h2></div>', unsafe_allow_html=True)
 
 stack = [
@@ -458,7 +460,7 @@ for i, (cat, items) in enumerate(stack):
         </div>""", unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════
-# DASHBOARD DEMO INTERATIVO
+# DEMO INTERATIVA (mantida + pequena otimização)
 # ═══════════════════════════════════════════════════════════════
 st.markdown('<div class="sec"><span class="sec-n">★ ·</span><h2 class="sec-t">Demonstração Interativa</h2></div>', unsafe_allow_html=True)
 st.caption("Exemplo do tipo de análise que construo — explore os filtros!")
@@ -486,8 +488,7 @@ with tab1:
     )
     st.plotly_chart(fig, use_container_width=True)
 
-    m1, m2, m3 = st.columns(3)
-    total_real = sum(vendas_adj)
+    m1, m2, m3 = st.columns(3)    total_real = sum(vendas_adj)
     total_meta = sum(meta_base)
     ating = total_real / total_meta * 100
     m1.metric("Total Realizado", f"{total_real}", f"{crescimento:+d}% ajuste")
@@ -508,14 +509,13 @@ with tab2:
     ))
     fig2.update_layout(
         height=300, margin=dict(t=10, b=10, l=0, r=0),
-        paper_bgcolor='#fafaf8',
-        showlegend=False
+        paper_bgcolor='#fafaf8', showlegend=False
     )
     st.plotly_chart(fig2, use_container_width=True)
     st.caption("Distribuição simulada — baseada no perfil real dos dados processados.")
 
 # ═══════════════════════════════════════════════════════════════
-# FORMAÇÃO
+# FORMAÇÃO (mantido)
 # ═══════════════════════════════════════════════════════════════
 st.markdown('<a id="formacao"></a>', unsafe_allow_html=True)
 st.markdown('<div class="sec"><span class="sec-n">05 ·</span><h2 class="sec-t">Formação &amp; Certificações</h2></div>', unsafe_allow_html=True)
@@ -537,15 +537,14 @@ with ec2:
         ("✓", "Power BI Completo (Básico ao Avançado)"),
         ("✓", "Python para Análise de Dados (Pandas)"),
         ("✓", "Algoritmos e Lógica de Programação"),
-        ("✓", "IA Aplicada a Negócios — Hashtag"),
-        ("◆", "+20 anos de prática operacional em ambientes reais"),
+        ("✓", "IA Aplicada a Negócios — Hashtag"),        ("◆", "+20 anos de prática operacional em ambientes reais"),
     ]
     rows = "".join(f'<div class="cert-row"><span>{ico}</span><span>{txt}</span></div>' for ico, txt in certs)
     st.markdown(f'<div class="edu-box"><div class="edu-cat">Cursos &amp; Certificações</div>{rows}</div>',
                 unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════
-# CONTATO
+# CONTATO (mantido)
 # ═══════════════════════════════════════════════════════════════
 st.markdown('<a id="contato"></a>', unsafe_allow_html=True)
 st.markdown('<div class="sec"><span class="sec-n">06 ·</span><h2 class="sec-t">Contato</h2></div>', unsafe_allow_html=True)
