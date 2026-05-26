@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Portfolio - Raphael Pires (Versão Moderna 2026)
-Arquivo: app.py
+Premium Portfolio - Raphael Pires
+Streamlit App com design customizado, linha do tempo, cards e layout profissional.
 """
 
 import streamlit as st
@@ -14,24 +14,22 @@ import requests
 from io import BytesIO
 
 # ------------------------------------------------------------------------------
-# CONFIGURAÇÃO DA PÁGINA
+# CONFIGURAÇÃO INICIAL
 # ------------------------------------------------------------------------------
 st.set_page_config(
     page_title="Raphael Pires | Dados & BI",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # ------------------------------------------------------------------------------
-# CARREGAMENTO DE IMAGEM (foto e PDF)
+# CARREGAMENTO DE IMAGEM E PDF
 # ------------------------------------------------------------------------------
 @st.cache_data(show_spinner=False)
 def load_image():
-    # Tenta primeiro o arquivo local enviado (rapha.jpeg)
     if os.path.exists("rapha.jpeg"):
         return Image.open("rapha.jpeg")
-    # Caso contrário, tenta URLs do GitHub
     urls = [
         "https://raw.githubusercontent.com/raphaelcaxias/curriculo/main/rapha.jpeg",
         "https://avatars.githubusercontent.com/raphaelcaxias",
@@ -43,7 +41,6 @@ def load_image():
                 return Image.open(BytesIO(r.content))
         except Exception:
             pass
-    # Se nada der certo, retorna None (será tratado depois)
     return None
 
 @st.cache_data(show_spinner=False)
@@ -66,11 +63,12 @@ profile_image = load_image()
 cv_pdf = load_cv()
 
 # ------------------------------------------------------------------------------
-# CSS PERSONALIZADO (Moderno, responsivo, com sombras e fontes atuais)
+# CSS PERSONALIZADO (MODERN TECH MINIMALIST)
 # ------------------------------------------------------------------------------
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap');
+/* Reset e importação de fontes */
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap');
 
 * {
     margin: 0;
@@ -78,679 +76,692 @@ st.markdown("""
     box-sizing: border-box;
 }
 
-html, body, .stApp {
-    background-color: #f8fafc !important;
+body, .stApp {
+    background-color: #F4F7F6 !important;
     font-family: 'Inter', sans-serif;
-    color: #0f172a;
+    color: #1D2C4D;
 }
 
 /* Esconde elementos padrão do Streamlit */
-#MainMenu, footer, header {
-    visibility: hidden;
+#MainMenu, footer, header, .stDeployButton {
+    display: none !important;
 }
 
 .block-container {
-    padding-top: 1rem !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+}
+
+/* Barra de navegação centralizada */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid #e0e8e6;
+    padding: 1rem 0;
+    z-index: 1000;
+    text-align: center;
+}
+
+.navbar a {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #1D2C4D;
+    text-decoration: none;
+    margin: 0 1.2rem;
+    padding: 0.25rem 0;
+    transition: color 0.2s, border-bottom 0.2s;
+    border-bottom: 2px solid transparent;
+}
+
+.navbar a:hover {
+    color: #007BFF;
+    border-bottom-color: #007BFF;
+}
+
+/* Container principal para compensar navbar */
+.main-container {
+    padding-top: 80px;
     max-width: 1200px;
     margin: 0 auto;
+    padding-left: 2rem;
+    padding-right: 2rem;
 }
 
-/* Sidebar moderna */
-[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
-    border-right: none !important;
+/* Seções */
+.section {
+    margin-bottom: 4rem;
+    scroll-margin-top: 80px;
 }
 
-[data-testid="stSidebar"] * {
-    color: #e2e8f0 !important;
-    font-family: 'Inter', sans-serif;
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    letter-spacing: -0.01em;
+    color: #1D2C4D;
+    position: relative;
+    display: inline-block;
 }
 
-[data-testid="stSidebar"] a {
-    color: #94a3b8 !important;
-    text-decoration: none;
-    transition: color 0.2s;
+.section-title:after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: #007BFF;
+    border-radius: 3px;
 }
 
-[data-testid="stSidebar"] a:hover {
-    color: #fbbf24 !important;
+/* Cards de impacto */
+.impact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
 }
 
-[data-testid="stSidebar"] hr {
-    border-color: #334155 !important;
-}
-
-[data-testid="stSidebar"] .stDownloadButton > button {
-    background: #3b82f6 !important;
-    color: white !important;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    width: 100%;
-    transition: background 0.2s;
-}
-
-[data-testid="stSidebar"] .stDownloadButton > button:hover {
-    background: #2563eb !important;
-}
-
-/* Cards e containers principais */
-.main-card {
+.impact-card {
     background: white;
-    border-radius: 24px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.03);
+    border-radius: 20px;
     padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 25px -8px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.02);
     transition: transform 0.2s, box-shadow 0.2s;
+    text-align: center;
 }
 
-.main-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15);
+.impact-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 30px -12px rgba(0,123,255,0.1);
 }
 
-/* Cabeçalho com foto e nome */
-.profile-header {
+.impact-number {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #007BFF;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+}
+
+.impact-text {
+    font-size: 0.85rem;
+    color: #5a6e7a;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+/* Perfil / Apresentação */
+.profile-container {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 2.5rem;
     flex-wrap: wrap;
     margin-bottom: 2rem;
 }
 
 .profile-pic {
+    width: 160px;
+    height: 160px;
     border-radius: 50%;
     object-fit: cover;
-    width: 120px;
-    height: 120px;
-    border: 3px solid white;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border: 3px solid #007BFF;
+    box-shadow: 0 12px 24px -12px rgba(0,123,255,0.3);
 }
 
-.profile-info h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;
+.profile-name {
+    font-size: 2.8rem;
     font-weight: 700;
-    margin: 0;
-    color: #0f172a;
+    margin-bottom: 0.25rem;
+    color: #1D2C4D;
 }
 
-.profile-info .subtitle {
+.profile-title {
+    font-size: 1.2rem;
+    color: #007BFF;
+    font-weight: 500;
+    margin-bottom: 0.8rem;
+}
+
+.profile-summary {
     font-size: 1rem;
-    color: #475569;
-    margin-top: 0.25rem;
-    border-left: 4px solid #3b82f6;
-    padding-left: 1rem;
+    line-height: 1.5;
+    color: #2c3e50;
+    max-width: 600px;
+    margin: 0.8rem 0;
 }
 
-/* Botões e links */
-.btn-primary {
-    background: #0f172a;
-    color: white;
-    padding: 0.5rem 1.2rem;
-    border-radius: 40px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.875rem;
-    transition: background 0.2s;
-    display: inline-block;
-}
-
-.btn-primary:hover {
-    background: #1e293b;
-}
-
-.btn-outline {
-    border: 1.5px solid #0f172a;
-    background: transparent;
-    color: #0f172a;
-    padding: 0.5rem 1.2rem;
-    border-radius: 40px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.875rem;
-    transition: all 0.2s;
-    display: inline-block;
-}
-
-.btn-outline:hover {
-    background: #0f172a;
-    color: white;
-}
-
-/* Seção título */
-.section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 2rem 0 1.5rem 0;
-    letter-spacing: -0.01em;
-    border-left: 5px solid #3b82f6;
-    padding-left: 1rem;
-}
-
-/* KPI cards */
-.kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.kpi-card {
-    background: white;
-    border-radius: 20px;
-    padding: 1.2rem;
-    text-align: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s;
-}
-
-.kpi-card:hover {
-    border-color: #cbd5e1;
-    box-shadow: 0 8px 20px -12px rgba(0,0,0,0.1);
-}
-
-.kpi-number {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    font-weight: 800;
-    color: #0f172a;
-    line-height: 1.2;
-}
-
-.kpi-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #475569;
-    margin-top: 0.5rem;
-}
-
-/* Timeline de experiência */
-.timeline-item {
+/* Botões pílula */
+.pill-buttons {
     display: flex;
     gap: 1rem;
-    margin-bottom: 1.5rem;
-    border-left: 2px solid #e2e8f0;
-    padding-left: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border: 1px solid #d0dad8;
+    padding: 0.5rem 1.2rem;
+    border-radius: 40px;
+    font-weight: 500;
+    color: #1D2C4D;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+}
+
+.pill-btn:hover {
+    border-color: #007BFF;
+    background: #f0f9ff;
+    color: #007BFF;
+    transform: translateY(-2px);
+}
+
+/* Sobre - diferenciais com ícones */
+.diff-list {
+    list-style: none;
+    padding-left: 0;
+}
+.diff-list li {
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.diff-icon {
+    color: #007BFF;
+    font-weight: bold;
+}
+
+/* Linha do tempo vertical */
+.timeline {
+    position: relative;
+    margin-left: 1rem;
+}
+.timeline-item {
+    display: flex;
+    margin-bottom: 2rem;
     position: relative;
 }
-
+.timeline-left {
+    width: 120px;
+    flex-shrink: 0;
+    text-align: right;
+    padding-right: 1.5rem;
+    font-weight: 600;
+    color: #007BFF;
+}
+.timeline-line {
+    position: relative;
+    width: 2px;
+    background: #cbdcd9;
+    margin-right: 1.5rem;
+}
 .timeline-dot {
     position: absolute;
-    left: -6px;
+    left: -5px;
     top: 6px;
-    width: 10px;
-    height: 10px;
-    background: #3b82f6;
+    width: 12px;
+    height: 12px;
+    background: #007BFF;
     border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #007BFF30;
 }
-
-.timeline-date {
-    font-family: 'Inter', monospace;
-    font-size: 0.75rem;
-    color: #3b82f6;
-    font-weight: 600;
-    min-width: 100px;
-}
-
 .timeline-content {
     flex: 1;
+    padding-bottom: 0.5rem;
 }
-
 .timeline-title {
     font-weight: 700;
     font-size: 1.1rem;
-    margin-bottom: 0.25rem;
 }
-
 .timeline-company {
-    font-size: 0.85rem;
-    color: #475569;
+    color: #5a6e7a;
     margin-bottom: 0.5rem;
+    font-weight: 500;
 }
-
 .timeline-desc {
-    font-size: 0.85rem;
-    color: #334155;
-    margin: 0.25rem 0;
-    padding-left: 0;
+    font-size: 0.9rem;
+    color: #2c3e50;
+    margin: 0.3rem 0;
+    line-height: 1.4;
 }
 
-/* Project cards */
-.project-grid {
+/* Projects cards */
+.projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    gap: 1.8rem;
 }
-
 .project-card {
     background: white;
-    border-radius: 20px;
-    padding: 1.25rem;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px -8px rgba(0,0,0,0.05);
+    transition: transform 0.25s, box-shadow 0.25s;
 }
-
 .project-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15);
-    border-color: #cbd5e1;
+    transform: translateY(-5px);
+    box-shadow: 0 20px 30px -12px rgba(0,0,0,0.15);
 }
-
+.project-img {
+    width: 100%;
+    height: 160px;
+    background: #eef3f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+.project-content {
+    padding: 1.2rem;
+}
 .project-title {
     font-weight: 700;
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
 }
-
 .project-desc {
     font-size: 0.85rem;
-    color: #475569;
+    color: #5a6e7a;
     margin-bottom: 1rem;
-    flex: 1;
+    line-height: 1.4;
 }
-
 .project-tech {
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
     margin-bottom: 1rem;
 }
-
-.tech-badge {
-    background: #f1f5f9;
-    color: #0f172a;
-    font-size: 0.7rem;
+.tech-tag {
+    background: #edf2f1;
     padding: 0.2rem 0.6rem;
     border-radius: 30px;
+    font-size: 0.7rem;
+    color: #1D2C4D;
 }
-
 .project-links a {
     font-size: 0.8rem;
-    margin-right: 0.8rem;
+    margin-right: 1rem;
+    color: #007BFF;
     text-decoration: none;
 }
 
-/* Stack técnica */
+/* Stack técnica - chips refinados */
 .stack-category {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border: 1px solid #e2e8f0;
+    margin-bottom: 2rem;
 }
-
 .stack-title {
     font-weight: 600;
-    margin-bottom: 0.75rem;
-    color: #0f172a;
+    margin-bottom: 0.8rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-size: 1.1rem;
 }
-
-.stack-tags {
+.stack-chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.6rem;
 }
-
-.stack-tag {
-    background: white;
-    border: 1px solid #cbd5e1;
-    padding: 0.25rem 0.75rem;
+.chip {
+    background: #e9f0ef;
+    color: #1D2C4D;
+    padding: 0.4rem 1rem;
     border-radius: 40px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.chip:hover {
+    background: #d0e2df;
+    transform: scale(0.98);
 }
 
-/* Contato */
-.contact-card {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    border-radius: 24px;
+/* Formação e certificações grid */
+.edu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+.edu-block {
+    background: white;
+    border-radius: 20px;
+    padding: 1.2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+.edu-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+.cert-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+}
+.cert-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+/* Rodapé de impacto */
+.footer-impact {
+    background: #1D2C4D;
+    border-radius: 30px;
     padding: 2rem;
     color: white;
-    margin-top: 1.5rem;
+    text-align: center;
+    margin-top: 2rem;
 }
-
-.contact-card a {
-    color: #fbbf24;
+.footer-impact a {
+    color: #9fc9ff;
     text-decoration: none;
+    margin: 0 0.5rem;
 }
-
-.contact-card a:hover {
+.footer-impact a:hover {
     text-decoration: underline;
 }
-
-/* Footer */
-.footer {
-    text-align: center;
-    padding: 2rem 0 1rem;
-    font-size: 0.7rem;
-    color: #94a3b8;
-    border-top: 1px solid #e2e8f0;
-    margin-top: 2rem;
+.footer-links {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# SIDEBAR
-# ------------------------------------------------------------------------------
-with st.sidebar:
-    if profile_image:
-        st.image(profile_image, use_container_width=True, output_format="JPEG")
-    else:
-        st.markdown("""
-        <div style="background:#1e293b;border-radius:20px;height:150px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;">
-            <span style="font-family:'Playfair Display',serif;font-size:3rem;color:white;">RP</span>
-        </div>
-        """, unsafe_allow_html=True)
+# Barra de navegação HTML
+st.markdown("""
+<div class="navbar">
+    <a href="#inicio">Início</a>
+    <a href="#sobre">Sobre</a>
+    <a href="#experiencia">Experiência</a>
+    <a href="#habilidades">Habilidades</a>
+    <a href="#portfolio">Portfólio</a>
+    <a href="#contato">Contato</a>
+</div>
+""", unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.markdown("### 🧭 Navegação")
-    st.markdown("""
-- [🏠 Início](#inicio)
-- [👤 Sobre](#sobre)
-- [💼 Experiência](#experiencia)
-- [🚀 Projetos](#projetos)
-- [⚙️ Stack](#stack)
-- [📬 Contato](#contato)
-    """)
-    st.markdown("---")
-    if cv_pdf:
-        st.download_button(
-            label="📄 Baixar Currículo (PDF)",
-            data=cv_pdf,
-            file_name="Raphael_Pires_Curriculo.pdf",
-            mime="application/pdf",
-            use_container_width=True
-        )
-    else:
-        st.warning("PDF não disponível no momento.")
-    st.markdown("---")
-    st.markdown("### 🔗 Links rápidos")
-    st.markdown("""
-[🔗 LinkedIn](https://linkedin.com/in/raphael-pires-caxias)  
-[💻 GitHub](https://github.com/raphaelcaxias)  
-[📧 Email](mailto:raphael_caxias@hotmail.com)  
-[📱 WhatsApp](https://wa.me/5524992275226)
-    """)
-    st.caption("Portfolio atualizado · 2026")
+# Container principal
+st.markdown('<div class="main-container">', unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# CONTEÚDO PRINCIPAL
-# ------------------------------------------------------------------------------
-# Hero / Cabeçalho com foto
-col1, col2 = st.columns([1, 3], gap="large")
+# ==============================================================================
+# SEÇÃO DE APRESENTAÇÃO (INÍCIO)
+# ==============================================================================
+st.markdown('<div id="inicio"></div>', unsafe_allow_html=True)
+col1, col2 = st.columns([1, 2], gap="large")
 with col1:
     if profile_image:
-        st.image(profile_image, width=150, output_format="JPEG")
+        st.image(profile_image, width=160, output_format="JPEG")
     else:
-        st.markdown('<div style="width:150px;height:150px;background:#e2e8f0;border-radius:50%;"></div>', unsafe_allow_html=True)
+        st.markdown('<div style="width:160px;height:160px;background:#e0e8e6;border-radius:50%;"></div>', unsafe_allow_html=True)
 with col2:
     st.markdown("""
-    <h1 style="font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:700;margin:0;">Raphael Pires</h1>
-    <p style="font-size:1.2rem;color:#334155;margin-top:0.25rem;">Analista de Dados & Business Intelligence</p>
-    <p style="color:#475569;border-left:4px solid #3b82f6;padding-left:1rem;">+15 anos de experiência real em operações, automação e indicadores de negócio</p>
-    <div>
-        <a class="btn-primary" href="https://linkedin.com/in/raphael-pires-caxias" target="_blank">🔗 LinkedIn</a>
-        <a class="btn-outline" href="https://github.com/raphaelcaxias" target="_blank">💻 GitHub</a>
-        <a class="btn-outline" href="https://wa.me/5524992275226" target="_blank">📱 WhatsApp</a>
+    <div class="profile-name">Raphael Pires</div>
+    <div class="profile-title">Analista de Dados & Business Intelligence</div>
+    <div class="profile-summary">+15 anos de experiência real em operações, automação e indicadores de negócio. Transformo dados em decisões práticas.</div>
+    <div class="pill-buttons">
+        <a class="pill-btn" href="https://linkedin.com/in/raphael-pires-caxias" target="_blank">🔗 LinkedIn</a>
+        <a class="pill-btn" href="https://github.com/raphaelcaxias" target="_blank">💻 GitHub</a>
+        <a class="pill-btn" href="https://wa.me/5524992275226" target="_blank">📱 WhatsApp</a>
     </div>
     """, unsafe_allow_html=True)
 
-st.markdown('<div id="sobre"></div>', unsafe_allow_html=True)
+# ==============================================================================
+# SEÇÃO SOBRE
+# ==============================================================================
+st.markdown('<div id="sobre" class="section"></div>', unsafe_allow_html=True)
 st.markdown('<div class="section-title">Sobre</div>', unsafe_allow_html=True)
 
-col_a, col_b = st.columns([2,1], gap="large")
-with col_a:
+col_sobre1, col_sobre2 = st.columns([2, 1], gap="large")
+with col_sobre1:
     st.markdown("""
-    <div style="background:#f1f5f9;padding:1.5rem;border-radius:24px;border-left:5px solid #3b82f6;">
-    Profissional com <strong>+15 anos de operação real</strong> em varejo e instituição financeira (Banco do Brasil).<br><br>
-    Construí minha experiência em dados na prática – estoque, faturamento, fluxo de caixa, automação – antes mesmo de “Data Analyst” ser um cargo comum.<br><br>
-    Atualmente focado em transformar rotinas operacionais em dashboards interativos, indicadores de performance e automação inteligente, conectando o mundo do negócio com a tecnologia.
+    Profissional com mais de 15 anos de atuação em operações comerciais reais, instituição financeira e gestão de negócio próprio.  
+    Minha trajetória começou no chão da fábrica e passou por automação bancária, controle de estoque, análise de margem e criação de dashboards estratégicos.
+
+    Atualmente, integro dados e negócio para entregar indicadores confiáveis, dashboards interativos e automação de processos.  
+    Acredito que um analista de dados só é completo quando entende a operação que está analisando.
+    """)
+with col_sobre2:
+    st.markdown("""
+    <div style="background:white; border-radius:20px; padding:1rem;">
+    <strong>✔ Diferenciais</strong>
+    <ul class="diff-list" style="margin-top:0.5rem;">
+        <li><span class="diff-icon">✓</span> Visão operacional de ponta a ponta</li>
+        <li><span class="diff-icon">✓</span> Domínio de Power BI, SQL e Python</li>
+        <li><span class="diff-icon">✓</span> Comunicação com áreas não técnicas</li>
+        <li><span class="diff-icon">✓</span> Foco em resultado, não em gráficos bonitos</li>
+    </ul>
     </div>
     """, unsafe_allow_html=True)
-with col_b:
-    st.markdown("""
-    **✔ Diferenciais**  
-    - Visão operacional de ponta a ponta  
-    - Domínio de Power BI, SQL e Python  
-    - Comunicação direta com áreas não técnicas  
-    - Foco em resultado, não em gráficos bonitos  
-    """)
 
-# ------------------------------------------------------------------------------
-# KPIs (métricas de impacto)
+# ==============================================================================
+# IMPACTO EM NÚMEROS (CARDS COM SOMBRA)
+# ==============================================================================
 st.markdown('<div class="section-title">Impacto em números</div>', unsafe_allow_html=True)
-kpis = [
-    ("70%", "Redução operacional\nBanco do Brasil"),
-    ("2h → 15min", "Ciclo de análise\notimizado"),
+impact_data = [
+    ("70%", "Redução operacional • Banco do Brasil"),
+    ("2h → 15min", "Ciclo de análise otimizado"),
     ("20 agências", "Automação com VBA"),
-    ("213k+", "Registros processados"),
+    ("213k+", "Registros processados")
 ]
-cols = st.columns(4)
-for i, (num, desc) in enumerate(kpis):
-    with cols[i]:
+cols_impact = st.columns(4)
+for i, (num, desc) in enumerate(impact_data):
+    with cols_impact[i]:
         st.markdown(f"""
-        <div class="kpi-card">
-            <div class="kpi-number">{num}</div>
-            <div class="kpi-label">{desc}</div>
+        <div class="impact-card">
+            <div class="impact-number">{num}</div>
+            <div class="impact-text">{desc}</div>
         </div>
         """, unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# EXPERIÊNCIA PROFISSIONAL
-st.markdown('<div id="experiencia"></div>', unsafe_allow_html=True)
+# ==============================================================================
+# TRAJETÓRIA PROFISSIONAL (LINHA DO TEMPO VERTICAL)
+# ==============================================================================
+st.markdown('<div id="experiencia" class="section"></div>', unsafe_allow_html=True)
 st.markdown('<div class="section-title">Trajetória profissional</div>', unsafe_allow_html=True)
 
 experiences = [
     {
-        "date": "2014 – 2026",
-        "title": "Analista de KPIs & Operações",
-        "company": "J Sintonía Calçados Ltda",
-        "desc": [
+        "periodo": "2014 – 2026",
+        "titulo": "Analista de KPIs & Operações",
+        "empresa": "J Sintonía Calçados",
+        "descricoes": [
             "Monitoramento de vendas, margem e giro de estoque com dashboards em Power BI e Looker Studio.",
             "Criação de relatórios automatizados para suporte à gestão estratégica.",
             "Aplicação de SQL e Python na consolidação de bases históricas."
         ]
     },
     {
-        "date": "2009 – presente",
-        "title": "Gestão Comercial & Dados",
-        "company": "Jardim do Éden",
-        "desc": [
+        "periodo": "2009 – presente",
+        "titulo": "Gestão Comercial & Dados",
+        "empresa": "Jardim do Éden",
+        "descricoes": [
             "Redução do ciclo de análise de 2h para 15min com dashboards em Power BI/Looker.",
             "Automação de relatórios via Python e IA generativa.",
-            "Estruturação de fluxo analítico para faturamento, margem e controle de estoque."
+            "Estruturação de fluxo analítico para faturamento, margem e estoque."
         ]
     },
     {
-        "date": "2008 – 2010",
-        "title": "Estagiário de Dados & Automação",
-        "company": "Banco do Brasil",
-        "desc": [
+        "periodo": "2008 – 2010",
+        "titulo": "Estagiário de Dados & Automação",
+        "empresa": "Banco do Brasil",
+        "descricoes": [
             "Automação de processos em 20 agências usando Excel/VBA – redução de 70% no tempo operacional.",
             "Consolidação e padronização de relatórios gerenciais."
         ]
     },
     {
-        "date": "2002 – 2009",
-        "title": "Suporte Operacional & Controle",
-        "company": "NSM Comércio e Serviço",
-        "desc": [
+        "periodo": "2002 – 2009",
+        "titulo": "Suporte Operacional & Controle",
+        "empresa": "NSM Comércio e Serviço",
+        "descricoes": [
             "Centralização de dados operacionais de 7 unidades, eliminando inconsistências.",
             "Controle de estoque e suporte administrativo."
         ]
-    },
+    }
 ]
 
+timeline_html = '<div class="timeline">'
 for exp in experiences:
-    with st.container():
-        st.markdown(f"""
-        <div class="timeline-item">
+    timeline_html += f"""
+    <div class="timeline-item">
+        <div class="timeline-left">{exp['periodo']}</div>
+        <div class="timeline-line" style="position:relative;">
             <div class="timeline-dot"></div>
-            <div class="timeline-date">{exp['date']}</div>
-            <div class="timeline-content">
-                <div class="timeline-title">{exp['title']}</div>
-                <div class="timeline-company">{exp['company']}</div>
-                {''.join([f'<div class="timeline-desc">— {item}</div>' for item in exp['desc']])}
-            </div>
         </div>
-        """, unsafe_allow_html=True)
+        <div class="timeline-content">
+            <div class="timeline-title">{exp['titulo']}</div>
+            <div class="timeline-company">{exp['empresa']}</div>
+    """
+    for desc in exp['descricoes']:
+        timeline_html += f'<div class="timeline-desc">— {desc}</div>'
+    timeline_html += '</div></div>'
+timeline_html += '</div>'
+st.markdown(timeline_html, unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# PROJETOS EM DESTAQUE
-st.markdown('<div id="projetos"></div>', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Projetos em destaque</div>', unsafe_allow_html=True)
+# ==============================================================================
+# STACK TÉCNICA (CHIPS REFINADOS)
+# ==============================================================================
+st.markdown('<div id="habilidades" class="section"></div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Stack técnica</div>', unsafe_allow_html=True)
+
+stack_cats = {
+    "📌 Dados & ETL": ["SQL", "PostgreSQL", "Python", "Pandas", "NumPy", "ETL / Saneamento"],
+    "📊 BI & Visualização": ["Power BI", "Looker Studio", "Plotly", "Streamlit", "Excel Avançado"],
+    "📈 Análise & Indicadores": ["KPIs", "Controle de Fluxo", "Margem & Giro", "Dashboards Gerenciais"],
+    "⚙️ Automação & Ferramentas": ["Excel/VBA", "Git", "IA Generativa", "Padronização de Processos"]
+}
+
+for cat, items in stack_cats.items():
+    st.markdown(f'<div class="stack-category"><div class="stack-title">{cat}</div><div class="stack-chips">', unsafe_allow_html=True)
+    for item in items:
+        st.markdown(f'<span class="chip">{item}</span>', unsafe_allow_html=True)
+    st.markdown('</div></div>', unsafe_allow_html=True)
+
+# ==============================================================================
+# PROJETOS EM DESTAQUE (CARDS COM MINIATURAS)
+# ==============================================================================
+st.markdown('<div id="portfolio" class="section"></div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Portfólio de projetos</div>', unsafe_allow_html=True)
 
 projects = [
     {
-        "title": "Desenrola Brasil – Painel Executivo",
-        "desc": "Dashboard interativo com dados oficiais do Banco Central (R$ 50 bi renegociados, 15M contratos). Análise de concentração de mercado (HHI), clusterização K-Means e previsão Holt-Winters.",
+        "nome": "Desenrola Brasil – Painel Executivo",
+        "desc": "Dashboard com dados oficiais do Banco Central (R$50 bi renegociados). Análise de concentração de mercado (HHI), clusterização K-Means e previsão Holt-Winters.",
         "tech": ["Python", "Pandas", "Plotly", "Streamlit", "PostgreSQL"],
-        "app": "https://desenrolabrasil.streamlit.app/",
-        "code": "https://github.com/raphaelcaxias/DESENROLA_BRASIL"
+        "app_url": "https://desenrolabrasil.streamlit.app/",
+        "code_url": "https://github.com/raphaelcaxias/DESENROLA_BRASIL",
+        "img_char": "📈"
     },
     {
-        "title": "CNPq Analytics",
-        "desc": "Processamento de 213 mil bolsas de pesquisa (R$ 1,2 bi). Identificação de desigualdades regionais e rankings dinâmicos.",
+        "nome": "CNPq Analytics – Investimentos",
+        "desc": "Processamento de 213 mil bolsas de pesquisa (R$1,2 bi). Identificação de desigualdades regionais e rankings dinâmicos.",
         "tech": ["Python", "Pandas", "Plotly", "Streamlit", "PostgreSQL"],
-        "app": "https://cnpq-analytics.streamlit.app/",
-        "code": "https://github.com/raphaelcaxias/CNPq-Analytics"
+        "app_url": "https://cnpq-analytics.streamlit.app/",
+        "code_url": "https://github.com/raphaelcaxias/CNPq-Analytics",
+        "img_char": "🎓"
     },
     {
-        "title": "ANP – Preços de Combustíveis",
+        "nome": "ANP – Preços de Combustíveis",
         "desc": "Dashboard com dados públicos da ANP para análise temporal e regional de preços de combustíveis.",
         "tech": ["Python", "Pandas", "Plotly", "Streamlit"],
-        "app": None,
-        "code": "https://github.com/raphaelcaxias/anp-combustiveis-dashboard"
-    },
+        "app_url": None,
+        "code_url": "https://github.com/raphaelcaxias/anp-combustiveis-dashboard",
+        "img_char": "⛽"
+    }
 ]
 
+projects_html = '<div class="projects-grid">'
 for proj in projects:
-    tech_badges = "".join(f'<span class="tech-badge">{t}</span>' for t in proj["tech"])
-    links = ""
-    if proj["app"]:
-        links += f'<a href="{proj["app"]}" target="_blank" style="margin-right:1rem;">🔗 Aplicação</a>'
-    if proj["code"]:
-        links += f'<a href="{proj["code"]}" target="_blank">📄 Código</a>'
-    st.markdown(f"""
+    tech_badges = ''.join(f'<span class="tech-tag">{t}</span>' for t in proj['tech'])
+    app_link = f'<a href="{proj["app_url"]}" target="_blank">🔗 Aplicação</a>' if proj["app_url"] else ''
+    code_link = f'<a href="{proj["code_url"]}" target="_blank">📄 Código</a>'
+    projects_html += f"""
     <div class="project-card">
-        <div class="project-title">{proj['title']}</div>
-        <div class="project-desc">{proj['desc']}</div>
-        <div class="project-tech">{tech_badges}</div>
-        <div class="project-links">{links}</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# ------------------------------------------------------------------------------
-# STACK TÉCNICA
-st.markdown('<div id="stack"></div>', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Stack técnica</div>', unsafe_allow_html=True)
-
-stack_categories = {
-    "Dados & ETL": ["SQL", "PostgreSQL", "Python", "Pandas", "NumPy", "ETL/Saneamento"],
-    "BI & Visualização": ["Power BI", "Looker Studio", "Plotly", "Streamlit", "Excel Avançado"],
-    "Análise & Indicadores": ["KPIs", "Controle de Fluxo", "Margem & Giro", "Dashboards Gerenciais"],
-    "Automação & Ferramentas": ["Excel/VBA", "Git", "IA Generativa", "Padronização de Processos"],
-}
-
-cols = st.columns(2)
-for i, (cat, items) in enumerate(stack_categories.items()):
-    with cols[i % 2]:
-        badges = "".join(f'<span class="stack-tag">{item}</span>' for item in items)
-        st.markdown(f"""
-        <div class="stack-category">
-            <div class="stack-title">📌 {cat}</div>
-            <div class="stack-tags">{badges}</div>
+        <div class="project-img">{proj['img_char']} Dashboard</div>
+        <div class="project-content">
+            <div class="project-title">{proj['nome']}</div>
+            <div class="project-desc">{proj['desc']}</div>
+            <div class="project-tech">{tech_badges}</div>
+            <div class="project-links">{app_link} {code_link}</div>
         </div>
-        """, unsafe_allow_html=True)
-
-# ------------------------------------------------------------------------------
-# DEMONSTRAÇÃO INTERATIVA (opcional, igual ao original)
-st.markdown('<div class="section-title">Demonstração interativa</div>', unsafe_allow_html=True)
-st.caption("Exemplo do tipo de análise que construo – explore os filtros abaixo.")
-
-tab1, tab2 = st.tabs(["📈 Vendas vs Meta", "🗺️ Distribuição Regional"])
-
-with tab1:
-    meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun']
-    vendas_base = [120, 145, 132, 168, 189, 201]
-    meta_base = [130, 140, 145, 160, 180, 200]
-
-    crescimento = st.slider("Simular crescimento de vendas (%)", -20, 50, 0, 5)
-    vendas_adj = [int(v * (1 + crescimento/100)) for v in vendas_base]
-
-    fig = go.Figure()
-    fig.add_trace(go.Bar(x=meses, y=meta_base, name='Meta', marker_color='#e2e8f0'))
-    fig.add_trace(go.Scatter(x=meses, y=vendas_adj, name='Realizado',
-        mode='lines+markers', line=dict(color='#3b82f6', width=3), marker=dict(size=9)))
-    fig.update_layout(height=350, margin=dict(t=20, b=10), plot_bgcolor='white', paper_bgcolor='white')
-    st.plotly_chart(fig, use_container_width=True)
-
-    total_real = sum(vendas_adj)
-    total_meta = sum(meta_base)
-    ating = total_real / total_meta * 100
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Total realizado", f"{total_real}", f"{crescimento:+d}% ajuste")
-    col2.metric("Atingimento da meta", f"{ating:.1f}%")
-    col3.metric("Melhor mês", meses[vendas_adj.index(max(vendas_adj))])
-
-with tab2:
-    regioes = ['Sudeste', 'Nordeste', 'Sul', 'Centro-Oeste', 'Norte']
-    valores = [42, 28, 15, 10, 5]
-    cores = ['#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd']
-    fig2 = go.Figure(data=[go.Pie(labels=regioes, values=valores, hole=0.4,
-                                   marker=dict(colors=cores), textinfo='label+percent')])
-    fig2.update_layout(height=350, margin=dict(t=0, b=0), paper_bgcolor='white')
-    st.plotly_chart(fig2, use_container_width=True)
-
-# ------------------------------------------------------------------------------
-# FORMAÇÃO E CERTIFICAÇÕES (simplificado, mas bonito)
-st.markdown('<div class="section-title">Formação & certificações</div>', unsafe_allow_html=True)
-col_f1, col_f2 = st.columns(2)
-with col_f1:
-    st.markdown("""
-    <div class="stack-category">
-        <div class="stack-title">🎓 Formação acadêmica</div>
-        <p><strong>Sistemas de Informação</strong><br>UniFOA – 2010</p>
-        <p><strong>Técnico em Informática</strong><br>CIBA – 2005</p>
     </div>
-    """, unsafe_allow_html=True)
-with col_f2:
-    st.markdown("""
-    <div class="stack-category">
-        <div class="stack-title">📜 Certificações (Hashtag Treinamentos)</div>
-        <ul style="margin:0;padding-left:1.2rem;">
-            <li>SQL para Análise de Dados</li>
-            <li>Power BI Expert</li>
-            <li>Python para Análise de Dados (Pandas)</li>
-            <li>Algoritmos e IA aplicada</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    """
+projects_html += '</div>'
+st.markdown(projects_html, unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# CONTATO FINAL
-st.markdown('<div id="contato"></div>', unsafe_allow_html=True)
+# ==============================================================================
+# FORMAÇÃO & CERTIFICAÇÕES (LAYOUT ALTERNATIVO)
+# ==============================================================================
+st.markdown('<div class="section-title">Formação & Certificações</div>', unsafe_allow_html=True)
+st.markdown('<div class="edu-grid">', unsafe_allow_html=True)
+# Formação
 st.markdown("""
-<div class="contact-card">
-    <div style="font-size:1.5rem;font-weight:700;margin-bottom:0.5rem;">Vamos trabalhar juntos?</div>
-    <p>Busco oportunidades como Analista de Dados, BI ou Automação. Total disponibilidade para remoto.</p>
-    <p>📧 <a href="mailto:raphael_caxias@hotmail.com">raphael_caxias@hotmail.com</a> &nbsp;|&nbsp; 📱 <a href="https://wa.me/5524992275226">(24) 99227-5226</a></p>
-    <div style="margin-top:1rem;">
-        <a class="btn-primary" href="https://linkedin.com/in/raphael-pires-caxias" target="_blank">LinkedIn</a>
-        <a class="btn-outline" href="https://github.com/raphaelcaxias" target="_blank">GitHub</a>
+<div class="edu-block">
+    <div class="edu-icon">🎓</div>
+    <strong>Sistemas de Informação</strong><br>UniFOA – 2010<br><br>
+    <strong>Técnico em Informática</strong><br>CIBA – 2005
+</div>
+""", unsafe_allow_html=True)
+# Certificações grid
+st.markdown("""
+<div class="edu-block">
+    <div class="edu-icon">📜</div>
+    <strong>Certificações (Hashtag Treinamentos)</strong>
+    <div class="cert-grid" style="margin-top:0.8rem;">
+        <div class="cert-item">✓ SQL para Análise de Dados</div>
+        <div class="cert-item">✓ Power BI Expert</div>
+        <div class="cert-item">✓ Python para Análise de Dados</div>
+        <div class="cert-item">✓ IA Aplicada a Negócios</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+# ==============================================================================
+# RODAPÉ DE IMPACTO (VAMOS TRABALHAR JUNTOS?)
+# ==============================================================================
+st.markdown('<div id="contato" class="section"></div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="footer-impact">
+    <h3 style="margin-bottom:0.5rem;">Vamos trabalhar juntos?</h3>
+    <p>Busco oportunidades como Analista de Dados, BI ou Automação. Disponível para remoto ou híbrido.</p>
+    <div class="footer-links">
+        <a href="mailto:raphael_caxias@hotmail.com">📧 raphael_caxias@hotmail.com</a>
+        <a href="tel:+5524992275226">📱 (24) 99227-5226</a>
+        <a href="https://linkedin.com/in/raphael-pires-caxias" target="_blank">🔗 LinkedIn</a>
+        <a href="https://github.com/raphaelcaxias" target="_blank">💻 GitHub</a>
+    </div>
+    <div style="margin-top:1rem; font-size:0.8rem;">
+        <a href="https://github.com/raphaelcaxias/curriculo" target="_blank">Portfolio GitHub</a> • © 2026 Raphael Pires
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="footer">© 2026 Raphael Pires • Portfolio desenvolvido com Streamlit • Dados e BI com propósito</div>', unsafe_allow_html=True)
+# Botão de download do currículo (opcional, discreto)
+if cv_pdf:
+    st.download_button(
+        label="📄 Baixar currículo (PDF)",
+        data=cv_pdf,
+        file_name="Raphael_Pires_Curriculo.pdf",
+        mime="application/pdf",
+        use_container_width=False,
+        key="cv_download"
+    )
+
+st.markdown('</div>', unsafe_allow_html=True)  # fecha main-container
