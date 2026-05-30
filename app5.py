@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Portfolio Premium — Raphael Pires
-Versão: 7.0 — Dark/Light toggle, gráficos, sem erros de formatação
+Versão: 7.1 — Paletas de Cores Otimizadas, Gráficos Harmonizados, Sem Erros de Formatação
 """
 
 import streamlit as st
@@ -83,41 +83,42 @@ profile_base64 = get_image_base64(profile_image) if profile_image else None
 cv_pdf         = load_cv()
 
 # ─────────────────────────────────────────────
-# TOKENS DE COR POR TEMA
+# TOKENS DE COR POR TEMA (VERSÃO REFINADA 7.1)
 # ─────────────────────────────────────────────
 dark = {
-    "bg":         "#0A0A0B",
-    "surface":    "#141418",
-    "surface2":   "#1E1E24",
-    "border":     "#2A2A32",
-    "text":       "#EAEAF0",
-    "text_dim":   "#9898A8",
-    "text_muted": "#5A5A68",
-    "gold":       "#C9A84C",
-    "gold_light": "#E8C877",
-    "gold_dim":   "#4A3A18",
-    "teal":       "#2DD4BF",
-    "plot_bg":    "#141418",
-    "plot_paper": "#141418",
-    "plot_grid":  "#2A2A32",
-    "plot_font":  "#9898A8",
+    "bg":         "#0F1115",  # Grafite profundo com sutil toque azulado (reduz fadiga visual)
+    "surface":    "#161920",  # Superfície ligeiramente mais clara que o fundo
+    "surface2":   "#20242F",  # Destaque secundário
+    "border":     "#292E3C",  # Bordas sutis e elegantes
+    "text":       "#F1F3F5",  # Branco fosco de alta legibilidade
+    "text_dim":   "#A5B4FC",  # Azul acinzentado suave para textos secundários
+    "text_muted": "#64748B",  # Cinza ardósia para textos de apoio
+    "gold":       "#D4AF37",  # Dourado metálico clássico refinado
+    "gold_light": "#F3E5AB",  # Tom baunilha/champanhe para hover
+    "gold_dim":   "#3B3217",  # Dourado escuro de fundo para pílulas e hover
+    "teal":       "#38BDF8",  # Ciano suave para destaques técnicos
+    "plot_bg":    "#161920",  # Casado com a surface
+    "plot_paper": "#0F1115",  # Casado com o bg
+    "plot_grid":  "#232834",  # Linhas de grade discretas
+    "plot_font":  "#94A3B8",  
 }
+
 light = {
-    "bg":         "#F7F5F0",
-    "surface":    "#FFFFFF",
-    "surface2":   "#F0EDE6",
-    "border":     "#D8D4C8",
-    "text":       "#1A1A1E",
-    "text_dim":   "#5A5A68",
-    "text_muted": "#9898A8",
-    "gold":       "#A07830",
-    "gold_light": "#C9A84C",
-    "gold_dim":   "#F0E4C8",
-    "teal":       "#0F766E",
-    "plot_bg":    "#FFFFFF",
-    "plot_paper": "#F7F5F0",
-    "plot_grid":  "#E8E4DC",
-    "plot_font":  "#5A5A68",
+    "bg":         "#F9F8F6",  # Alabastro/Creme suave inspirado em design editorial
+    "surface":    "#FFFFFF",  # Cartões brancos puros gerando profundidade sobre o fundo
+    "surface2":   "#F1EFEA",  # Elementos secundários
+    "border":     "#E2DDD5",  # Bordas suaves com tom quente
+    "text":       "#1E2229",  # Grafite escuro (menos agressivo que preto puro)
+    "text_dim":   "#4A5568",  # Cinza médio de alto contraste
+    "text_muted": "#8A94A6",  # Cinza sutil para metadados
+    "gold":       "#A36E1A",  # Âmbar/Dourado denso de alta acessibilidade e contraste
+    "gold_light": "#C98A2A",  # Tom de hover dinâmico
+    "gold_dim":   "#FDF6E2",  # Fundo sutil para hover no modo claro
+    "teal":       "#0369A1",  # Azul oceano para contraste técnico
+    "plot_bg":    "#FFFFFF",  
+    "plot_paper": "#F9F8F6",  
+    "plot_grid":  "#EFECE6",  
+    "plot_font":  "#64748B",  
 }
 
 T = dark if st.session_state.dark_mode else light
@@ -125,7 +126,6 @@ T = dark if st.session_state.dark_mode else light
 # ─────────────────────────────────────────────
 # CSS DINÂMICO
 # ─────────────────────────────────────────────
-# Fonts + CSS — split into chunks to avoid Streamlit truncation
 st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -146,7 +146,7 @@ html, body, .stApp {{
 .block-container {{ padding:0 !important; max-width:100% !important; }}
 .stDownloadButton > button {{
     background:{T['gold']};
-    color:{T['bg']};
+    color:{'#0F1115' if not st.session_state.dark_mode else T['bg']};
     border:none;
     border-radius:3px;
     font-size:0.8rem;
@@ -156,7 +156,6 @@ html, body, .stApp {{
     cursor:pointer;
 }}
 .stDownloadButton > button:hover {{ background:{T['gold_light']}; }}
-
 
 </style>""", unsafe_allow_html=True)
 
@@ -283,7 +282,7 @@ st.markdown(f"""<style>
 .rp-actions {{ display:flex; gap:1rem; flex-wrap:wrap; }}
 .rp-btn-primary {{
     display:inline-flex; align-items:center; gap:0.5rem;
-    background:{T['gold']}; color:{T['bg']} !important;
+    background:{T['gold']}; color:{'#0F1115' if not st.session_state.dark_mode else T['bg']} !important;
     font-size:0.75rem; font-weight:500;
     letter-spacing:0.1em; text-transform:uppercase;
     padding:0.7rem 1.6rem; border-radius:2px;
@@ -301,7 +300,6 @@ st.markdown(f"""<style>
 }}
 .rp-btn-ghost:hover {{ border-color:{T['gold']}; color:{T['gold']} !important; transform:translateY(-2px); }}
 
-
 </style>""", unsafe_allow_html=True)
 
 # CSS chunk 3/4
@@ -311,6 +309,7 @@ st.markdown(f"""<style>
     display:grid; grid-template-columns:repeat(4,1fr);
     border:1px solid {T['border']}; border-radius:4px;
     overflow:hidden; margin-bottom:5rem;
+    background:{T['surface']};
 }}
 .rp-strip-cell {{
     padding:2rem 1.5rem;
@@ -318,7 +317,7 @@ st.markdown(f"""<style>
     transition:background 0.2s;
 }}
 .rp-strip-cell:last-child {{ border-right:none; }}
-.rp-strip-cell:hover {{ background:{T['surface']}; }}
+.rp-strip-cell:hover {{ background:{T['surface2']}; }}
 .rp-strip-num {{
     font-family:'Playfair Display',serif;
     font-size:2.6rem; color:{T['gold']};
@@ -447,7 +446,6 @@ st.markdown(f"""<style>
 }}
 .rp-proj-links a:hover {{ color:{T['gold']}; }}
 
-
 </style>""", unsafe_allow_html=True)
 
 # CSS chunk 4/4
@@ -469,13 +467,14 @@ st.markdown(f"""<style>
     font-size:0.8rem; font-weight:300;
     padding:0.4rem 0.9rem; border-radius:2px;
     border:1px solid {T['border']}; color:{T['text_dim']};
+    background:{T['surface']};
     transition:border-color 0.2s,color 0.2s,background 0.2s;
     cursor:default;
 }}
 .rp-pill:hover {{
     border-color:{T['gold']};
     color:{T['gold']};
-    background:rgba(74,58,24,0.2);
+    background:{T['gold_dim']};
 }}
 
 /* LAB */
@@ -483,13 +482,15 @@ st.markdown(f"""<style>
     display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem;
 }}
 .rp-lab-card {{
+    background:{T['surface']};
     padding:1.75rem; border:1px solid {T['border']};
     border-radius:4px;
     transition:border-color 0.25s, transform 0.25s;
 }}
 .rp-lab-card:hover {{
-    border-color:{T['gold_dim']};
+    border-color:{T['gold']};
     transform:translateY(-4px);
+    background:{T['surface2']};
 }}
 .rp-lab-icon {{ font-size:1.5rem; margin-bottom:0.75rem; }}
 .rp-lab-title {{
@@ -772,7 +773,7 @@ fig2.update_layout(
             linecolor=T["border"]
         ),
         angularaxis=dict(
-            tickfont=dict(color=T["text_dim"], size=10),
+            tickfont=dict(color=T["plot_font"], size=10),
             gridcolor=T["plot_grid"],
             linecolor=T["border"]
         )
@@ -791,7 +792,7 @@ fig3 = go.Figure(go.Bar(
     orientation="h",
     marker=dict(
         color=usos,
-        colorscale=[[0, hex_rgba(T["gold_dim"], 0.55)], [1, T["gold"]]],
+        colorscale=[[0, hex_rgba(T["gold_dim"], 0.75)], [1, T["gold"]]],
         line=dict(width=0)
     ),
     hovertemplate="%{y}: %{x} projetos<extra></extra>"
@@ -807,7 +808,7 @@ fig3.update_layout(
         zeroline=False, tickfont=dict(color=T["plot_font"], size=10)
     ),
     yaxis=dict(
-        showgrid=False, tickfont=dict(color=T["text_dim"], size=11)
+        showgrid=False, tickfont=dict(color=T["plot_font"], size=11)
     ),
     showlegend=False
 )
@@ -843,7 +844,7 @@ st.markdown(f"""
     <div class="rp-method-icon">⚙️</div>
     <div class="rp-method-title">2. Automatizo o gargalo</div>
     <p class="rp-method-desc">
-      Relatório que leva 2 horas é um problema de engenharia, não de Excel. Construo pipelines que transformam entrada de dados em análise pronta — sem intervenção manual.
+      Relatório que leva 2 hours é um problema de engenharia, não de Excel. Construo pipelines que transformam entrada de dados em análise pronta — sem intervenção manual.
     </p>
   </div>
   <div class="rp-method-card">
