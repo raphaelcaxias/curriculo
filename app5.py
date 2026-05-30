@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Premium Personal Product - Raphael Pires
-Versão: 5.0 - Corrigido erro de hash do PIL Image
+Portfolio Premium — Raphael Pires
+Versão: 6.0 — Redesign editorial luxury dark
 """
 
 import streamlit as st
@@ -15,18 +15,16 @@ import base64
 # CONFIGURAÇÃO INICIAL
 # ------------------------------------------------------------------------------
 st.set_page_config(
-    page_title="Raphael Pires | Dados · Automação · BI",
+    page_title="Raphael Pires — Dados & Automação",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 # ------------------------------------------------------------------------------
-# CARREGAMENTO DE IMAGEM E PDF (SEM CACHE NOS OBJETOS PIL)
+# CARREGAMENTO DE IMAGEM E PDF
 # ------------------------------------------------------------------------------
 def load_image():
-    """Carrega a imagem sem cache para evitar erro de hash"""
-    # Tenta URL raw do GitHub
     url = "https://raw.githubusercontent.com/raphaelcaxias/curriculo/main/rapha.jpeg"
     try:
         r = requests.get(url, timeout=6)
@@ -34,15 +32,12 @@ def load_image():
             return Image.open(BytesIO(r.content))
     except Exception:
         pass
-    
-    # Tenta arquivo local como fallback
     for p in ["rapha.jpeg", "rapha.jpg", "assets/rapha.jpeg"]:
         if os.path.exists(p):
             return Image.open(p)
     return None
 
 def get_image_base64(img):
-    """Converte imagem PIL para base64"""
     if img:
         buffered = BytesIO()
         img.save(buffered, format="JPEG")
@@ -51,7 +46,6 @@ def get_image_base64(img):
 
 @st.cache_data(show_spinner=False)
 def load_cv():
-    """Cache apenas para o PDF"""
     try:
         r = requests.get(
             "https://raw.githubusercontent.com/raphaelcaxias/curriculo/main/Curriculo_Raphael_Premium_Final.pdf",
@@ -66,155 +60,466 @@ def load_cv():
                 return f.read()
     return None
 
-# Carrega imagem e converte para base64
 profile_image = load_image()
 profile_base64 = get_image_base64(profile_image) if profile_image else None
 cv_pdf = load_cv()
 
 # ------------------------------------------------------------------------------
-# CSS PREMIUM COMPLETO (mantido igual)
+# DESIGN SYSTEM — EDITORIAL DARK LUXURY
 # ------------------------------------------------------------------------------
 st.markdown("""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+
 <style>
-/* ==================== DESIGN SYSTEM ==================== */
 :root {
-    --bg-primary: #F8FAFC;
-    --bg-secondary: #FFFFFF;
-    --bg-tertiary: #F1F5F9;
-    --text-primary: #0F172A;
-    --text-secondary: #475569;
-    --text-tertiary: #64748B;
-    --accent-primary: #059669;
-    --accent-primary-dark: #047857;
-    --accent-secondary: #3B82F6;
-    --border-light: #E2E8F0;
-    --border-medium: #CBD5E1;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 20px;
-    --radius-xl: 28px;
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --ink:        #0A0A0B;
+    --ink-soft:   #1A1A1E;
+    --ink-mid:    #2C2C32;
+    --rule:       #2A2A30;
+    --muted:      #6B6B78;
+    --quiet:      #9696A0;
+    --text:       #E8E8EC;
+    --text-dim:   #A8A8B4;
+    --gold:       #C9A84C;
+    --gold-light: #E8C877;
+    --gold-dim:   #7A6228;
+    --teal:       #2DD4BF;
+    --teal-dim:   #134E4A;
+    --serif:      'DM Serif Display', Georgia, serif;
+    --sans:       'DM Sans', system-ui, sans-serif;
+    --ease:       cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-primary: #0F172A;
-        --bg-secondary: #1E293B;
-        --bg-tertiary: #334155;
-        --text-primary: #F8FAFC;
-        --text-secondary: #CBD5E1;
-        --text-tertiary: #94A3B8;
-        --border-light: #334155;
-        --border-medium: #475569;
-    }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html, body, .stApp {
+    background: var(--ink) !important;
+    font-family: var(--sans);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body, .stApp { background-color: var(--bg-primary) !important; font-family: var(--font-sans); color: var(--text-primary); }
-#MainMenu, footer, header, .stDeployButton { display: none !important; }
-.block-container { padding: 0 !important; max-width: 100% !important; }
+#MainMenu, footer, header, .stDeployButton,
+.stToolbar, [data-testid="stToolbar"] { display:none !important; }
 
-/* Animações */
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.block-container { padding:0 !important; max-width:100% !important; }
 
-.fade-in { animation: fadeIn 0.6s ease-out forwards; }
-.slide-in { animation: slideInLeft 0.5s ease-out forwards; }
-.scale-in { animation: scaleIn 0.4s ease-out forwards; }
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:var(--ink); }
+::-webkit-scrollbar-thumb { background:var(--gold-dim); border-radius:2px; }
 
-/* Navbar */
-.navbar { position: fixed; top: 0; left: 0; width: 100%; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); padding: 1rem 0; z-index: 1000; }
-@media (prefers-color-scheme: dark) { .navbar { background: rgba(15, 23, 42, 0.8); } }
-.navbar-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-.navbar-logo { font-weight: 700; font-size: 1.2rem; color: var(--accent-primary); text-decoration: none; }
-.navbar-links { display: flex; gap: 2rem; flex-wrap: wrap; }
-.navbar-links a { font-weight: 500; font-size: 0.9rem; color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast); position: relative; }
-.navbar-links a:hover { color: var(--accent-primary); }
-.navbar-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--accent-primary); transition: var(--transition-fast); }
-.navbar-links a:hover::after { width: 100%; }
+/* ── ANIMATIONS ── */
+@keyframes rise {
+    from { opacity:0; transform:translateY(32px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+@keyframes appear {
+    from { opacity:0; }
+    to   { opacity:1; }
+}
+@keyframes lineGrow {
+    from { transform:scaleX(0); }
+    to   { transform:scaleX(1); }
+}
 
-/* Container */
-.main-container { padding-top: 90px; max-width: 1200px; margin: 0 auto; padding-left: 2rem; padding-right: 2rem; }
-.section { margin-bottom: 5rem; scroll-margin-top: 90px; animation: fadeIn 0.6s ease-out; }
-.section-title { font-size: 2rem; font-weight: 700; margin-bottom: 2rem; letter-spacing: -0.02em; background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; position: relative; display: inline-block; }
-.section-title::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 60px; height: 3px; background: var(--accent-primary); border-radius: 3px; }
+/* ── NAVBAR ── */
+.navbar {
+    position: fixed; top:0; left:0; width:100%;
+    background: rgba(10,10,11,0.85);
+    backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid var(--rule);
+    z-index: 1000;
+    animation: appear 0.4s var(--ease);
+}
+.navbar-inner {
+    max-width: 1280px; margin:0 auto;
+    padding: 0 3rem;
+    height: 68px;
+    display: flex; align-items:center; justify-content:space-between;
+}
+.navbar-logo {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+    text-decoration:none;
+}
+.navbar-nav { display:flex; gap:2.5rem; }
+.navbar-nav a {
+    font-size: 0.78rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--quiet);
+    text-decoration:none;
+    transition: color 0.2s;
+}
+.navbar-nav a:hover { color: var(--gold); }
 
-/* Hero */
-.hero-pic { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-primary); box-shadow: var(--shadow-xl); transition: var(--transition-normal); }
-.hero-pic:hover { transform: scale(1.02); }
-.hero-name { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.02em; background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.hero-title { font-size: 1.25rem; color: var(--accent-primary); font-weight: 500; margin-bottom: 1rem; }
-.hero-description { font-size: 1rem; color: var(--text-secondary); line-height: 1.6; max-width: 600px; margin-bottom: 1.5rem; }
-.hero-stats { display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.hero-stat-number { font-size: 1.5rem; font-weight: 700; color: var(--accent-primary); }
-.hero-stat-label { font-size: 0.7rem; color: var(--text-tertiary); text-transform: uppercase; }
+/* ── PAGE WRAPPER ── */
+.page { max-width:1280px; margin:0 auto; padding: 120px 3rem 0; }
 
-/* Botões */
-.btn-group { display: flex; gap: 1rem; flex-wrap: wrap; }
-.btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--accent-primary); color: white; padding: 0.7rem 1.5rem; border-radius: 40px; text-decoration: none; font-weight: 600; transition: var(--transition-fast); }
-.btn-primary:hover { background: var(--accent-primary-dark); transform: translateY(-2px); }
-.btn-secondary { display: inline-flex; align-items: center; gap: 0.5rem; background: transparent; border: 1px solid var(--border-medium); color: var(--text-primary); padding: 0.7rem 1.5rem; border-radius: 40px; text-decoration: none; font-weight: 500; transition: var(--transition-fast); }
-.btn-secondary:hover { border-color: var(--accent-primary); color: var(--accent-primary); transform: translateY(-2px); }
+/* ── SECTION ── */
+.section { margin-bottom: 7rem; scroll-margin-top: 90px; }
 
-/* Cards */
-.impact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-.impact-card { background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; border: 1px solid var(--border-light); transition: var(--transition-normal); }
-.impact-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-xl); }
-.impact-number { font-size: 2.5rem; font-weight: 800; color: var(--accent-primary); }
+.section-label {
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+    display: flex; align-items:center; gap:0.75rem;
+}
+.section-label::before {
+    content:'';
+    display:inline-block;
+    width:24px; height:1px;
+    background: var(--gold);
+}
 
-/* Timeline */
-.timeline-item { display: flex; margin-bottom: 2rem; position: relative; }
-.timeline-left { width: 120px; flex-shrink: 0; text-align: right; padding-right: 1.5rem; }
-.timeline-year { font-weight: 700; color: var(--accent-primary); }
-.timeline-line { position: relative; width: 2px; background: var(--border-light); margin-right: 1.5rem; }
-.timeline-dot { position: absolute; left: -5px; top: 8px; width: 12px; height: 12px; background: var(--accent-primary); border-radius: 50%; border: 2px solid var(--bg-secondary); }
-.timeline-title { font-weight: 700; font-size: 1.1rem; }
-.timeline-company { color: var(--text-tertiary); font-size: 0.85rem; }
-.timeline-desc { font-size: 0.85rem; color: var(--text-secondary); margin: 0.3rem 0; padding-left: 1rem; border-left: 2px solid var(--border-light); }
+.section-title {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.1;
+    letter-spacing:-0.01em;
+    margin-bottom: 3rem;
+}
 
-/* Project cards */
-.projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
-.project-card { background: var(--bg-secondary); border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-light); transition: var(--transition-normal); }
-.project-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-xl); border-color: var(--accent-primary); }
-.project-img { width: 100%; height: 180px; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
-.project-content { padding: 1.5rem; }
-.project-title { font-weight: 700; font-size: 1.2rem; }
-.project-desc { font-size: 0.85rem; color: var(--text-secondary); margin: 0.5rem 0 1rem; }
-.project-metrics { display: flex; gap: 1rem; margin-bottom: 1rem; }
-.project-metric-value { font-weight: 700; color: var(--accent-primary); }
-.tech-tag { background: var(--bg-tertiary); padding: 0.25rem 0.75rem; border-radius: 30px; font-size: 0.7rem; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.5rem; }
-.project-links a { font-size: 0.8rem; color: var(--accent-primary); text-decoration: none; margin-right: 1rem; }
+/* ── RULE ── */
+.hr { border:none; border-top:1px solid var(--rule); margin: 4rem 0; }
 
-/* Stack */
-.stack-category { margin-bottom: 2rem; }
-.stack-chips { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-.chip { background: var(--bg-tertiary); padding: 0.5rem 1.2rem; border-radius: 40px; font-size: 0.8rem; transition: var(--transition-fast); }
-.chip:hover { background: var(--accent-primary); color: white; }
+/* ── HERO ── */
+.hero-wrap {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 4rem;
+    align-items: center;
+    padding: 4rem 0 6rem;
+    animation: rise 0.8s var(--ease);
+}
+.hero-photo-ring {
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    flex-shrink:0;
+}
+.hero-photo-inner {
+    width:100%; height:100%;
+    border-radius:50%;
+    overflow:hidden;
+    background: var(--ink-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-size:4rem;
+}
+.hero-photo-inner img { width:100%; height:100%; object-fit:cover; }
 
-/* Method */
-.method-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-.method-card { background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 1.5rem; border: 1px solid var(--border-light); transition: var(--transition-normal); }
-.method-card:hover { transform: translateY(-5px); border-color: var(--accent-primary); }
+.hero-eyebrow {
+    font-size:0.72rem; font-weight:400;
+    letter-spacing:0.22em; text-transform:uppercase;
+    color: var(--gold); margin-bottom:1rem;
+}
+.hero-name {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 5vw, 5rem);
+    font-weight:400;
+    color: var(--text);
+    line-height:1;
+    letter-spacing:-0.02em;
+    margin-bottom:0.5rem;
+}
+.hero-name em { font-style:italic; color: var(--gold); }
 
-/* Footer */
-.footer-impact { background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); border-radius: var(--radius-xl); padding: 2.5rem; text-align: center; margin-top: 3rem; }
-.footer-links { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin: 1.5rem 0; }
-.footer-links a { color: var(--text-secondary); text-decoration: none; }
-.footer-links a:hover { color: var(--accent-primary); }
+.hero-tagline {
+    font-size:1.1rem;
+    font-weight:300;
+    color: var(--text-dim);
+    max-width:500px;
+    line-height:1.65;
+    margin-bottom:2.5rem;
+}
+.hero-kpis {
+    display:flex; gap:3rem; margin-bottom:2.5rem; flex-wrap:wrap;
+}
+.hero-kpi-val {
+    font-family: var(--serif);
+    font-size:2.4rem; font-weight:400;
+    color: var(--gold);
+    display:block; line-height:1;
+}
+.hero-kpi-lbl {
+    font-size:0.68rem;
+    letter-spacing:0.14em; text-transform:uppercase;
+    color: var(--muted);
+    margin-top:0.3rem; display:block;
+}
+.hero-actions { display:flex; gap:1rem; flex-wrap:wrap; }
 
-/* Responsivo */
-@media (max-width: 768px) {
-    .main-container { padding-left: 1rem; padding-right: 1rem; }
-    .hero-name { font-size: 2.2rem; }
-    .timeline-left { width: 80px; }
-    .projects-grid { grid-template-columns: 1fr; }
+.btn-gold {
+    display:inline-flex; align-items:center; gap:0.5rem;
+    background: var(--gold);
+    color: var(--ink) !important;
+    font-size:0.78rem; font-weight:500;
+    letter-spacing:0.1em; text-transform:uppercase;
+    padding:0.75rem 1.75rem;
+    border-radius:2px;
+    text-decoration:none;
+    transition: background 0.2s, transform 0.2s;
+    white-space:nowrap;
+}
+.btn-gold:hover { background: var(--gold-light); transform:translateY(-2px); }
+
+.btn-ghost {
+    display:inline-flex; align-items:center; gap:0.5rem;
+    background: transparent;
+    color: var(--text-dim) !important;
+    font-size:0.78rem; font-weight:400;
+    letter-spacing:0.1em; text-transform:uppercase;
+    padding:0.75rem 1.75rem;
+    border:1px solid var(--rule);
+    border-radius:2px;
+    text-decoration:none;
+    transition: border-color 0.2s, color 0.2s, transform 0.2s;
+    white-space:nowrap;
+}
+.btn-ghost:hover { border-color:var(--gold); color:var(--gold) !important; transform:translateY(-2px); }
+
+/* ── IMPACT STRIP ── */
+.impact-strip {
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    border: 1px solid var(--rule);
+    border-radius:4px;
+    overflow:hidden;
+    margin-bottom:5rem;
+    animation: rise 0.9s 0.15s var(--ease) both;
+}
+.impact-cell {
+    padding:2rem 1.5rem;
+    border-right:1px solid var(--rule);
+    transition: background 0.25s;
+}
+.impact-cell:last-child { border-right:none; }
+.impact-cell:hover { background:var(--ink-soft); }
+.impact-num {
+    font-family:var(--serif);
+    font-size:2.75rem; font-weight:400;
+    color: var(--gold);
+    display:block; line-height:1;
+    margin-bottom:0.5rem;
+}
+.impact-lbl {
+    font-size:0.72rem;
+    letter-spacing:0.14em; text-transform:uppercase;
+    color: var(--muted);
+}
+
+/* ── METHOD CARDS ── */
+.method-trio {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:1.5px;
+    background:var(--rule); border-radius:4px; overflow:hidden;
+    margin-bottom:2rem;
+}
+.method-card {
+    background:var(--ink-soft);
+    padding:2.5rem 2rem;
+    transition:background 0.25s;
+}
+.method-card:hover { background:var(--ink-mid); }
+.method-icon { font-size:1.75rem; margin-bottom:1.25rem; display:block; }
+.method-title {
+    font-family:var(--serif); font-size:1.25rem; color:var(--text);
+    margin-bottom:0.75rem;
+}
+.method-desc { font-size:0.875rem; color:var(--text-dim); line-height:1.7; font-weight:300; }
+
+/* ── TIMELINE ── */
+.timeline { position:relative; }
+.timeline::before {
+    content:''; position:absolute; left:120px; top:0; bottom:0;
+    width:1px; background:var(--rule);
+}
+.tl-item {
+    display:grid; grid-template-columns:120px 1fr;
+    gap:2.5rem; margin-bottom:3rem; position:relative;
+}
+.tl-item::before {
+    content:''; position:absolute;
+    left:115px; top:6px;
+    width:11px; height:11px;
+    border-radius:50%;
+    background: var(--ink);
+    border: 2px solid var(--gold);
+}
+.tl-year {
+    font-size:0.72rem;
+    letter-spacing:0.08em;
+    color:var(--muted);
+    padding-top:3px;
+    text-align:right;
+}
+.tl-role {
+    font-family:var(--serif); font-size:1.2rem; color:var(--text);
+    margin-bottom:0.2rem;
+}
+.tl-company { font-size:0.8rem; color:var(--gold); letter-spacing:0.06em; margin-bottom:0.75rem; }
+.tl-detail {
+    font-size:0.82rem; color:var(--text-dim); font-weight:300;
+    line-height:1.75;
+    padding-left:0.75rem;
+    border-left:1px solid var(--gold-dim);
+    margin-bottom:0.4rem;
+}
+
+/* ── PROJECTS ── */
+.projects-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5px; background:var(--rule); border-radius:4px; overflow:hidden; }
+.proj-card {
+    background:var(--ink-soft);
+    padding:2rem;
+    display:flex; flex-direction:column;
+    transition:background 0.25s;
+    position:relative; overflow:hidden;
+}
+.proj-card:hover { background:var(--ink-mid); }
+.proj-card::after {
+    content:''; position:absolute; bottom:0; left:0; right:0;
+    height:2px; background:var(--gold);
+    transform:scaleX(0); transform-origin:left;
+    transition:transform 0.35s var(--ease);
+}
+.proj-card:hover::after { transform:scaleX(1); }
+.proj-number {
+    font-family:var(--serif); font-size:3rem; font-weight:400;
+    color:var(--rule); line-height:1; margin-bottom:1.5rem;
+}
+.proj-icon { font-size:2rem; margin-bottom:1rem; }
+.proj-title {
+    font-family:var(--serif); font-size:1.3rem; color:var(--text);
+    margin-bottom:0.75rem; line-height:1.2;
+}
+.proj-desc { font-size:0.82rem; color:var(--text-dim); line-height:1.7; font-weight:300; flex:1; margin-bottom:1.5rem; }
+.proj-metric { font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-bottom:1.25rem; }
+.proj-tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:1.25rem; }
+.tag {
+    font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase;
+    padding:0.3rem 0.65rem; border-radius:1px;
+    border:1px solid var(--rule); color:var(--muted);
+}
+.proj-links { display:flex; gap:1.25rem; }
+.proj-links a {
+    font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--quiet); text-decoration:none;
+    transition:color 0.2s;
+}
+.proj-links a:hover { color:var(--gold); }
+
+/* ── STACK ── */
+.stack-section { display:grid; grid-template-columns:repeat(2,1fr); gap:2rem; }
+.stack-block { }
+.stack-cat {
+    font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:1rem;
+    display:flex; align-items:center; gap:0.5rem;
+}
+.stack-cat::after { content:''; flex:1; height:1px; background:var(--rule); }
+.stack-pills { display:flex; flex-wrap:wrap; gap:0.5rem; }
+.pill {
+    font-size:0.8rem; font-weight:300;
+    padding:0.45rem 1rem; border-radius:2px;
+    border:1px solid var(--rule);
+    color:var(--text-dim);
+    transition:border-color 0.2s, color 0.2s, background 0.2s;
+    cursor:default;
+}
+.pill:hover { border-color:var(--gold); color:var(--gold); background:rgba(201,168,76,0.06); }
+
+/* ── LAB ── */
+.lab-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+.lab-card {
+    padding:1.75rem;
+    border:1px solid var(--rule);
+    border-radius:4px;
+    transition:border-color 0.25s, transform 0.25s;
+}
+.lab-card:hover { border-color:var(--gold-dim); transform:translateY(-4px); }
+.lab-card-icon { font-size:1.5rem; margin-bottom:1rem; }
+.lab-card-title { font-family:var(--serif); font-size:1.1rem; color:var(--text); margin-bottom:0.35rem; }
+.lab-status {
+    font-size:0.65rem; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--gold); font-weight:400;
+}
+
+/* ── EDUCATION ── */
+.edu-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--rule); border-radius:4px; overflow:hidden; margin-bottom:2rem; }
+.edu-card { background:var(--ink-soft); padding:2rem; }
+.edu-icon { font-size:1.5rem; margin-bottom:1rem; }
+.edu-degree { font-family:var(--serif); font-size:1.1rem; color:var(--text); margin-bottom:0.25rem; }
+.edu-school { font-size:0.78rem; letter-spacing:0.08em; color:var(--muted); text-transform:uppercase; }
+
+/* ── CONTACT ── */
+.contact-footer {
+    background: var(--ink-soft);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:4rem;
+    text-align:center;
+    margin-bottom:4rem;
+    position:relative; overflow:hidden;
+}
+.contact-footer::before {
+    content:'';
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:60%; height:1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.contact-headline {
+    font-family:var(--serif);
+    font-size:clamp(1.75rem, 3vw, 2.75rem);
+    color:var(--text); font-weight:400;
+    margin-bottom:0.75rem;
+}
+.contact-sub { font-size:0.95rem; color:var(--text-dim); font-weight:300; margin-bottom:2.5rem; }
+.contact-links { display:flex; justify-content:center; gap:2rem; flex-wrap:wrap; margin-bottom:2.5rem; }
+.contact-links a {
+    font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--text-dim); text-decoration:none;
+    transition:color 0.2s;
+}
+.contact-links a:hover { color:var(--gold); }
+.copyright { font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+
+/* ── RESPONSIVE ── */
+@media (max-width:960px) {
+    .page { padding:100px 1.5rem 0; }
+    .hero-wrap { grid-template-columns:1fr; gap:2rem; text-align:center; }
+    .hero-photo-ring { margin:0 auto; }
+    .hero-kpis { justify-content:center; }
+    .hero-actions { justify-content:center; }
+    .impact-strip { grid-template-columns:repeat(2,1fr); }
+    .impact-cell:nth-child(2) { border-right:none; }
+    .impact-cell:nth-child(3) { border-top:1px solid var(--rule); }
+    .method-trio { grid-template-columns:1fr; }
+    .projects-grid { grid-template-columns:1fr; }
+    .stack-section { grid-template-columns:1fr; }
+    .lab-grid { grid-template-columns:1fr; }
+    .edu-grid { grid-template-columns:1fr; }
+    .contact-footer { padding:2.5rem 1.5rem; }
+    .timeline::before { left:80px; }
+    .tl-item { grid-template-columns:80px 1fr; gap:1.5rem; }
+    .tl-item::before { left:75px; }
+    .navbar-inner { padding:0 1.5rem; }
+    .navbar-nav { gap:1.5rem; }
+}
+@media (max-width:600px) {
+    .navbar-nav { display:none; }
+    .impact-strip { grid-template-columns:1fr 1fr; }
+    .projects-grid { grid-template-columns:1fr; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -223,218 +528,351 @@ body, .stApp { background-color: var(--bg-primary) !important; font-family: var(
 # NAVBAR
 # ------------------------------------------------------------------------------
 st.markdown("""
-<div class="navbar">
-    <div class="navbar-container">
-        <a href="#inicio" class="navbar-logo">RP</a>
-        <div class="navbar-links">
-            <a href="#inicio">Início</a>
-            <a href="#sobre">Sobre</a>
-            <a href="#experiencia">Trajetória</a>
-            <a href="#portfolio">Cases</a>
-            <a href="#stack">Stack</a>
-            <a href="#lab">Lab</a>
-            <a href="#contato">Contato</a>
-        </div>
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="#inicio" class="navbar-logo">Raphael Pires</a>
+    <div class="navbar-nav">
+      <a href="#sobre">Sobre</a>
+      <a href="#trajetoria">Trajetória</a>
+      <a href="#cases">Cases</a>
+      <a href="#stack">Stack</a>
+      <a href="#contato">Contato</a>
     </div>
-</div>
+  </div>
+</nav>
 """, unsafe_allow_html=True)
 
 # ------------------------------------------------------------------------------
-# MAIN CONTAINER
+# PAGE WRAPPER
 # ------------------------------------------------------------------------------
-st.markdown('<div class="main-container">', unsafe_allow_html=True)
-
-# ==============================================================================
-# HERO SECTION
-# ==============================================================================
+st.markdown('<div class="page">', unsafe_allow_html=True)
 st.markdown('<div id="inicio"></div>', unsafe_allow_html=True)
 
-hero_col1, hero_col2 = st.columns([1, 2], gap="large")
-with hero_col1:
-    if profile_base64:
-        st.markdown(f'<img src="data:image/jpeg;base64,{profile_base64}" class="hero-pic">', unsafe_allow_html=True)
-    else:
-        st.markdown('<div style="width:180px;height:180px;background:var(--bg-tertiary);border-radius:50%;display:flex;align-items:center;justify-content:center;">📷</div>', unsafe_allow_html=True)
-
-with hero_col2:
-    st.markdown("""
-    <h1 class="hero-name">Raphael Pires</h1>
-    <div class="hero-title">Dados · Automação · Inteligência Operacional</div>
-    <div class="hero-description">
-    +15 anos transformando operações reais em inteligência acionável. 
-    Da automação bancária à gestão de negócio próprio — dados não são teoria, são decisão.
-    </div>
-    <div class="hero-stats">
-        <div><div class="hero-stat-number">15+</div><div class="hero-stat-label">anos operação</div></div>
-        <div><div class="hero-stat-number">70%</div><div class="hero-stat-label">redução operacional</div></div>
-        <div><div class="hero-stat-number">213k+</div><div class="hero-stat-label">registros</div></div>
-        <div><div class="hero-stat-number">4+</div><div class="hero-stat-label">dashboards</div></div>
-    </div>
-    <div class="btn-group">
-        <a class="btn-primary" href="#contato">📬 Vamos conversar</a>
-        <a class="btn-secondary" href="#portfolio">📊 Ver Cases</a>
-    </div>
-    """, unsafe_allow_html=True)
-
 # ==============================================================================
-# METODOLOGIA
+# HERO
 # ==============================================================================
-st.markdown('<div id="sobre" class="section"></div>', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Como penso dados</div>', unsafe_allow_html=True)
+if profile_base64:
+    photo_html = f'<img src="data:image/jpeg;base64,{profile_base64}" alt="Raphael Pires">'
+else:
+    photo_html = '<span>👤</span>'
 
-st.markdown("""
-<div class="method-grid">
-    <div class="method-card"><div style="font-size:2rem;">🔍</div><h4>Entendo a operação</h4><p style="color:var(--text-secondary);">Antes de qualquer SQL, entendo o fluxo real. Números só fazem sentido com contexto.</p></div>
-    <div class="method-card"><div style="font-size:2rem;">⚙️</div><h4>Automatizo o repetitivo</h4><p style="color:var(--text-secondary);">Planilha que abre em 14 minutos não é dado — é sofrimento. Crio pipelines que entregam análise.</p></div>
-    <div class="method-card"><div style="font-size:2rem;">📊</div><h4>Traduzo para decisão</h4><p style="color:var(--text-secondary);">Gráfico bonito não aprova orçamento. Insight claro e acionável sim.</p></div>
+st.markdown(f"""
+<div class="hero-wrap">
+  <div>
+    <div class="hero-photo-ring">
+      <div class="hero-photo-inner">{photo_html}</div>
+    </div>
+  </div>
+  <div>
+    <div class="hero-eyebrow">Dados · Automação · Inteligência Operacional</div>
+    <h1 class="hero-name">Raphael <em>Pires</em></h1>
+    <p class="hero-tagline">
+      +15 anos transformando operações reais em inteligência acionável.
+      Da automação bancária à gestão de negócio próprio — dados não são teoria, são decisão.
+    </p>
+    <div class="hero-kpis">
+      <div>
+        <span class="hero-kpi-val">15+</span>
+        <span class="hero-kpi-lbl">Anos de operação</span>
+      </div>
+      <div>
+        <span class="hero-kpi-val">−70%</span>
+        <span class="hero-kpi-lbl">Redução operacional</span>
+      </div>
+      <div>
+        <span class="hero-kpi-val">213k</span>
+        <span class="hero-kpi-lbl">Registros processados</span>
+      </div>
+      <div>
+        <span class="hero-kpi-val">4+</span>
+        <span class="hero-kpi-lbl">Dashboards ativos</span>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <a href="#contato" class="btn-gold">✉ Vamos conversar</a>
+      <a href="#cases" class="btn-ghost">→ Ver cases</a>
+    </div>
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# IMPACT CARDS
+# IMPACTO STRIP
 # ==============================================================================
-st.markdown('<div class="section-title">Impacto mensurável</div>', unsafe_allow_html=True)
-impact_data = [("-70%", "Tempo operacional"), ("2h → 15min", "Ciclo de análise"), ("20", "Agências automatizadas"), ("213.735", "Registros processados")]
-cols = st.columns(4)
-for i, (num, desc) in enumerate(impact_data):
-    with cols[i]:
-        st.markdown(f'<div class="impact-card"><div class="impact-number">{num}</div><div class="impact-text">{desc}</div></div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="impact-strip">
+  <div class="impact-cell">
+    <span class="impact-num">2h→15'</span>
+    <span class="impact-lbl">Ciclo de análise reduzido</span>
+  </div>
+  <div class="impact-cell">
+    <span class="impact-num">20</span>
+    <span class="impact-lbl">Agências automatizadas</span>
+  </div>
+  <div class="impact-cell">
+    <span class="impact-num">R$1,2bi</span>
+    <span class="impact-lbl">Volume de dados analisado</span>
+  </div>
+  <div class="impact-cell">
+    <span class="impact-num">100%</span>
+    <span class="impact-lbl">Remoto / Híbrido</span>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+# ==============================================================================
+# SOBRE / METODOLOGIA
+# ==============================================================================
+st.markdown('<div id="sobre" class="section">', unsafe_allow_html=True)
+st.markdown('<div class="section-label">Metodologia</div>', unsafe_allow_html=True)
+st.markdown('<h2 class="section-title">Como penso dados</h2>', unsafe_allow_html=True)
+
+st.markdown("""
+<div class="method-trio">
+  <div class="method-card">
+    <span class="method-icon">🔍</span>
+    <div class="method-title">Entendo a operação</div>
+    <p class="method-desc">Antes de qualquer SQL, entendo o fluxo real. Números só fazem sentido com contexto operacional.</p>
+  </div>
+  <div class="method-card">
+    <span class="method-icon">⚙️</span>
+    <div class="method-title">Automatizo o repetitivo</div>
+    <p class="method-desc">Planilha que abre em 14 minutos não é dado — é sofrimento. Crio pipelines que entregam análise limpa e rápida.</p>
+  </div>
+  <div class="method-card">
+    <span class="method-icon">📊</span>
+    <div class="method-title">Traduzo para decisão</div>
+    <p class="method-desc">Gráfico bonito não aprova orçamento. Insight claro e acionável sim. Foco total no que muda o próximo passo.</p>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<hr class="hr">', unsafe_allow_html=True)
 
 # ==============================================================================
 # EXPERIÊNCIA
 # ==============================================================================
-st.markdown('<div id="experiencia" class="section"></div>', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Trajetória profissional</div>', unsafe_allow_html=True)
+st.markdown('<div id="trajetoria" class="section">', unsafe_allow_html=True)
+st.markdown('<div class="section-label">Trajetória</div>', unsafe_allow_html=True)
+st.markdown('<h2 class="section-title">Experiência profissional</h2>', unsafe_allow_html=True)
 
 experiences = [
-    {"year": "2014 — 2026", "title": "Analista de KPIs & Operações", "company": "J Sintonía", "desc": ["Monitoramento de vendas, margem e giro", "Relatórios automatizados", "SQL e Python para consolidação"]},
-    {"year": "2009 — presente", "title": "Gestão Comercial & Dados", "company": "Jardim do Éden", "desc": ["Redução de 2h para 15min no ciclo", "Automação com Python e IA", "Estruturação de fluxo analítico"]},
-    {"year": "2008 — 2010", "title": "Estagiário — Automação & Dados", "company": "Banco do Brasil", "desc": ["Automação em 20 agências com VBA", "Redução de 70% no tempo", "Consolidação de relatórios"]},
-    {"year": "2002 — 2009", "title": "Suporte Operacional", "company": "NSM Comércio", "desc": ["Centralização de dados de 7 unidades", "Controle de estoque"]}
+    {
+        "year": "2014 – 2026",
+        "role": "Analista de KPIs & Operações",
+        "company": "J Sintonía",
+        "items": ["Monitoramento contínuo de vendas, margem e giro de estoque", "Relatórios automatizados com Python e SQL", "Estruturação de indicadores operacionais"]
+    },
+    {
+        "year": "2009 – presente",
+        "role": "Gestão Comercial & Dados",
+        "company": "Jardim do Éden",
+        "items": ["Redução do ciclo de análise de 2h para 15 minutos", "Automação completa com Python e IA generativa", "Arquitetura do fluxo analítico do negócio"]
+    },
+    {
+        "year": "2008 – 2010",
+        "role": "Estagiário — Automação & Dados",
+        "company": "Banco do Brasil",
+        "items": ["Automação VBA implantada em 20 agências", "Redução de 70% no tempo operacional", "Consolidação de relatórios de múltiplas unidades"]
+    },
+    {
+        "year": "2002 – 2009",
+        "role": "Suporte Operacional",
+        "company": "NSM Comércio",
+        "items": ["Centralização de dados de 7 unidades", "Controle de estoque e indicadores comerciais"]
+    }
 ]
 
+st.markdown('<div class="timeline">', unsafe_allow_html=True)
 for exp in experiences:
+    details_html = ''.join([f'<div class="tl-detail">{d}</div>' for d in exp['items']])
     st.markdown(f"""
-    <div class="timeline-item">
-        <div class="timeline-left"><span class="timeline-year">{exp['year']}</span></div>
-        <div class="timeline-line"><div class="timeline-dot"></div></div>
-        <div class="timeline-content">
-            <div class="timeline-title">{exp['title']}</div>
-            <div class="timeline-company">{exp['company']}</div>
-            {''.join([f'<div class="timeline-desc">— {d}</div>' for d in exp['desc']])}
-        </div>
+    <div class="tl-item">
+      <div class="tl-year">{exp['year']}</div>
+      <div>
+        <div class="tl-role">{exp['role']}</div>
+        <div class="tl-company">{exp['company']}</div>
+        {details_html}
+      </div>
     </div>
     """, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<hr class="hr">', unsafe_allow_html=True)
 
 # ==============================================================================
 # CASES
 # ==============================================================================
-st.markdown('<div id="portfolio" class="section"></div>', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Cases em destaque</div>', unsafe_allow_html=True)
+st.markdown('<div id="cases" class="section">', unsafe_allow_html=True)
+st.markdown('<div class="section-label">Portfolio</div>', unsafe_allow_html=True)
+st.markdown('<h2 class="section-title">Cases em destaque</h2>', unsafe_allow_html=True)
 
 projects = [
-    {"name": "Desenrola Brasil", "desc": "Dashboard com dados do Banco Central (R$50 bi).", "tech": ["Python", "Pandas", "Plotly", "Streamlit"], "metrics": [("R$50B", "renegociados")], "app_url": "https://desenrolabrasil.streamlit.app/", "code_url": "https://github.com/raphaelcaxias/DESENROLA_BRASIL", "icon": "📊"},
-    {"name": "CNPq Analytics", "desc": "Análise de 213 mil bolsas, R$1,2 bi.", "tech": ["Python", "Pandas", "Plotly", "Streamlit"], "metrics": [("213k+", "bolsas")], "app_url": "https://cnpq-analytics.streamlit.app/", "code_url": "https://github.com/raphaelcaxias/CNPq-Analytics", "icon": "🎓"},
-    {"name": "Portfólio Premium (Este Site)", "desc": "Produto pessoal com design system, animações, responsividade.", "tech": ["Streamlit", "Python", "CSS3", "Design System"], "metrics": [("100%", "customizado")], "app_url": None, "code_url": "https://github.com/raphaelcaxias/curriculo", "icon": "⚡"}
+    {
+        "num": "01",
+        "icon": "📊",
+        "title": "Desenrola Brasil",
+        "desc": "Dashboard analítico com dados abertos do Banco Central — visualização de R$50 bilhões em renegociações de dívida por perfil, faixa e modalidade.",
+        "metric": "R$ 50B em dados visualizados",
+        "tech": ["Python", "Pandas", "Plotly", "Streamlit"],
+        "app": "https://desenrolabrasil.streamlit.app/",
+        "code": "https://github.com/raphaelcaxias/DESENROLA_BRASIL"
+    },
+    {
+        "num": "02",
+        "icon": "🎓",
+        "title": "CNPq Analytics",
+        "desc": "Análise de 213 mil bolsas científicas, representando R$1,2 bilhão em fomento à pesquisa no Brasil. Exploração por área, instituição e distribuição geográfica.",
+        "metric": "213.735 bolsas · R$1,2bi",
+        "tech": ["Python", "Pandas", "Plotly", "Streamlit"],
+        "app": "https://cnpq-analytics.streamlit.app/",
+        "code": "https://github.com/raphaelcaxias/CNPq-Analytics"
+    },
+    {
+        "num": "03",
+        "icon": "⚡",
+        "title": "Portfólio Premium",
+        "desc": "Produto pessoal desenvolvido do zero — design system editorial, tema dark refinado, tipografia expressiva, responsividade completa e foco em conversão.",
+        "metric": "100% design customizado",
+        "tech": ["Streamlit", "Python", "CSS3"],
+        "app": None,
+        "code": "https://github.com/raphaelcaxias/curriculo"
+    }
 ]
 
+st.markdown('<div class="projects-grid">', unsafe_allow_html=True)
 for proj in projects:
-    metrics_html = ''.join([f'<div class="project-metric"><div class="project-metric-value">{m[0]}</div><div class="project-metric-label">{m[1]}</div></div>' for m in proj['metrics']])
-    tech_tags = ''.join([f'<span class="tech-tag">{t}</span>' for t in proj['tech']])
-    app_link = f'<a href="{proj["app_url"]}" target="_blank">🔗 Aplicação</a>' if proj['app_url'] else ''
-    code_link = f'<a href="{proj["code_url"]}" target="_blank">📄 Código</a>'
+    tags_html = ''.join([f'<span class="tag">{t}</span>' for t in proj['tech']])
+    app_link = f'<a href="{proj["app"]}" target="_blank">↗ App ao vivo</a>' if proj['app'] else ''
+    code_link = f'<a href="{proj["code"]}" target="_blank">↗ Código</a>'
+
     st.markdown(f"""
-    <div class="project-card">
-        <div class="project-img">{proj['icon']} {proj['name']}</div>
-        <div class="project-content">
-            <div class="project-title">{proj['name']}</div>
-            <div class="project-desc">{proj['desc']}</div>
-            <div class="project-metrics">{metrics_html}</div>
-            <div class="project-tech">{tech_tags}</div>
-            <div class="project-links">{app_link} {code_link}</div>
-        </div>
+    <div class="proj-card">
+      <div class="proj-number">{proj['num']}</div>
+      <div class="proj-icon">{proj['icon']}</div>
+      <div class="proj-title">{proj['title']}</div>
+      <p class="proj-desc">{proj['desc']}</p>
+      <div class="proj-metric">{proj['metric']}</div>
+      <div class="proj-tags">{tags_html}</div>
+      <div class="proj-links">{app_link} {code_link}</div>
     </div>
     """, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<hr class="hr">', unsafe_allow_html=True)
 
 # ==============================================================================
 # STACK
 # ==============================================================================
-st.markdown('<div id="stack" class="section"></div>', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Stack técnica</div>', unsafe_allow_html=True)
+st.markdown('<div id="stack" class="section">', unsafe_allow_html=True)
+st.markdown('<div class="section-label">Tecnologias</div>', unsafe_allow_html=True)
+st.markdown('<h2 class="section-title">Stack técnica</h2>', unsafe_allow_html=True)
 
-stack_cats = {
-    "📌 Dados & ETL": ["SQL", "PostgreSQL", "Python", "Pandas", "NumPy"],
-    "📊 BI & Visualização": ["Power BI", "Looker Studio", "Plotly", "Streamlit"],
-    "📈 Análise & Indicadores": ["KPIs", "Dashboards", "ETL"],
-    "⚙️ Automação & Ferramentas": ["Excel/VBA", "Git", "IA Generativa", "CSS Design"]
+stack = {
+    "Dados & ETL": ["SQL", "PostgreSQL", "Python", "Pandas", "NumPy"],
+    "BI & Visualização": ["Power BI", "Looker Studio", "Plotly", "Streamlit"],
+    "Análise & Indicadores": ["KPIs", "Dashboards", "ETL", "Data Modeling"],
+    "Automação & Ferramentas": ["Excel / VBA", "Git", "IA Generativa", "CSS / Design"]
 }
 
-for cat, items in stack_cats.items():
-    st.markdown(f'<div class="stack-category"><h4>{cat}</h4><div class="stack-chips">', unsafe_allow_html=True)
-    for item in items:
-        st.markdown(f'<span class="chip">{item}</span>', unsafe_allow_html=True)
-    st.markdown('</div></div>', unsafe_allow_html=True)
+st.markdown('<div class="stack-section">', unsafe_allow_html=True)
+for cat, items in stack.items():
+    pills = ''.join([f'<span class="pill">{item}</span>' for item in items])
+    st.markdown(f"""
+    <div class="stack-block">
+      <div class="stack-cat">{cat}</div>
+      <div class="stack-pills">{pills}</div>
+    </div>
+    """, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<hr class="hr">', unsafe_allow_html=True)
 
 # ==============================================================================
-# LABORATÓRIO
+# LAB
 # ==============================================================================
-st.markdown('<div id="lab" class="section"></div>', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Laboratório</div>', unsafe_allow_html=True)
+st.markdown('<div class="section">', unsafe_allow_html=True)
+st.markdown('<div class="section-label">Em construção</div>', unsafe_allow_html=True)
+st.markdown('<h2 class="section-title">Laboratório</h2>', unsafe_allow_html=True)
 
-lab_items = [("⚡", "Portfólio Premium", "Concluído"), ("🤖", "IA para relatórios", "Em desenvolvimento"), ("📊", "Dashboard fluxo de caixa", "Prototipado")]
+lab = [
+    ("⚡", "Portfólio Premium", "Concluído"),
+    ("🤖", "IA para relatórios automáticos", "Em desenvolvimento"),
+    ("📈", "Dashboard de fluxo de caixa", "Prototipado")
+]
 
-cols_lab = st.columns(3)
-for i, (icon, title, status) in enumerate(lab_items):
-    with cols_lab[i]:
-        st.markdown(f"""
-        <div class="method-card" style="text-align:center;">
-            <div style="font-size:2rem;">{icon}</div>
-            <div style="font-weight:600;">{title}</div>
-            <div style="font-size:0.7rem;color:var(--accent-primary);">{status}</div>
-        </div>
-        """, unsafe_allow_html=True)
+st.markdown('<div class="lab-grid">', unsafe_allow_html=True)
+for icon, title, status in lab:
+    st.markdown(f"""
+    <div class="lab-card">
+      <div class="lab-card-icon">{icon}</div>
+      <div class="lab-card-title">{title}</div>
+      <div class="lab-status">{status}</div>
+    </div>
+    """, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<hr class="hr">', unsafe_allow_html=True)
 
 # ==============================================================================
 # FORMAÇÃO
 # ==============================================================================
-st.markdown('<div class="section-title">Formação & Certificações</div>', unsafe_allow_html=True)
-col_f1, col_f2 = st.columns(2)
-with col_f1:
-    st.markdown("""
-    <div style="background:var(--bg-secondary);border-radius:20px;padding:1.5rem;">
-        <div style="font-size:1.5rem;">🎓</div>
-        <strong>Sistemas de Informação</strong> — UniFOA (2010)<br>
-        <strong>Técnico em Informática</strong> — CIBA (2005)
-    </div>
-    """, unsafe_allow_html=True)
-with col_f2:
-    st.markdown("""
-    <div style="background:var(--bg-secondary);border-radius:20px;padding:1.5rem;">
-        <div style="font-size:1.5rem;">📜</div>
-        <strong>Certificações (Hashtag)</strong><br>
-        • SQL · Power BI · Python · IA Aplicada
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown('<div class="section">', unsafe_allow_html=True)
+st.markdown('<div class="section-label">Educação</div>', unsafe_allow_html=True)
+st.markdown('<h2 class="section-title">Formação & Certificações</h2>', unsafe_allow_html=True)
+
+st.markdown("""
+<div class="edu-grid">
+  <div class="edu-card">
+    <div class="edu-icon">🎓</div>
+    <div class="edu-degree">Sistemas de Informação</div>
+    <div class="edu-school">UniFOA · 2010</div>
+    <br>
+    <div class="edu-degree">Técnico em Informática</div>
+    <div class="edu-school">CIBA · 2005</div>
+  </div>
+  <div class="edu-card">
+    <div class="edu-icon">📜</div>
+    <div class="edu-degree">Certificações Hashtag Treinamentos</div>
+    <div class="edu-school" style="margin-top:0.75rem;">SQL avançado · Power BI · Python para dados · IA aplicada a negócios</div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # ==============================================================================
 # CONTATO
 # ==============================================================================
-st.markdown('<div id="contato" class="section"></div>', unsafe_allow_html=True)
+st.markdown('<div id="contato" class="section">', unsafe_allow_html=True)
+
 st.markdown("""
-<div class="footer-impact">
-    <h3>Transformando operações em inteligência acionável</h3>
-    <p>Disponível para remoto ou híbrido</p>
-    <div class="footer-links">
-        <a href="mailto:raphael_caxias@hotmail.com">📧 raphael_caxias@hotmail.com</a>
-        <a href="tel:+5524992275226">📱 (24) 99227-5226</a>
-        <a href="https://linkedin.com/in/raphael-pires-caxias" target="_blank">🔗 LinkedIn</a>
-        <a href="https://github.com/raphaelcaxias" target="_blank">💻 GitHub</a>
-    </div>
-    <div style="font-size:0.75rem;">© 2026 Raphael Pires · Dados com propósito</div>
+<div class="contact-footer">
+  <h3 class="contact-headline">Transformando dados em decisão</h3>
+  <p class="contact-sub">Disponível para trabalho remoto ou híbrido · Aberto a novas oportunidades</p>
+  <div class="contact-links">
+    <a href="mailto:raphael_caxias@hotmail.com">✉ raphael_caxias@hotmail.com</a>
+    <a href="tel:+5524992275226">📱 (24) 99227-5226</a>
+    <a href="https://linkedin.com/in/raphael-pires-caxias" target="_blank">LinkedIn ↗</a>
+    <a href="https://github.com/raphaelcaxias" target="_blank">GitHub ↗</a>
+  </div>
+  <div class="copyright">© 2026 Raphael Pires · Dados com propósito</div>
 </div>
 """, unsafe_allow_html=True)
 
 if cv_pdf:
-    st.download_button("📄 Baixar currículo (PDF)", data=cv_pdf, file_name="Raphael_Pires_Curriculo.pdf", mime="application/pdf")
+    st.download_button(
+        "↓  Baixar currículo (PDF)",
+        data=cv_pdf,
+        file_name="Raphael_Pires_Curriculo.pdf",
+        mime="application/pdf"
+    )
 
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Close page wrapper
 st.markdown('</div>', unsafe_allow_html=True)
