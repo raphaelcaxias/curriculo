@@ -25,6 +25,15 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────
+# UTILS
+# ─────────────────────────────────────────────
+def hex_rgba(hex_color: str, alpha: float) -> str:
+    """Converte cor hex (#RRGGBB) + alpha float para rgba()"""
+    h = hex_color.lstrip("#")
+    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    return f"rgba({r},{g},{b},{alpha})"
+
+# ─────────────────────────────────────────────
 # THEME STATE
 # ─────────────────────────────────────────────
 if "dark_mode" not in st.session_state:
@@ -446,7 +455,7 @@ html, body, .stApp {{
 .rp-pill:hover {{
     border-color:{T['gold']};
     color:{T['gold']};
-    background:{T['gold_dim']}33;
+    background:rgba(74,58,24,0.2);
 }}
 
 /* LAB */
@@ -686,7 +695,7 @@ fig1.add_trace(go.Scatter(
     line=dict(color=T["gold"], width=2.5),
     marker=dict(color=T["gold"], size=9, line=dict(color=T["surface"], width=2)),
     fill="tozeroy",
-    fillcolor=T["gold"] + "18",
+    fillcolor=hex_rgba(T["gold"], 0.09),
     hovertemplate="<b>%{customdata}</b><extra></extra>",
     customdata=df_impact["Marco"]
 ))
@@ -724,7 +733,7 @@ fig2 = go.Figure()
 fig2.add_trace(go.Scatterpolar(
     r=valores_full, theta=cats_full,
     fill="toself",
-    fillcolor=T["gold"] + "22",
+    fillcolor=hex_rgba(T["gold"], 0.13),
     line=dict(color=T["gold"], width=2),
     marker=dict(color=T["gold"], size=7)
 ))
@@ -761,7 +770,7 @@ fig3 = go.Figure(go.Bar(
     orientation="h",
     marker=dict(
         color=usos,
-        colorscale=[[0, T["gold_dim"] + "88"], [1, T["gold"]]],
+        colorscale=[[0, hex_rgba(T["gold_dim"], 0.55)], [1, T["gold"]]],
         line=dict(width=0)
     ),
     hovertemplate="%{y}: %{x} projetos<extra></extra>"
