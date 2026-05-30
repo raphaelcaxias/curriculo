@@ -125,11 +125,16 @@ T = dark if st.session_state.dark_mode else light
 # ─────────────────────────────────────────────
 # CSS DINÂMICO
 # ─────────────────────────────────────────────
-st.markdown(f"""
+# Fonts + CSS — split into chunks to avoid Streamlit truncation
+st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
+""", unsafe_allow_html=True)
+
+# CSS chunk 1/4
+st.markdown(f"""<style>
+
 * {{ margin:0; padding:0; box-sizing:border-box; }}
 html, body, .stApp {{
     background:{T['bg']} !important;
@@ -152,6 +157,11 @@ html, body, .stApp {{
 }}
 .stDownloadButton > button:hover {{ background:{T['gold_light']}; }}
 
+
+</style>""", unsafe_allow_html=True)
+
+# CSS chunk 2/4
+st.markdown(f"""<style>
 /* scrollbar */
 ::-webkit-scrollbar {{ width:4px; }}
 ::-webkit-scrollbar-track {{ background:{T['bg']}; }}
@@ -160,7 +170,7 @@ html, body, .stApp {{
 /* NAVBAR */
 .rp-nav {{
     position:fixed; top:0; left:0; width:100%;
-    background:{T['bg']}EE;
+    background:{hex_rgba(T['bg'], 0.93)};
     backdrop-filter:blur(14px);
     border-bottom:1px solid {T['border']};
     z-index:1000;
@@ -291,6 +301,11 @@ html, body, .stApp {{
 }}
 .rp-btn-ghost:hover {{ border-color:{T['gold']}; color:{T['gold']} !important; transform:translateY(-2px); }}
 
+
+</style>""", unsafe_allow_html=True)
+
+# CSS chunk 3/4
+st.markdown(f"""<style>
 /* IMPACT STRIP */
 .rp-strip {{
     display:grid; grid-template-columns:repeat(4,1fr);
@@ -432,6 +447,11 @@ html, body, .stApp {{
 }}
 .rp-proj-links a:hover {{ color:{T['gold']}; }}
 
+
+</style>""", unsafe_allow_html=True)
+
+# CSS chunk 4/4
+st.markdown(f"""<style>
 /* STACK */
 .rp-stack-grid {{
     display:grid; grid-template-columns:repeat(2,1fr); gap:2rem;
@@ -566,8 +586,9 @@ html, body, .stApp {{
     .rp-strip {{ grid-template-columns:1fr 1fr; }}
     .rp-tl-item {{ grid-template-columns:80px 20px 1fr; }}
 }}
-</style>
-""", unsafe_allow_html=True)
+
+</style>""", unsafe_allow_html=True)
+
 
 # ─────────────────────────────────────────────
 # NAVBAR  (toggle via Streamlit button inline)
