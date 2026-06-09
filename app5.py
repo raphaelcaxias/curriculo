@@ -93,9 +93,9 @@ dark = {
     "text":       "#F1F3F5",  # Branco fosco de alta legibilidade
     "text_dim":   "#A5B4FC",  # Azul acinzentado suave para textos secundários
     "text_muted": "#64748B",  # Cinza ardósia para textos de apoio
-    "gold":       "#D4AF37",  # Dourado metálico clássico refinado
-    "gold_light": "#F3E5AB",  # Tom baunilha/champanhe para hover
-    "gold_dim":   "#3B3217",  # Dourado escuro de fundo para pílulas e hover
+    "gold":       "#2563EB",  # Dourado metálico clássico refinado
+    "gold_light": "#60A5FA",  # Tom baunilha/champanhe para hover
+    "gold_dim":   "#DBEAFE",  # Dourado escuro de fundo para pílulas e hover
     "teal":       "#38BDF8",  # Ciano suave para destaques técnicos
     "plot_bg":    "#161920",  # Casado com a surface
     "plot_paper": "#0F1115",  # Casado com o bg
@@ -230,15 +230,15 @@ st.markdown(f"""<style>
     padding:3rem 0 5rem;
 }}
 .rp-photo-wrap {{
-    width:220px; height:220px;
-    border-radius:50%;
+    width:260px; height:320px;
+    border-radius:14px;
     padding:3px;
     background:linear-gradient(135deg,{T['gold']},{T['gold_dim']});
     flex-shrink:0;
 }}
 .rp-photo-inner {{
     width:100%; height:100%;
-    border-radius:50%; overflow:hidden;
+    border-radius:14px; overflow:hidden;
     background:{T['surface2']};
     display:flex; align-items:center; justify-content:center;
     font-size:4rem;
@@ -639,21 +639,21 @@ st.markdown(f"""
     </div>
   </div>
   <div>
-    <div class="rp-hero-eyebrow">Dados · Automação · Inteligência Operacional</div>
-    <h1 class="rp-hero-name">Raphael <em>Pires</em></h1>
+    <div class="rp-hero-eyebrow">Power BI • SQL • Python • Business Intelligence</div>
+    <h1 class="rp-hero-name">RAPHAEL FERNANDO DA SILVA PIRES</h1>
     <p class="rp-hero-subtitle">
-      Analista de Dados & Automação com +15 anos transformando operações reais em vantagem competitiva.
+      Analista de Dados e Business Intelligence com experiência em automação, indicadores de desempenho e desenvolvimento de dashboards para apoio à tomada de decisão.
     </p>
     <p class="rp-hero-pitch">
       Enquanto a maioria analisa planilhas, eu construo sistemas que<strong style="color:{T['gold']}"> eliminam o trabalho manual</strong>,
       reduzem custos operacionais em até 70% e entregam dashboards que gestores realmente usam para tomar decisões.
-      Meu diferencial: entendo o negócio antes de abrir o Python.
+      Experiência prática em operações comerciais, análise de indicadores e construção de soluções analíticas com foco em resultados de negócio.
     </p>
     <div class="rp-kpis">
       <div><span class="rp-kpi-val">15+</span><span class="rp-kpi-lbl">Anos de operação</span></div>
-      <div><span class="rp-kpi-val">−70%</span><span class="rp-kpi-lbl">Redução de tempo</span></div>
+      <div><span class="rp-kpi-val">70%</span><span class="rp-kpi-lbl">Redução operacional</span></div>
       <div><span class="rp-kpi-val">213k</span><span class="rp-kpi-lbl">Registros processados</span></div>
-      <div><span class="rp-kpi-val">R$1,2B</span><span class="rp-kpi-lbl">Volume analisado</span></div>
+      <div><span class="rp-kpi-val">20</span><span class="rp-kpi-lbl">Agências atendidas</span></div>
     </div>
     <div class="rp-actions">
       <a href="#contato" class="rp-btn-primary">✉ Falar comigo</a>
@@ -864,7 +864,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<hr class="rp-rule">', unsafe_allow_html=True)
 st.markdown('<div id="trajetoria" class="rp-section">', unsafe_allow_html=True)
 st.markdown('<div class="rp-eyebrow">Trajetória</div>', unsafe_allow_html=True)
-st.markdown('<h2 class="rp-h2">15 anos de operação real</h2>', unsafe_allow_html=True)
+st.markdown('<h2 class="rp-h2">Experiência Profissional</h2>', unsafe_allow_html=True)
 
 experiences = [
     {
@@ -879,7 +879,7 @@ experiences = [
     },
     {
         "year": "2009 – presente",
-        "role": "Gestão Comercial & Dados",
+        "role": "Gestão Comercial, Indicadores e Business Intelligence",
         "company": "Jardim do Éden",
         "items": [
             "Reduzi o ciclo de fechamento analítico de 2 horas para 15 minutos",
@@ -899,7 +899,7 @@ experiences = [
     },
     {
         "year": "2002 – 2009",
-        "role": "Suporte Operacional",
+        "role": "Controle Operacional e Dados",
         "company": "NSM Comércio",
         "items": [
             "Centralizei dados de 7 unidades em um único sistema de controle",
@@ -1086,7 +1086,7 @@ st.markdown(f"""
     <a href="https://linkedin.com/in/raphael-pires-caxias" target="_blank">LinkedIn ↗</a>
     <a href="https://github.com/raphaelcaxias" target="_blank">GitHub ↗</a>
   </div>
-  <div class="rp-copy">© 2026 Raphael Pires · Dados com propósito</div>
+  <div class="rp-copy">© 2026 Raphael Fernando da Silva Pires · Analista de Dados & Business Intelligence</div>
 </div>
 """, unsafe_allow_html=True)
 
