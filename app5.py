@@ -86,39 +86,39 @@ cv_pdf         = load_cv()
 # TOKENS DE COR POR TEMA (VERSÃO REFINADA 7.1)
 # ─────────────────────────────────────────────
 dark = {
-    "bg":         "#0F1115",  # Grafite profundo com sutil toque azulado (reduz fadiga visual)
-    "surface":    "#161920",  # Superfície ligeiramente mais clara que o fundo
-    "surface2":   "#20242F",  # Destaque secundário
-    "border":     "#292E3C",  # Bordas sutis e elegantes
-    "text":       "#F1F3F5",  # Branco fosco de alta legibilidade
-    "text_dim":   "#A5B4FC",  # Azul acinzentado suave para textos secundários
-    "text_muted": "#64748B",  # Cinza ardósia para textos de apoio
-    "gold":       "#2563EB",  # Dourado metálico clássico refinado
-    "gold_light": "#60A5FA",  # Tom baunilha/champanhe para hover
-    "gold_dim":   "#DBEAFE",  # Dourado escuro de fundo para pílulas e hover
-    "teal":       "#38BDF8",  # Ciano suave para destaques técnicos
-    "plot_bg":    "#161920",  # Casado com a surface
-    "plot_paper": "#0F1115",  # Casado com o bg
-    "plot_grid":  "#232834",  # Linhas de grade discretas
-    "plot_font":  "#94A3B8",  
+    "bg":         "#0B1220",
+    "surface":    "#111827",
+    "surface2":   "#1F2937",
+    "border":     "#334155",
+    "text":       "#F8FAFC",
+    "text_dim":   "#CBD5E1",
+    "text_muted": "#94A3B8",
+    "gold":       "#3B82F6",
+    "gold_light": "#60A5FA",
+    "gold_dim":   "#1E3A8A",
+    "teal":       "#06B6D4",
+    "plot_bg":    "#111827",
+    "plot_paper": "#0B1220",
+    "plot_grid":  "#1E293B",
+    "plot_font":  "#CBD5E1",
 }
 
 light = {
-    "bg":         "#F9F8F6",  # Alabastro/Creme suave inspirado em design editorial
-    "surface":    "#FFFFFF",  # Cartões brancos puros gerando profundidade sobre o fundo
-    "surface2":   "#F1EFEA",  # Elementos secundários
-    "border":     "#E2DDD5",  # Bordas suaves com tom quente
-    "text":       "#1E2229",  # Grafite escuro (menos agressivo que preto puro)
-    "text_dim":   "#4A5568",  # Cinza médio de alto contraste
-    "text_muted": "#8A94A6",  # Cinza sutil para metadados
-    "gold":       "#A36E1A",  # Âmbar/Dourado denso de alta acessibilidade e contraste
-    "gold_light": "#C98A2A",  # Tom de hover dinâmico
-    "gold_dim":   "#FDF6E2",  # Fundo sutil para hover no modo claro
-    "teal":       "#0369A1",  # Azul oceano para contraste técnico
-    "plot_bg":    "#FFFFFF",  
-    "plot_paper": "#F9F8F6",  
-    "plot_grid":  "#EFECE6",  
-    "plot_font":  "#64748B",  
+    "bg":         "#F8FAFC",
+    "surface":    "#FFFFFF",
+    "surface2":   "#F1F5F9",
+    "border":     "#CBD5E1",
+    "text":       "#0F172A",
+    "text_dim":   "#334155",
+    "text_muted": "#64748B",
+    "gold":       "#2563EB",
+    "gold_light": "#3B82F6",
+    "gold_dim":   "#DBEAFE",
+    "teal":       "#0891B2",
+    "plot_bg":    "#FFFFFF",
+    "plot_paper": "#F8FAFC",
+    "plot_grid":  "#E2E8F0",
+    "plot_font":  "#475569",
 }
 
 T = dark if st.session_state.dark_mode else light
@@ -170,7 +170,7 @@ st.markdown(f"""<style>
 .rp-nav {{
     position:fixed; top:0; left:0; width:100%;
     background:{hex_rgba(T['bg'], 0.93)};
-    backdrop-filter:blur(14px);
+    backdrop-filter:blur(24px);
     border-bottom:1px solid {T['border']};
     z-index:1000;
     height:64px;
@@ -271,7 +271,7 @@ st.markdown(f"""<style>
 .rp-kpi-val {{
     display:block;
     font-family:'Playfair Display',serif;
-    font-size:2.2rem; color:{T['gold']};
+    font-size:2.8rem; font-weight:700; color:{T['gold']};
     line-height:1;
 }}
 .rp-kpi-lbl {{
@@ -639,21 +639,21 @@ st.markdown(f"""
     </div>
   </div>
   <div>
-    <div class="rp-hero-eyebrow">Power BI • SQL • Python • Business Intelligence</div>
-    <h1 class="rp-hero-name">RAPHAEL FERNANDO DA SILVA PIRES</h1>
+    <div class="rp-hero-eyebrow">Dados · Automação · Inteligência Operacional</div>
+    <h1 class="rp-hero-name">Raphael <em>Pires</em></h1>
     <p class="rp-hero-subtitle">
-      Analista de Dados e Business Intelligence com experiência em automação, indicadores de desempenho e desenvolvimento de dashboards para apoio à tomada de decisão.
+      Analista de Dados & Automação com +15 anos transformando operações reais em vantagem competitiva.
     </p>
     <p class="rp-hero-pitch">
       Enquanto a maioria analisa planilhas, eu construo sistemas que<strong style="color:{T['gold']}"> eliminam o trabalho manual</strong>,
       reduzem custos operacionais em até 70% e entregam dashboards que gestores realmente usam para tomar decisões.
-      Experiência prática em operações comerciais, análise de indicadores e construção de soluções analíticas com foco em resultados de negócio.
+      Meu diferencial: entendo o negócio antes de abrir o Python.
     </p>
     <div class="rp-kpis">
       <div><span class="rp-kpi-val">15+</span><span class="rp-kpi-lbl">Anos de operação</span></div>
-      <div><span class="rp-kpi-val">70%</span><span class="rp-kpi-lbl">Redução operacional</span></div>
+      <div><span class="rp-kpi-val">−70%</span><span class="rp-kpi-lbl">Redução de tempo</span></div>
       <div><span class="rp-kpi-val">213k</span><span class="rp-kpi-lbl">Registros processados</span></div>
-      <div><span class="rp-kpi-val">20</span><span class="rp-kpi-lbl">Agências atendidas</span></div>
+      <div><span class="rp-kpi-val">R$1,2B</span><span class="rp-kpi-lbl">Volume analisado</span></div>
     </div>
     <div class="rp-actions">
       <a href="#contato" class="rp-btn-primary">✉ Falar comigo</a>
@@ -864,7 +864,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<hr class="rp-rule">', unsafe_allow_html=True)
 st.markdown('<div id="trajetoria" class="rp-section">', unsafe_allow_html=True)
 st.markdown('<div class="rp-eyebrow">Trajetória</div>', unsafe_allow_html=True)
-st.markdown('<h2 class="rp-h2">Experiência Profissional</h2>', unsafe_allow_html=True)
+st.markdown('<h2 class="rp-h2">15 anos de operação real</h2>', unsafe_allow_html=True)
 
 experiences = [
     {
@@ -879,7 +879,7 @@ experiences = [
     },
     {
         "year": "2009 – presente",
-        "role": "Gestão Comercial, Indicadores e Business Intelligence",
+        "role": "Gestão Comercial & Dados",
         "company": "Jardim do Éden",
         "items": [
             "Reduzi o ciclo de fechamento analítico de 2 horas para 15 minutos",
@@ -899,7 +899,7 @@ experiences = [
     },
     {
         "year": "2002 – 2009",
-        "role": "Controle Operacional e Dados",
+        "role": "Suporte Operacional",
         "company": "NSM Comércio",
         "items": [
             "Centralizei dados de 7 unidades em um único sistema de controle",
@@ -1086,7 +1086,7 @@ st.markdown(f"""
     <a href="https://linkedin.com/in/raphael-pires-caxias" target="_blank">LinkedIn ↗</a>
     <a href="https://github.com/raphaelcaxias" target="_blank">GitHub ↗</a>
   </div>
-  <div class="rp-copy">© 2026 Raphael Fernando da Silva Pires · Analista de Dados & Business Intelligence</div>
+  <div class="rp-copy">© 2026 Raphael Pires · Dados com propósito</div>
 </div>
 """, unsafe_allow_html=True)
 
