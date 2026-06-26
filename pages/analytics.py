@@ -5,7 +5,6 @@ import plotly.express as px
 from config import get_colors
 
 def generate_desenrola_data():
-    """Gera dados para análise do Desenrola Brasil"""
     np.random.seed(42)
     regioes = ["Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte"]
     faixas = ["Até R$ 5k", "R$ 5k-15k", "R$ 15k-50k", "Acima R$ 50k"]
@@ -18,7 +17,6 @@ def generate_desenrola_data():
     })
 
 def generate_anp_data():
-    """Gera dados para análise da ANP"""
     np.random.seed(123)
     estados = ["SP", "RJ", "MG", "RS", "PR", "BA"]
     combustiveis = ["Gasolina", "Etanol", "Diesel"]
@@ -38,7 +36,6 @@ def generate_anp_data():
     return pd.DataFrame(dados)
 
 def generate_operational_data():
-    """Gera dados de impacto operacional"""
     meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
     return pd.DataFrame({
         "Mês": meses * 2,
@@ -48,7 +45,6 @@ def generate_operational_data():
     })
 
 def render_desenrola():
-    """Renderiza análise do Desenrola Brasil"""
     st.markdown("### Análise de Renegociações")
     
     df = generate_desenrola_data()
@@ -66,7 +62,6 @@ def render_desenrola():
         st.warning("Nenhum dado encontrado para os filtros selecionados.")
         return
     
-    # Métricas
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Contratos", f"{len(df_filtered):,}".replace(",", "."))
@@ -75,7 +70,6 @@ def render_desenrola():
     with col3:
         st.metric("Taxa Sucesso", f"{(df_filtered['Status']=='Renegociado').mean()*100:.1f}%")
     
-    # Gráficos
     col1, col2 = st.columns(2)
     with col1:
         fig_pie = px.pie(
@@ -113,7 +107,6 @@ def render_desenrola():
         st.plotly_chart(fig_bar, use_container_width=True)
 
 def render_anp():
-    """Renderiza análise de combustíveis ANP"""
     st.markdown("### Preços de Combustíveis")
     
     df = generate_anp_data()
@@ -127,35 +120,37 @@ def render_anp():
     
     df_filtered = df[(df["Estado"] == estado) & (df["Combustível"] == combustivel)]
     
-    col1, col2 = st.columns(2)
-    with col1:
-        preco_atual = df_filtered[df_filtered["Mês"] == "Jun"]["Preço"].values[0]
-        st.metric("Preço Atual", f"R$ {preco_atual:.2f}")
-    with col2:
-        variacao = ((df_filtered["Preço"].max() - df_filtered["Preço"].min()) / df_filtered["Preço"].min()) * 100
-        st.metric("Variação Semestral", f"{variacao:.1f}%")
-    
-    fig = px.line(
-        df_filtered,
-        x="Mês",
-        y="Preço",
-        markers=True,
-        color_discrete_sequence=[colors["chart_colors"][0]],
-        template=colors["plotly_template"]
-    )
-    fig.update_layout(
-        title=f"{combustivel} - {estado}",
-        margin=dict(l=20, r=20, t=50, b=20),
-        height=350,
-        paper_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter", color=colors["text"]),
-        xaxis=dict(showgrid=False),
-        yaxis=dict(showgrid=True, gridcolor="rgba(148,163,184,0.1)")
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    if len(df_filtered) > 0:
+        col1, col2 = st.columns(2)
+        with col1:
+            preco_atual = df_filtered[df_filtered["Mês"] == "Jun"]["Preço"].values[0]
+            st.metric("Preço Atual", f"R$ {preco_atual:.2f}")
+        with col2:
+            variacao = ((df_filtered["Preço"].max() - df_filtered["Preço"].min()) / df_filtered["Preço"].min()) * 100
+            st.metric("Variação Semestral", f"{variacao:.1f}%")
+        
+        fig = px.line(
+            df_filtered,
+            x="Mês",
+            y="Preço",
+            markers=True,
+            color_discrete_sequence=[colors["chart_colors"][0]],
+            template=colors["plotly_template"]
+        )
+        fig.update_layout(
+            title=f"{combustivel} - {estado}",
+            margin=dict(l=20, r=20, t=50, b=20),
+            height=350,
+            paper_bgcolor="rgba(0,0,0,0)",
+            font=dict(family="Inter", color=colors["text"]),
+            xaxis=dict(showgrid=False),
+            yaxis=dict(showgrid=True, gridcolor="rgba(148,163,184,0.1)")
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("Nenhum dado encontrado para os filtros selecionados.")
 
 def render_operational():
-    """Renderiza análise de impacto operacional"""
     st.markdown("### Impacto da Automação")
     
     df = generate_operational_data()
