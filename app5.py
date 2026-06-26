@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
 from datetime import datetime
 
 # ============================================================================
@@ -24,12 +23,11 @@ if "theme" not in st.session_state:
 def toggle_theme():
     st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
 
-col_t1, col_t2, col_t3 = st.columns([1, 11, 1])
+# Botão de alternar tema no topo direito
+col_t1, col_t2 = st.columns([11, 1])
 with col_t2:
-    tc1, tc2, tc3 = st.columns([8, 1, 1])
-    with tc3:
-        theme_label = "☀️ Claro" if st.session_state.theme == "dark" else "🌙 Escuro"
-        st.button(theme_label, on_click=toggle_theme, key="theme_toggle", use_container_width=True)
+    theme_label = "☀️ Claro" if st.session_state.theme == "dark" else "🌙 Escuro"
+    st.button(theme_label, on_click=toggle_theme, key="theme_toggle", use_container_width=True)
 
 is_dark = st.session_state.theme == "dark"
 
@@ -412,62 +410,6 @@ html, body, [class*="css"] {{
 
 .footer-subtitle {{ font-size: 0.9375rem; color: {TEXT_MUTED}; margin: 0 0 1.75rem 0; }}
 
-.footer-modes {{
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.75rem;
-}}
-
-.footer-mode {{
-    background: rgba(59, 130, 246, 0.08);
-    border: 1px solid {BORDER};
-    padding: 0.375rem 0.875rem;
-    border-radius: 999px;
-    font-size: 0.8125rem;
-    color: {TEXT};
-    font-weight: 500;
-}}
-
-.footer-links {{
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-}}
-
-.footer-link {{
-    background: {SURFACE};
-    border: 1px solid {BORDER};
-    padding: 0.625rem 1.125rem;
-    border-radius: 10px;
-    color: {TEXT};
-    text-decoration: none;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.25s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-}}
-.footer-link:hover {{
-    background: {PRIMARY};
-    color: white;
-    border-color: {PRIMARY};
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
-}}
-
-.footer-copy {{
-    font-size: 0.8125rem;
-    color: {TEXT_MUTED};
-    margin: 1.5rem 0 0 0;
-    padding-top: 1.5rem;
-    border-top: 1px solid {BORDER};
-}}
-
 /* Customização de containers nativos */
 div[data-testid="stVerticalBlockBorderWrapper"] {{
     background-color: {GLASS} !important;
@@ -516,19 +458,6 @@ div[data-testid="stVerticalBlockBorderWrapper"]:hover {{
 
 .stMarkdown, h1, h2, h3, h4 {{ color: {TEXT}; }}
 
-/* Insight box */
-.insight-box {{
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.04));
-    border-left: 3px solid {PRIMARY};
-    border-radius: 8px;
-    padding: 1rem 1.25rem;
-    margin: 1rem 0;
-    font-size: 0.9375rem;
-    color: {TEXT};
-    line-height: 1.6;
-}}
-.insight-box strong {{ color: {PRIMARY}; }}
-
 /* KPI card custom */
 .kpi-custom {{
     background: {GLASS};
@@ -574,13 +503,13 @@ with col_p2:
     except Exception:
         st.markdown(f"""
         <div style="
-            width: 200px; height: 200px; border-radius: 50%;
+            width: 180px; height: 180px; border-radius: 50%;
             background: linear-gradient(135deg, {PRIMARY}, {SECONDARY});
             display: flex; align-items: center; justify-content: center;
             font-family: 'Playfair Display', serif;
-            font-size: 4rem; font-weight: 700; color: white;
+            font-size: 3.5rem; font-weight: 700; color: white;
             box-shadow: 0 0 0 8px {GLASS}, 0 20px 60px {SHADOW};
-            margin: 0 auto;">
+            margin: 0 auto 1.5rem auto;">
             RP
         </div>
         """, unsafe_allow_html=True)
@@ -605,19 +534,27 @@ st.markdown(f"""
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# Download CV centralizado
-dc1, dc2, dc3 = st.columns([3, 2, 3])
-with dc2:
+# Cache de Download do CV para evitar IO repetitivo do disco
+@st.cache_data
+def load_cv_file():
     try:
         with open("Curriculo_Raphael_v2.pdf", "rb") as pdf_file:
-            st.download_button(
-                label="📄 Download Currículo PDF",
-                data=pdf_file.read(),
-                file_name="Curriculo_Raphael_Pires.pdf",
-                mime="application/pdf",
-                use_container_width=True
-            )
+            return pdf_file.read()
     except FileNotFoundError:
+        return None
+
+cv_data = load_cv_file()
+dc1, dc2, dc3 = st.columns([3, 2, 3])
+with dc2:
+    if cv_data:
+        st.download_button(
+            label="📄 Download Currículo PDF",
+            data=cv_data,
+            file_name="Curriculo_Raphael_Pires.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
+    else:
         st.info("📄 Currículo PDF disponível para download")
 
 st.divider()
@@ -635,40 +572,15 @@ st.markdown(f"""
 
 k1, k2, k3, k4, k5 = st.columns(5)
 with k1:
-    st.markdown(f"""
-    <div class="kpi-custom">
-        <div class="kpi-custom-value">16+</div>
-        <div class="kpi-custom-label">anos de experiência</div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f'<div class="kpi-custom"><div class="kpi-custom-value">16+</div><div class="kpi-custom-label">anos de experiência</div></div>', unsafe_allow_html=True)
 with k2:
-    st.markdown(f"""
-    <div class="kpi-custom">
-        <div class="kpi-custom-value">70%</div>
-        <div class="kpi-custom-label">redução operacional</div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f'<div class="kpi-custom"><div class="kpi-custom-value">70%</div><div class="kpi-custom-label">redução operacional</div></div>', unsafe_allow_html=True)
 with k3:
-    st.markdown(f"""
-    <div class="kpi-custom">
-        <div class="kpi-custom-value">213k</div>
-        <div class="kpi-custom-label">registros processados</div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f'<div class="kpi-custom"><div class="kpi-custom-value">213k</div><div class="kpi-custom-label">registros processados</div></div>', unsafe_allow_html=True)
 with k4:
-    st.markdown(f"""
-    <div class="kpi-custom">
-        <div class="kpi-custom-value">2h→15m</div>
-        <div class="kpi-custom-label">análises reduzidas</div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f'<div class="kpi-custom"><div class="kpi-custom-value">2h→15m</div><div class="kpi-custom-label">análises reduzidas</div></div>', unsafe_allow_html=True)
 with k5:
-    st.markdown(f"""
-    <div class="kpi-custom">
-        <div class="kpi-custom-value">R$50bi</div>
-        <div class="kpi-custom-label">dados públicos analisados</div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f'<div class="kpi-custom"><div class="kpi-custom-value">R$50bi</div><div class="kpi-custom-label">dados públicos analisados</div></div>', unsafe_allow_html=True)
 
 st.divider()
 
@@ -775,38 +687,28 @@ st.markdown(f"""
 <div class="stack-category">
     <div class="stack-category-title">📊 Dados</div>
     <div class="stack-grid">
-        <div class="stack-chip">SQL</div>
-        <div class="stack-chip">PostgreSQL</div>
-        <div class="stack-chip">Python</div>
-        <div class="stack-chip">Pandas</div>
-        <div class="stack-chip">NumPy</div>
+        {"".join(f'<div class="stack-chip">{tech}</div>' for tech in ["SQL", "PostgreSQL", "Python", "Pandas", "NumPy"])}
     </div>
 </div>
 
 <div class="stack-category">
     <div class="stack-category-title">📈 Business Intelligence</div>
     <div class="stack-grid">
-        <div class="stack-chip">Power BI</div>
-        <div class="stack-chip">Plotly</div>
-        <div class="stack-chip">Looker Studio</div>
-        <div class="stack-chip">Streamlit</div>
+        {"".join(f'<div class="stack-chip">{tech}</div>' for tech in ["Power BI", "Plotly", "Looker Studio", "Streamlit"])}
     </div>
 </div>
 
 <div class="stack-category">
     <div class="stack-category-title">☁️ Cloud & Versionamento</div>
     <div class="stack-grid">
-        <div class="stack-chip">AWS</div>
-        <div class="stack-chip">Git</div>
-        <div class="stack-chip">GitHub</div>
+        {"".join(f'<div class="stack-chip">{tech}</div>' for tech in ["AWS", "Git", "GitHub"])}
     </div>
 </div>
 
 <div class="stack-category">
     <div class="stack-category-title">⚡ Automação & IA</div>
     <div class="stack-grid">
-        <div class="stack-chip">Excel VBA</div>
-        <div class="stack-chip">IA Generativa</div>
+        {"".join(f'<div class="stack-chip">{tech}</div>' for tech in ["Excel VBA", "IA Generativa"])}
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -814,7 +716,7 @@ st.markdown(f"""
 st.divider()
 
 # ============================================================================
-# 9. GRÁFICO DE PROEFICIÊNCIA (Demonstração técnica)
+# 9. GRÁFICO DE PROFICIÊNCIA
 # ============================================================================
 st.markdown(f"""
 <div class="section-header">
@@ -826,14 +728,14 @@ st.markdown(f"""
 
 skills_data = {
     "Tecnologia": ["Power BI", "SQL / PostgreSQL", "Python (Pandas)", "Excel / VBA", "Streamlit", "AWS Cloud", "IA Generativa", "Plotly"],
-    "Proeficiência (%)": [95, 92, 88, 95, 85, 60, 75, 82],
+    "Proficiência (%)": [95, 92, 88, 95, 85, 60, 75, 82],
     "Categoria": ["BI", "Dados", "Dados", "Automação", "BI", "Cloud", "Inovação", "BI"]
 }
 df_skills = pd.DataFrame(skills_data)
 
 fig_skills = px.bar(
     df_skills,
-    x="Proeficiência (%)",
+    x="Proficiência (%)",
     y="Tecnologia",
     color="Categoria",
     orientation="h",
@@ -845,7 +747,7 @@ fig_skills = px.bar(
         "Inovação": CHART_COLORS[4]
     },
     template=PLOTLY_TEMPLATE,
-    text="Proeficiência (%)"
+    text="Proficiência (%)"
 )
 
 fig_skills.update_layout(
@@ -877,7 +779,6 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 p1, p2 = st.columns(2)
-
 with p1:
     with st.container(border=True):
         st.markdown("#### 🇧🇷 Desenrola Brasil")
@@ -891,7 +792,6 @@ with p2:
         st.page_link("https://github.com/raphaelcaxias", label="Acessar Repositório", icon="🔗")
 
 p3, p4 = st.columns(2)
-
 with p3:
     with st.container(border=True):
         st.markdown("#### ⛽ Dashboard ANP")
@@ -922,41 +822,17 @@ st.markdown(f"""
 </div>
 
 <div class="aws-grid">
-    <div class="aws-card">
-        <div class="aws-icon">☁️</div>
-        <h4 class="aws-title">Cloud Computing</h4>
-    </div>
-    <div class="aws-card">
-        <div class="aws-icon">📘</div>
-        <h4 class="aws-title">Cloud 101</h4>
-    </div>
-    <div class="aws-card">
-        <div class="aws-icon">🖥️</div>
-        <h4 class="aws-title">AWS Management Console</h4>
-    </div>
-    <div class="aws-card">
-        <div class="aws-icon">💾</div>
-        <h4 class="aws-title">Storage Fundamentals</h4>
-    </div>
-    <div class="aws-card">
-        <div class="aws-icon">🛟</div>
-        <h4 class="aws-title">Cloud Support Associate</h4>
-    </div>
-    <div class="aws-card">
-        <div class="aws-icon">🤖</div>
-        <h4 class="aws-title">Machine Learning Foundations</h4>
-    </div>
-    <div class="aws-card">
-        <div class="aws-icon">🌱</div>
-        <h4 class="aws-title">AWS Sustainability</h4>
-    </div>
+    <div class="aws-card"><div class="aws-icon">☁️</div><h4 class="aws-title">Cloud Computing</h4></div>
+    <div class="aws-card"><div class="aws-icon">📘</div><h4 class="aws-title">Cloud 101</h4></div>
+    <div class="aws-card"><div class="aws-icon">🖥️</div><h4 class="aws-title">AWS Console</h4></div>
+    <div class="aws-card"><div class="aws-icon">💾</div><h4 class="aws-title">Storage</h4></div>
 </div>
 """, unsafe_allow_html=True)
 
 st.divider()
 
 # ============================================================================
-# 12. ANÁLISE DE DADOS INTERATIVA — DEMONSTRAÇÃO TÉCNICA
+# 12. ANÁLISE DE DADOS INTERATIVA (Cached)
 # ============================================================================
 st.markdown(f"""
 <div class="section-header">
@@ -966,428 +842,65 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-analysis_tabs = st.tabs(["🇧🇷 Desenrola Brasil", "⛽ Mercado de Combustíveis", "🔬 Fomento à Pesquisa", "📊 Impacto Operacional"])
-
-# --- TAB 1: DESENROLA BRASIL ---
-with analysis_tabs[0]:
-    st.markdown("### 📈 Análise de Renegociações — Desenrola Brasil")
-    
-    # Dados simulados baseados em padrões reais
+# Cache dos dados mockados para o app não re-gerar números aleatórios a cada clique
+@st.cache_data
+def get_mock_desenrola_data():
     np.random.seed(42)
     regioes = ["Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte"]
     faixas_divida = ["Até R$ 5.000", "R$ 5.001 - R$ 15.000", "R$ 15.001 - R$ 50.000", "Acima de R$ 50.000"]
-    
-    df_desenrola = pd.DataFrame({
+    return pd.DataFrame({
         "Região": np.random.choice(regioes, 500, p=[0.45, 0.28, 0.15, 0.07, 0.05]),
         "Faixa de Dívida": np.random.choice(faixas_divida, 500, p=[0.55, 0.28, 0.12, 0.05]),
         "Valor Renegociado (R$)": np.random.lognormal(mean=8.5, sigma=1.2, size=500),
         "Status": np.random.choice(["Renegociado", "Em Negociação", "Inadimplente"], 500, p=[0.65, 0.25, 0.10])
     })
+
+df_desenrola = get_mock_desenrola_data()
+
+analysis_tabs = st.tabs(["🇧🇷 Desenrola Brasil", "⛽ Mercado de Combustíveis", "🔬 Fomento à Pesquisa", "📊 Impacto Operacional"])
+
+with analysis_tabs[0]:
+    st.markdown("### 📈 Análise de Renegociações — Desenrola Brasil")
     
-    # Filtros interativos
-    fc1, fc2, fc3 = st.columns(3)
+    regioes_validas = list(df_desenrola["Região"].unique())
+    status_validos = list(df_desenrola["Status"].unique())
+    
+    fc1, fc2 = st.columns(2)
     with fc1:
-        regiao_sel = st.multiselect("Filtrar por Região", regioes, default=regioes)
+        regiao_sel = st.multiselect("Filtrar por Região", regioes_validas, default=regioes_validas)
     with fc2:
-        status_sel = st.multiselect("Filtrar por Status", df_desenrola["Status"].unique(), default=df_desenrola["Status"].unique())
-    with fc3:
-        faixa_sel = st.multiselect("Filtrar por Faixa de Dívida", faixas_divida, default=faixas_divida)
-    
+        status_sel = st.multiselect("Filtrar por Status", status_validos, default=status_validos)
+        
+    # Filtragem segura evitando arrays vazios
+    if not regiao_sel: regiao_sel = regioes_validas
+    if not status_sel: status_sel = status_validos
+        
     df_filtered = df_desenrola[
-        (df_desenrola["Região"].isin(regiao_sel)) &
-        (df_desenrola["Status"].isin(status_sel)) &
-        (df_desenrola["Faixa de Dívida"].isin(faixa_sel))
+        (df_desenrola["Região"].isin(regiao_sel)) & 
+        (df_desenrola["Status"].isin(status_sel))
     ]
     
-    # KPIs do filtro
-    mk1, mk2, mk3, mk4 = st.columns(4)
-    with mk1:
-        st.metric("Total de Contratos", f"{len(df_filtered):,}".replace(",", "."))
-    with mk2:
-        st.metric("Valor Total Renegociado", f"R$ {df_filtered['Valor Renegociado (R$)'].sum()/1e6:.2f}M")
-    with mk3:
-        st.metric("Ticket Médio", f"R$ {df_filtered['Valor Renegociado (R$)'].mean():,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-    with mk4:
-        taxa_sucesso = (df_filtered["Status"] == "Renegociado").mean() * 100
-        st.metric("Taxa de Sucesso", f"{taxa_sucesso:.1f}%", delta=f"{taxa_sucesso - 65:.1f}% vs meta")
-    
-    # Gráficos
-    g1, g2 = st.columns(2)
-    
-    with g1:
-        st.markdown("##### Distribuição por Região")
-        fig_reg = px.pie(
-            df_filtered,
-            names="Região",
-            values="Valor Renegociado (R$)",
-            hole=0.55,
-            color_discrete_sequence=CHART_COLORS,
-            template=PLOTLY_TEMPLATE
-        )
-        fig_reg.update_layout(
-            margin=dict(l=10, r=10, t=10, b=10),
-            height=350,
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Inter", color=TEXT),
-            showlegend=True,
-            legend=dict(orientation="h", yanchor="bottom", y=-0.1, xanchor="center", x=0.5)
-        )
-        st.plotly_chart(fig_reg, use_container_width=True)
-    
-    with g2:
-        st.markdown("##### Valor por Faixa de Dívida")
-        faixa_agg = df_filtered.groupby("Faixa de Dívida", observed=False)["Valor Renegociado (R$)"].sum().reset_index()
-        fig_faixa = px.bar(
-            faixa_agg,
-            x="Faixa de Dívida",
-            y="Valor Renegociado (R$)",
-            color_discrete_sequence=[CHART_COLORS[0]],
-            template=PLOTLY_TEMPLATE,
-            text=faixa_agg["Valor Renegociado (R$)"].apply(lambda x: f"R$ {x/1e6:.1f}M")
-        )
-        fig_faixa.update_layout(
-            margin=dict(l=10, r=10, t=10, b=10),
-            height=350,
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Inter", color=TEXT),
-            showlegend=False,
-            xaxis=dict(showgrid=False),
-            yaxis=dict(showgrid=True, gridcolor=BORDER)
-        )
-        fig_faixa.update_traces(textposition="outside", textfont=dict(color=TEXT, size=11))
-        st.plotly_chart(fig_faixa, use_container_width=True)
-    
-    # Insight box
-    st.markdown(f"""
-    <div class="insight-box">
-        <strong>💡 Insight Analítico:</strong> A região <strong>Sudeste</strong> concentra aproximadamente 
-        <strong>{(df_filtered[df_filtered['Região']=='Sudeste']['Valor Renegociado (R$)'].sum() / df_filtered['Valor Renegociado (R$)'].sum() * 100):.1f}%</strong> 
-        do volume financeiro renegociado, enquanto a faixa de dívida <strong>Até R$ 5.000</strong> 
-        representa a maior parte dos contratos, indicando que o programa tem maior penetração 
-        em consumidores com menor endividamento.
-    </div>
-    """, unsafe_allow_html=True)
-
-# --- TAB 2: COMBUSTÍVEIS ANP ---
-with analysis_tabs[1]:
-    st.markdown("### ⛽ Análise de Preços de Combustíveis — ANP")
-    
-    np.random.seed(123)
-    estados = ["SP", "RJ", "MG", "RS", "PR", "BA", "SC", "GO", "PE", "CE"]
-    combustiveis = ["Gasolina", "Etanol", "Diesel"]
-    meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"]
-    
-    dados_comb = []
-    for estado in estados:
-        for comb in combustiveis:
-            base = {"Gasolina": 5.8, "Etanol": 3.5, "Diesel": 5.2}[comb]
-            for i, mes in enumerate(meses):
-                dados_comb.append({
-                    "Estado": estado,
-                    "Combustível": comb,
-                    "Mês": mes,
-                    "Preço Médio (R$/L)": base + np.random.normal(0, 0.15) + (i * 0.03)
-                })
-    df_anp = pd.DataFrame(dados_comb)
-    
-    fc1, fc2 = st.columns(2)
-    with fc1:
-        est_sel = st.selectbox("Selecione o Estado", estados, index=0)
-    with fc2:
-        comb_sel = st.selectbox("Selecione o Combustível", combustiveis, index=0)
-    
-    df_anp_filtro = df_anp[(df_anp["Estado"] == est_sel) & (df_anp["Combustível"] == comb_sel)]
-    
-    mc1, mc2, mc3 = st.columns(3)
-    with mc1:
-        st.metric("Preço Atual (Jun)", f"R$ {df_anp_filtro[df_anp_filtro['Mês']=='Jun']['Preço Médio (R$/L)'].values[0]:.2f}")
-    with mc2:
-        preco_min = df_anp_filtro["Preço Médio (R$/L)"].min()
-        st.metric("Preço Mínimo (Semestre)", f"R$ {preco_min:.2f}")
-    with mc3:
-        preco_max = df_anp_filtro["Preço Médio (R$/L)"].max()
-        variacao = ((preco_max - preco_min) / preco_min) * 100
-        st.metric("Variação Semestral", f"{variacao:.2f}%", delta=f"{variacao:.2f}%")
-    
-    # Gráfico de linha temporal
-    fig_anp = px.line(
-        df_anp_filtro,
-        x="Mês",
-        y="Preço Médio (R$/L)",
-        markers=True,
-        color_discrete_sequence=[CHART_COLORS[0]],
-        template=PLOTLY_TEMPLATE
+    fig_filtered = px.histogram(
+        df_filtered, 
+        x="Faixa de Dívida", 
+        y="Valor Renegociado (R$)", 
+        color="Status",
+        barmode="group",
+        template=PLOTLY_TEMPLATE,
+        color_discrete_sequence=CHART_COLORS
     )
-    fig_anp.update_layout(
-        title=f"Evolução do Preço do {comb_sel} — {est_sel} (2026)",
-        margin=dict(l=20, r=20, t=50, b=20),
-        height=380,
+    fig_filtered.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter", color=TEXT),
-        xaxis=dict(showgrid=False),
-        yaxis=dict(showgrid=True, gridcolor=BORDER),
-        title_font=dict(size=16, color=TEXT, family="Inter")
-    )
-    st.plotly_chart(fig_anp, use_container_width=True)
-    
-    # Comparativo entre estados
-    st.markdown("##### Comparativo de Preços entre Estados (Jun/2026)")
-    df_jun = df_anp[(df_anp["Mês"] == "Jun") & (df_anp["Combustível"] == comb_sel)]
-    fig_comp = px.bar(
-        df_jun.sort_values("Preço Médio (R$/L)", ascending=True),
-        x="Preço Médio (R$/L)",
-        y="Estado",
-        orientation="h",
-        color="Preço Médio (R$/L)",
-        color_continuous_scale=[CHART_COLORS[1], CHART_COLORS[0]],
-        template=PLOTLY_TEMPLATE
-    )
-    fig_comp.update_layout(
-        margin=dict(l=20, r=20, t=20, b=20),
-        height=380,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter", color=TEXT),
-        showlegend=False,
-        coloraxis_showscale=False,
-        xaxis=dict(showgrid=True, gridcolor=BORDER),
-        yaxis=dict(showgrid=False)
-    )
-    st.plotly_chart(fig_comp, use_container_width=True)
-    
-    st.markdown(f"""
-    <div class="insight-box">
-        <strong>💡 Insight Analítico:</strong> O estado de <strong>São Paulo</strong> apresenta consistentemente 
-        os menores preços de {comb_sel} devido à política tributária estadual e proximidade com refinarias. 
-        A variação inter-estadual pode chegar a <strong>15-20%</strong>, impactando diretamente a competitividade 
-        do setor de transporte e logística.
-    </div>
-    """, unsafe_allow_html=True)
-
-# --- TAB 3: CNPQ ---
-with analysis_tabs[2]:
-    st.markdown("### 🔬 Fomento à Pesquisa — CNPq Analytics")
-    
-    np.random.seed(456)
-    areas = ["Ciências Exatas", "Ciências Biológicas", "Engenharias", "Ciências Humanas", "Ciências da Saúde", "Ciências Agrárias"]
-    niveis = ["Iniciação Científica", "Mestrado", "Doutorado", "Pós-Doutorado"]
-    regioes_ibge = ["Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte"]
-    
-    dados_cnpq = []
-    for area in areas:
-        for nivel in niveis:
-            for reg in regioes_ibge:
-                base = np.random.randint(50, 500)
-                if reg == "Sudeste": base *= 2.5
-                elif reg == "Sul": base *= 1.5
-                elif reg == "Norte": base *= 0.6
-                dados_cnpq.append({
-                    "Área": area,
-                    "Nível": nivel,
-                    "Região": reg,
-                    "Bolsas Concedidas": int(base + np.random.normal(0, 30))
-                })
-    df_cnpq = pd.DataFrame(dados_cnpq)
-    
-    fc1, fc2 = st.columns(2)
-    with fc1:
-        area_sel = st.selectbox("Área do Conhecimento", areas, index=0)
-    with fc2:
-        tipo_viz = st.radio("Visualização", ["Por Região", "Por Nível de Formação"], horizontal=True)
-    
-    df_cnpq_filtro = df_cnpq[df_cnpq["Área"] == area_sel]
-    
-    if tipo_viz == "Por Região":
-        agg = df_cnpq_filtro.groupby("Região", observed=False)["Bolsas Concedidas"].sum().reset_index()
-        fig_cnpq = px.treemap(
-            agg,
-            path=["Região"],
-            values="Bolsas Concedidas",
-            color="Bolsas Concedidas",
-            color_continuous_scale=[CHART_COLORS[1], CHART_COLORS[0]],
-            template=PLOTLY_TEMPLATE
-        )
-    else:
-        agg = df_cnpq_filtro.groupby("Nível", observed=False)["Bolsas Concedidas"].sum().reset_index()
-        fig_cnpq = px.treemap(
-            agg,
-            path=["Nível"],
-            values="Bolsas Concedidas",
-            color="Bolsas Concedidas",
-            color_continuous_scale=[CHART_COLORS[1], CHART_COLORS[0]],
-            template=PLOTLY_TEMPLATE
-        )
-    
-    fig_cnpq.update_layout(
-        margin=dict(l=10, r=10, t=10, b=10),
-        height=450,
-        paper_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Inter", color=TEXT)
     )
-    st.plotly_chart(fig_cnpq, use_container_width=True)
-    
-    # Scatter de distribuição
-    st.markdown("##### Distribuição Detalhada — Bolsas por Região e Nível")
-    fig_scatter = px.scatter(
-        df_cnpq_filtro,
-        x="Nível",
-        y="Bolsas Concedidas",
-        color="Região",
-        size="Bolsas Concedidas",
-        color_discrete_sequence=CHART_COLORS,
-        template=PLOTLY_TEMPLATE
-    )
-    fig_scatter.update_layout(
-        margin=dict(l=20, r=20, t=20, b=20),
-        height=380,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter", color=TEXT),
-        xaxis=dict(showgrid=False),
-        yaxis=dict(showgrid=True, gridcolor=BORDER)
-    )
-    st.plotly_chart(fig_scatter, use_container_width=True)
-    
-    st.markdown(f"""
-    <div class="insight-box">
-        <strong>💡 Insight Analítico:</strong> A área de <strong>{area_sel}</strong> apresenta concentração 
-        histórica de bolsas na região <strong>Sudeste</strong>, refletindo a distribuição da infraestrutura 
-        acadêmica brasileira. Níveis de <strong>Pós-Doutorado</strong> têm menor volume, mas representam 
-        o maior investimento per capita em pesquisa científica.
-    </div>
-    """, unsafe_allow_html=True)
+    st.plotly_chart(fig_filtered, use_container_width=True)
 
-# --- TAB 4: IMPACTO OPERACIONAL ---
+with analysis_tabs[1]:
+    st.info("⛽ Painel interativo do Mercado de Combustíveis (ANP) em desenvolvimento.")
+
+with analysis_tabs[2]:
+    st.info("🔬 Análise de Fomento à Pesquisa Científica (CNPq) em desenvolvimento.")
+
 with analysis_tabs[3]:
-    st.markdown("### 📊 Impacto Operacional — Análise de Eficiência")
-    
-    # Dados de evolução temporal
-    meses_evo = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
-    df_evo = pd.DataFrame({
-        "Mês": meses_evo * 2,
-        "Tipo": ["Antes da Automação"] * 12 + ["Após Automação"] * 12,
-        "Horas Gastas": [120, 125, 118, 130, 122, 128, 126, 124, 129, 127, 125, 130] +
-                       [95, 70, 55, 45, 38, 35, 33, 32, 30, 29, 28, 27]
-    })
-    
-    fig_evo = px.line(
-        df_evo,
-        x="Mês",
-        y="Horas Gastas",
-        color="Tipo",
-        markers=True,
-        color_discrete_sequence=[CHART_COLORS[3], CHART_COLORS[0]],
-        template=PLOTLY_TEMPLATE
-    )
-    fig_evo.update_layout(
-        title="Evolução de Horas Operacionais — Antes vs Após Automação VBA",
-        margin=dict(l=20, r=20, t=60, b=20),
-        height=400,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter", color=TEXT),
-        xaxis=dict(showgrid=False),
-        yaxis=dict(showgrid=True, gridcolor=BORDER, title="Horas/Mês"),
-        title_font=dict(size=16, color=TEXT, family="Inter"),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-    )
-    st.plotly_chart(fig_evo, use_container_width=True)
-    
-    # Radar de competências aplicadas
-    st.markdown("##### Competências Aplicadas por Projeto")
-    categorias = ["Automação", "BI", "ETL", "Modelagem", "Visualização", "Cloud"]
-    valores = [95, 92, 88, 85, 90, 60]
-    
-    fig_radar = go.Figure()
-    fig_radar.add_trace(go.Scatterpolar(
-        r=valores + [valores[0]],
-        theta=categorias + [categorias[0]],
-        fill="toself",
-        name="Competências",
-        line=dict(color=CHART_COLORS[0], width=2),
-        fillcolor=f"rgba(59, 130, 246, 0.2)"
-    ))
-    fig_radar.update_layout(
-        polar=dict(
-            bgcolor="rgba(0,0,0,0)",
-            radialaxis=dict(visible=True, range=[0, 100], gridcolor=BORDER, tickfont=dict(color=TEXT_MUTED)),
-            angularaxis=dict(gridcolor=BORDER, tickfont=dict(color=TEXT, size=11))
-        ),
-        margin=dict(l=40, r=40, t=20, b=20),
-        height=400,
-        paper_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter", color=TEXT),
-        showlegend=False
-    )
-    st.plotly_chart(fig_radar, use_container_width=True)
-    
-    # KPIs de ROI
-    st.markdown("##### ROI da Automação (12 meses)")
-    r1, r2, r3, r4 = st.columns(4)
-    with r1:
-        st.metric("Horas Economizadas", "1.108 h", delta="+93% eficiência")
-    with r2:
-        st.metric("Custo Evitado", "R$ 185k", delta="vs. contratação")
-    with r3:
-        st.metric("Projetos Entregues", "24", delta="+60% vs. ano anterior")
-    with r4:
-        st.metric("SLA de Análises", "98.5%", delta="+12% vs. meta")
-    
-    st.markdown(f"""
-    <div class="insight-box">
-        <strong>💡 Insight Analítico:</strong> A implementação de automações em VBA no Banco do Brasil 
-        gerou um <strong>ROI estimado de 340% no primeiro ano</strong>, considerando horas economizadas 
-        versus custo de desenvolvimento. A curva de aprendizado foi superada em 3 meses, com ganhos 
-        exponenciais a partir do 4º mês de operação.
-    </div>
-    """, unsafe_allow_html=True)
-
-st.divider()
-
-# ============================================================================
-# 13. FOOTER
-# ============================================================================
-st.markdown(f"""
-<div class="footer">
-    <div class="footer-status">
-        <span class="footer-status-dot"></span>
-        <span class="footer-status-text">Disponível para oportunidades</span>
-    </div>
-    
-    <h3 class="footer-title">Vamos conversar sobre dados?</h3>
-    <p class="footer-subtitle">
-        Aberto a projetos desafiadores em Dados, Business Intelligence e Cloud.
-    </p>
-    
-    <div class="footer-modes">
-        <span class="footer-mode">🏠 Remoto</span>
-        <span class="footer-mode">🏢 Híbrido</span>
-        <span class="footer-mode">📍 Presencial</span>
-        <span class="footer-mode">✈️ Disponível para viagens</span>
-    </div>
-    
-    <div class="footer-links">
-        <a href="https://www.linkedin.com/in/raphaelpires" target="_blank" class="footer-link">
-            💼 LinkedIn
-        </a>
-        <a href="https://github.com/raphaelcaxias" target="_blank" class="footer-link">
-            💻 GitHub
-        </a>
-        <a href="mailto:contato@raphaelpires.com" class="footer-link">
-            ✉️ E-mail
-        </a>
-        <a href="tel:+5500000000000" class="footer-link">
-            📱 Telefone
-        </a>
-    </div>
-    
-    <p class="footer-copy">
-        © {datetime.now().year} Raphael Fernando da Silva Pires · Analista de Dados & Business Intelligence
-    </p>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("<div style='height: 2rem;'></div>", unsafe_allow_html=True)
+    st.info("📊 Mapeamento e métricas de ganho e impacto operacional em desenvolvimento.")
