@@ -223,7 +223,7 @@ def render_skills_chart():
     st.plotly_chart(fig, use_container_width=True)
 
 def render_projects():
-    """Renderiza os projetos - Usando apenas st.write e st.markdown"""
+    """Renderiza os projetos - SOMENTE st.write e st.markdown com links markdown"""
     st.markdown("""
     <div class="section-header">
         <span class="section-label">Portfólio</span>
@@ -231,35 +231,31 @@ def render_projects():
     </div>
     """, unsafe_allow_html=True)
     
-    # Projetos usando colunas com markdown
+    # Usando apenas st.write e markdown links
     col1, col2 = st.columns(2)
     
     with col1:
-        # Projeto 1
-        st.markdown("### 🇧🇷 Desenrola Brasil")
+        st.write("### 🇧🇷 Desenrola Brasil")
         st.write("Análise de dados do programa governamental, explorando renegociações e perfis de consumidores.")
-        st.markdown("[🔗 Acessar Repositório](https://github.com/raphaelcaxias)")
-        st.markdown("---")
+        st.write("[🔗 Acessar Repositório](https://github.com/raphaelcaxias)")
+        st.write("---")
         
-        # Projeto 3
-        st.markdown("### ⛽ Dashboard ANP")
+        st.write("### ⛽ Dashboard ANP")
         st.write("Inteligência de dados da ANP com análise de preços e produção de combustíveis.")
-        st.markdown("[📊 Ver Dashboard](https://github.com/raphaelcaxias)")
+        st.write("[📊 Ver Dashboard](https://github.com/raphaelcaxias)")
     
     with col2:
-        # Projeto 2
-        st.markdown("### 🔬 CNPq Analytics")
+        st.write("### 🔬 CNPq Analytics")
         st.write("Dashboard analítico sobre bolsas e fomento do CNPq com cruzamento de dados de pesquisa.")
-        st.markdown("[🔗 Acessar Repositório](https://github.com/raphaelcaxias)")
-        st.markdown("---")
+        st.write("[🔗 Acessar Repositório](https://github.com/raphaelcaxias)")
+        st.write("---")
         
-        # Projeto 4
-        st.markdown("### 💎 Portfólio Premium")
+        st.write("### 💎 Portfólio Premium")
         st.write("Este portfólio construído em Streamlit com design premium e visualização de dados.")
-        st.markdown("[💻 Ver Código](https://github.com/raphaelcaxias)")
+        st.write("[💻 Ver Código](https://github.com/raphaelcaxias)")
 
 def render_footer():
-    """Renderiza o footer - com links diretos"""
+    """Renderiza o footer"""
     st.markdown("""
     <div class="footer">
         <div class="footer-status">
