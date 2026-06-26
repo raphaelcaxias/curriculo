@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 from datetime import datetime
+import os
 
 # ============================================================================
 # CONFIGURAÇÃO DA PÁGINA
@@ -779,11 +780,11 @@ h1, h2, h3, h4 {{
 # ============================================================================
 st.markdown('<div class="hero-container">', unsafe_allow_html=True)
 
-# Foto de perfil
+# Foto de perfil - CORREÇÃO: nome correto do arquivo
 col_photo_l, col_photo, col_photo_r = st.columns([3, 2, 3])
 with col_photo:
     try:
-        st.image("foto.jpg", width=200, output_format="JPEG")
+        st.image("rapha.jpeg", width=200, output_format="JPEG")
     except Exception:
         st.markdown(f"""
         <div class="hero-avatar-wrapper">
@@ -816,6 +817,28 @@ st.markdown(f"""
     <span class="hero-badge">📈 Dashboards</span>
 </div>
 """, unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# ============================================================================
+# BOTÃO DOWNLOAD CURRÍCULO
+# ============================================================================
+st.markdown(f"""
+<div style="text-align: center; margin: 2rem 0;">
+""", unsafe_allow_html=True)
+
+try:
+    with open("Curriculo_Raphael_v2.pdf", "rb") as pdf_file:
+        pdf_bytes = pdf_file.read()
+        st.download_button(
+            label="📄 Download Currículo PDF",
+            data=pdf_bytes,
+            file_name="Curriculo_Raphael_v2.pdf",
+            mime="application/pdf",
+            use_container_width=False
+        )
+except Exception as e:
+    st.warning("📄 Currículo PDF não encontrado no repositório")
 
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1117,8 +1140,8 @@ fig_impact.add_trace(go.Bar(
     marker=dict(
         color=df_impact["Ganho de Eficiência (%)"],
         colorscale=[[0, GRADIENT_START], [1, GRADIENT_END]],
-        line=dict(width=0),
-        cornerradius=8
+        line=dict(width=0)
+        # CORREÇÃO: removido cornerradius que não é válido
     ),
     text=df_impact["Ganho de Eficiência (%)"].apply(lambda x: f"{x}%"),
     textposition="outside",
@@ -1183,7 +1206,7 @@ st.markdown(f"""
         <a href="https://www.linkedin.com/in/raphaelpires" target="_blank" class="footer-link">
             💼 LinkedIn
         </a>
-        <a href="https://github.com/raphaelpires" target="_blank" class="footer-link">
+        <a href="https://github.com/raphaelcaxias" target="_blank" class="footer-link">
             💻 GitHub
         </a>
         <a href="mailto:contato@raphaelpires.com" class="footer-link">
