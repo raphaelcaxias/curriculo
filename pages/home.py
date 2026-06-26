@@ -1,5 +1,6 @@
 import streamlit as st
-from components import render_hero, render_kpis, render_experience, render_tech_stack, render_skills_chart, render_projects, render_footer
+from components import render_hero, render_kpis, render_experience, render_tech_stack, render_skills_chart, render_footer
+from projects import render_projects  # Importa do novo arquivo
 
 def main():
     render_hero()
@@ -12,7 +13,7 @@ def main():
     st.divider()
     render_skills_chart()
     st.divider()
-    render_projects()
+    render_projects()  # Usa a nova função
     st.divider()
     render_footer()
 
