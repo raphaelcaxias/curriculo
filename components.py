@@ -20,26 +20,31 @@ def render_hero():
     col1, col2, col3 = st.columns([4,2,4])
     with col2:
         if os.path.exists("rapha.jpeg"):
-            st.image("rapha.jpeg", width=180)
+            st.image("rapha.jpeg", width=160)
         else:
             st.markdown(f"""
-            <div style="width:180px;height:180px;border-radius:50%;background:linear-gradient(135deg,{colors['primary']},{colors['secondary']});
-            display:flex;align-items:center;justify-content:center;font-size:4rem;font-weight:700;color:white;margin:0 auto 1.5rem;border:3px solid {colors['primary']};">
+            <div style="width:160px;height:160px;border-radius:50%;background:linear-gradient(135deg,{colors['primary']},{colors['secondary']});
+            display:flex;align-items:center;justify-content:center;font-size:3.5rem;font-weight:700;color:white;margin:0 auto 1.5rem;border:3px solid {colors['primary']};">
             RP</div>""", unsafe_allow_html=True)
     st.markdown(f"""
     <h1 class="hero-name">Raphael Fernando da Silva Pires</h1>
     <div class="hero-title">Analista de Dados & Business Intelligence</div>
-    <p class="hero-subtitle">Transformando dados brutos em decisões estratégicas. Mais de <strong>16 anos</strong> construindo inteligência de negócios, automações e governança de dados que geram impacto real e mensurável.</p>
+    <p class="hero-subtitle">
+        Transformando dados brutos em decisões estratégicas. Mais de <strong>16 anos</strong> construindo inteligência de negócios,
+        automações e governança de dados que geram impacto real e mensurável.
+    </p>
     <div>
-        <span class="tech-badge">📊 Power BI</span>
-        <span class="tech-badge">🐍 Python</span>
-        <span class="tech-badge">🗄️ SQL</span>
-        <span class="tech-badge">☁️ AWS</span>
-        <span class="tech-badge">🤖 IA Generativa</span>
-        <span class="tech-badge">📈 Dashboards</span>
+        <span class="hero-badge">📊 Power BI</span>
+        <span class="hero-badge">🐍 Python</span>
+        <span class="hero-badge">🗄️ SQL</span>
+        <span class="hero-badge">☁️ AWS</span>
+        <span class="hero-badge">🤖 IA Generativa</span>
+        <span class="hero-badge">📈 Dashboards</span>
     </div>
     """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Download CV
     col1, col2, col3 = st.columns([4,2,4])
     with col2:
         if os.path.exists("Curriculo_Raphael_v2.pdf"):
@@ -55,7 +60,13 @@ def render_kpis():
         <h2 class="section-title">Números que contam histórias</h2>
     </div>
     """, unsafe_allow_html=True)
-    kpis = [("16+","anos de experiência"),("70%","redução operacional"),("213k","registros processados"),("2h→15m","análises reduzidas"),("R$50bi","dados analisados")]
+    kpis = [
+        ("16 anos", "transformando dados em decisões"),
+        ("70%", "redução de tempo em relatórios manuais"),
+        ("+213 mil", "registros processados com automação"),
+        ("2h → 15min", "de análise com IA"),
+        ("R$ 50 bi", "em dados analisados")
+    ]
     cols = st.columns(5)
     for col, (val, label) in zip(cols, kpis):
         with col:
@@ -70,18 +81,43 @@ def render_skills_chart():
     """, unsafe_allow_html=True)
     colors = get_colors()
     df = pd.DataFrame({
-        "Tecnologia": ["Power BI","SQL/PostgreSQL","Python","Excel/VBA","Streamlit","AWS","Plotly"],
-        "Proficiência": [95,92,88,95,85,60,82],
-        "Categoria": ["BI","Dados","Dados","Automação","BI","Cloud","BI"]
+        "Tecnologia": ["Power BI", "SQL/PostgreSQL", "Python", "Excel/VBA", "Streamlit", "AWS", "Plotly"],
+        "Proficiência": [95, 92, 88, 95, 85, 60, 82],
+        "Categoria": ["BI", "Dados", "Dados", "Automação", "BI", "Cloud", "BI"]
     })
     fig = px.bar(df, x="Proficiência", y="Tecnologia", color="Categoria", orientation="h",
                  color_discrete_sequence=colors["chart_colors"], template=colors["plotly_template"], text="Proficiência")
     fig.update_layout(height=380, margin=dict(l=20,r=40,t=20,b=40),
-                      xaxis=dict(range=[0,105], showgrid=True, gridcolor="rgba(148,163,184,0.1)"),
+                      xaxis=dict(range=[0,105], showgrid=True, gridcolor=colors["border"]),
                       yaxis=dict(showgrid=False), legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
                       font=dict(family="Inter", color=colors["text"]), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     fig.update_traces(textposition="outside", textfont=dict(color=colors["text"], size=11))
     st.plotly_chart(fig, use_container_width=True)
+
+def render_certification():
+    colors = get_colors()
+    st.markdown(f"""
+    <div class="section-header">
+        <span class="section-label">Certificação</span>
+        <h2 class="section-title">Próximo objetivo</h2>
+    </div>
+    <div class="cert-badge">
+        <div class="cert-badge-icon">🎯</div>
+        <div class="cert-badge-title">AWS Cloud Practitioner</div>
+        <div class="cert-badge-sub">Meta para 2026 · Certificação em andamento</div>
+        <div style="margin-top: 0.8rem;">
+            <span style="background: {colors['primary']}15; padding: 0.2rem 0.8rem; border-radius: 999px; font-size: 0.75rem; color: {colors['primary']};">
+                ☁️ Cloud Computing
+            </span>
+            <span style="background: {colors['primary']}15; padding: 0.2rem 0.8rem; border-radius: 999px; font-size: 0.75rem; color: {colors['primary']};">
+                📘 AWS Console
+            </span>
+            <span style="background: {colors['primary']}15; padding: 0.2rem 0.8rem; border-radius: 999px; font-size: 0.75rem; color: {colors['primary']};">
+                💾 Storage
+            </span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 def render_footer():
     st.markdown("""
