@@ -66,12 +66,10 @@ def render_analytics():
             combustivel = st.selectbox("Combustível", df["Combustível"].unique())
         filtro = df[(df["Estado"]==estado) & (df["Combustível"]==combustivel)]
 
-        # ===== CORREÇÃO: verifica se filtro não está vazio =====
         if filtro.empty:
             st.warning("Nenhum dado disponível para a combinação selecionada.")
         else:
             k1,k2 = st.columns(2)
-            # pega o último mês disponível (Jun)
             ultimo_mes = filtro["Mês"].max()
             preco_atual = filtro[filtro["Mês"]==ultimo_mes]["Preço"].values[0] if not filtro[filtro["Mês"]==ultimo_mes].empty else 0
             k1.metric("Preço Atual", f"R$ {preco_atual:.2f}")
