@@ -26,12 +26,37 @@ def render_hero():
     
     st.markdown('<div class="hero-section">', unsafe_allow_html=True)
     
-    # Foto
+    # Foto - CORRIGIDO
     col1, col2, col3 = st.columns([4, 2, 4])
     with col2:
+        # Tenta carregar a foto de diferentes lugares
+        foto_carregada = False
+        
+        # Tenta 1: assets/rapha.jpeg
         try:
             st.image("assets/rapha.jpeg", use_container_width=True)
+            foto_carregada = True
         except:
+            pass
+        
+        # Tenta 2: rapha.jpeg na raiz
+        if not foto_carregada:
+            try:
+                st.image("rapha.jpeg", use_container_width=True)
+                foto_carregada = True
+            except:
+                pass
+        
+        # Tenta 3: assets/raphael.jpeg
+        if not foto_carregada:
+            try:
+                st.image("assets/raphael.jpeg", use_container_width=True)
+                foto_carregada = True
+            except:
+                pass
+        
+        # Placeholder se nenhuma foto for encontrada
+        if not foto_carregada:
             st.markdown(f"""
             <div style="
                 width: 180px;
@@ -85,7 +110,17 @@ def render_hero():
                     use_container_width=True
                 )
         except:
-            st.info("📄 Currículo PDF disponível")
+            try:
+                with open("Curriculo_Raphael_v2.pdf", "rb") as pdf:
+                    st.download_button(
+                        label="📄 Download Currículo PDF",
+                        data=pdf.read(),
+                        file_name="Curriculo_Raphael_Pires.pdf",
+                        mime="application/pdf",
+                        use_container_width=True
+                    )
+            except:
+                st.info("📄 Currículo PDF disponível")
 
 # ============================================================================
 # COMPONENTES DE CONTEÚDO
@@ -204,7 +239,7 @@ def render_skills_chart():
     st.plotly_chart(fig, use_container_width=True)
 
 def render_projects():
-    """Renderiza os projetos sem usar border=True"""
+    """Renderiza os projetos - CORRIGIDO sem border=True"""
     st.markdown("""
     <div class="section-header">
         <span class="section-label">Portfólio</span>
@@ -212,37 +247,36 @@ def render_projects():
     </div>
     """, unsafe_allow_html=True)
     
-    # Organizar em grid 2x2
-    for i in range(0, len(PROJECTS), 2):
-        cols = st.columns(2)
-        for j, col in enumerate(cols):
-            if i + j < len(PROJECTS):
-                proj = PROJECTS[i + j]
-                with col:
-                    # Usando container sem border e adicionando CSS manualmente
-                    st.markdown(f"""
-                    <div style="
-                        background: rgba(59, 130, 246, 0.03);
-                        border: 1px solid rgba(59, 130, 246, 0.1);
-                        border-radius: 12px;
-                        padding: 1.5rem;
-                        margin-bottom: 1rem;
-                        transition: all 0.3s ease;
-                    ">
-                        <h4>{proj['icon']} {proj['title']}</h4>
-                        <p style="color: #94A3B8; margin: 0.5rem 0 1rem 0;">{proj['description']}</p>
-                        <a href="{proj['link']}" target="_blank" style="
-                            display: inline-block;
-                            background: rgba(59, 130, 246, 0.1);
-                            color: #3B82F6;
-                            padding: 0.4rem 1rem;
-                            border-radius: 6px;
-                            text-decoration: none;
-                            font-weight: 500;
-                            font-size: 0.9rem;
-                        ">🔗 {proj['label']}</a>
-                    </div>
-                    """, unsafe_allow_html=True)
+    # Projetos usando columns com st.container sem border
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        # Projeto 1
+        with st.container():
+            st.markdown("### 🇧🇷 Desenrola Brasil")
+            st.write("Análise de dados do programa governamental, explorando renegociações e perfis de consumidores.")
+            st.link_button("🔗 Acessar Repositório", "https://github.com/raphaelcaxias")
+            st.markdown("---")
+        
+        # Projeto 3
+        with st.container():
+            st.markdown("### ⛽ Dashboard ANP")
+            st.write("Inteligência de dados da ANP com análise de preços e produção de combustíveis.")
+            st.link_button("📊 Ver Dashboard", "https://github.com/raphaelcaxias")
+    
+    with col2:
+        # Projeto 2
+        with st.container():
+            st.markdown("### 🔬 CNPq Analytics")
+            st.write("Dashboard analítico sobre bolsas e fomento do CNPq com cruzamento de dados de pesquisa.")
+            st.link_button("🔗 Acessar Repositório", "https://github.com/raphaelcaxias")
+            st.markdown("---")
+        
+        # Projeto 4
+        with st.container():
+            st.markdown("### 💎 Portfólio Premium")
+            st.write("Este portfólio construído em Streamlit com design premium e visualização de dados.")
+            st.link_button("💻 Ver Código", "https://github.com/raphaelcaxias")
 
 def render_footer():
     """Renderiza o footer"""
