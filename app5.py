@@ -982,30 +982,34 @@ with analysis_tabs[0]:
     
     df_f = df_des[(df_des["Região"].isin(reg_sel)) & (df_des["Status"].isin(status_sel))]
     
-    mk1, mk2, mk3 = st.columns(3)
-    with mk1:
-        st.metric("Contratos", f"{len(df_f):,}".replace(",", "."))
-    with mk2:
-        st.metric("Valor Total", f"R$ {df_f['Valor'].sum()/1e6:.1f}M")
-    with mk3:
-        st.metric("Taxa Sucesso", f"{(df_f['Status']=='Renegociado').mean()*100:.1f}%")
-    
-    g1, g2 = st.columns(2)
-    with g1:
-        fig_reg = px.pie(df_f, names="Região", values="Valor", hole=0.55, 
-                        color_discrete_sequence=CHART_COLORS, template=PLOTLY_TEMPLATE)
-        fig_reg.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=320,
-                            paper_bgcolor="rgba(0,0,0,0)", font=dict(family="Inter", color=TEXT))
-        st.plotly_chart(fig_reg, use_container_width=True)
-    
-    with g2:
-        fig_faixa = px.bar(df_f.groupby("Faixa", observed=False)["Valor"].sum().reset_index(),
-                          x="Faixa", y="Valor", color_discrete_sequence=[CHART_COLORS[0]], 
-                          template=PLOTLY_TEMPLATE)
-        fig_faixa.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=320,
-                               paper_bgcolor="rgba(0,0,0,0)", font=dict(family="Inter", color=TEXT),
-                               xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="rgba(148,163,184,0.1)"))
-        st.plotly_chart(fig_faixa, use_container_width=True)
+    # Verificar se há dados após o filtro
+    if len(df_f) == 0:
+        st.warning("Nenhum dado encontrado para os filtros selecionados.")
+    else:
+        mk1, mk2, mk3 = st.columns(3)
+        with mk1:
+            st.metric("Contratos", f"{len(df_f):,}".replace(",", "."))
+        with mk2:
+            st.metric("Valor Total", f"R$ {df_f['Valor'].sum()/1e6:.1f}M")
+        with mk3:
+            st.metric("Taxa Sucesso", f"{(df_f['Status']=='Renegociado').mean()*100:.1f}%")
+        
+        g1, g2 = st.columns(2)
+        with g1:
+            fig_reg = px.pie(df_f, names="Região", values="Valor", hole=0.55, 
+                            color_discrete_sequence=CHART_COLORS, template=PLOTLY_TEMPLATE)
+            fig_reg.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=320,
+                                paper_bgcolor="rgba(0,0,0,0)", font=dict(family="Inter", color=TEXT))
+            st.plotly_chart(fig_reg, use_container_width=True)
+        
+        with g2:
+            fig_faixa = px.bar(df_f.groupby("Faixa", observed=False)["Valor"].sum().reset_index(),
+                              x="Faixa", y="Valor", color_discrete_sequence=[CHART_COLORS[0]], 
+                              template=PLOTLY_TEMPLATE)
+            fig_faixa.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=320,
+                                   paper_bgcolor="rgba(0,0,0,0)", font=dict(family="Inter", color=TEXT),
+                                   xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="rgba(148,163,184,0.1)"))
+            st.plotly_chart(fig_faixa, use_container_width=True)
 
 # TAB 2: COMBUSTÍVEIS
 with analysis_tabs[1]:
@@ -1035,19 +1039,23 @@ with analysis_tabs[1]:
     
     df_f = df_anp[(df_anp["Estado"] == est_sel) & (df_anp["Combustível"] == comb_sel)]
     
-    mc1, mc2 = st.columns(2)
-    with mc1:
-        st.metric("Preço Atual", f"R$ {df_f[df_f['Mês']=='Jun']['Preço'].values[0]:.2f}")
-    with mc2:
-        variacao = ((df_f["Preço"].max() - df_f["Preço"].min()) / df_f["Preço"].min()) * 100
-        st.metric("Variação Semestral", f"{variacao:.1f}%")
-    
-    fig = px.line(df_f, x="Mês", y="Preço", markers=True, 
-                  color_discrete_sequence=[CHART_COLORS[0]], template=PLOTLY_TEMPLATE)
-    fig.update_layout(title=f"{comb_sel} - {est_sel}", margin=dict(l=20, r=20, t=50, b=20),
-                     height=350, paper_bgcolor="rgba(0,0,0,0)", font=dict(family="Inter", color=TEXT),
-                     xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="rgba(148,163,184,0.1)"))
-    st.plotly_chart(fig, use_container_width=True)
+    # Verificar se há dados
+    if len(df_f) == 0:
+        st.warning("Nenhum dado encontrado para os filtros selecionados.")
+    else:
+        mc1, mc2 = st.columns(2)
+        with mc1:
+            st.metric("Preço Atual", f"R$ {df_f[df_f['Mês']=='Jun']['Preço'].values[0]:.2f}")
+        with mc2:
+            variacao = ((df_f["Preço"].max() - df_f["Preço"].min()) / df_f["Preço"].min()) * 100
+            st.metric("Variação Semestral", f"{variacao:.1f}%")
+        
+        fig = px.line(df_f, x="Mês", y="Preço", markers=True, 
+                      color_discrete_sequence=[CHART_COLORS[0]], template=PLOTLY_TEMPLATE)
+        fig.update_layout(title=f"{comb_sel} - {est_sel}", margin=dict(l=20, r=20, t=50, b=20),
+                         height=350, paper_bgcolor="rgba(0,0,0,0)", font=dict(family="Inter", color=TEXT),
+                         xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="rgba(148,163,184,0.1)"))
+        st.plotly_chart(fig, use_container_width=True)
 
 # TAB 3: IMPACTO OPERACIONAL
 with analysis_tabs[2]:
