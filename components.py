@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from config import get_colors, SOCIAL_LINKS, TECH_STACK, SKILLS_DATA
+from config import get_colors, SOCIAL_LINKS, TECH_STACK, SKILLS_DATA, EXPERIENCES, PROJECTS
 
 # ============================================================================
 # COMPONENTES DE UI
@@ -119,8 +119,6 @@ def render_kpis():
 
 def render_experience():
     """Renderiza a timeline de experiências"""
-    from config import EXPERIENCES
-    
     st.markdown("""
     <div class="section-header">
         <span class="section-label">Trajetória</span>
@@ -148,8 +146,6 @@ def render_experience():
 
 def render_tech_stack():
     """Renderiza a stack tecnológica"""
-    from config import TECH_STACK
-    
     st.markdown("""
     <div class="section-header">
         <span class="section-label">Stack</span>
@@ -171,8 +167,6 @@ def render_tech_stack():
 
 def render_skills_chart():
     """Renderiza o gráfico de habilidades"""
-    from config import SKILLS_DATA
-    
     st.markdown("""
     <div class="section-header">
         <span class="section-label">Competências</span>
@@ -210,9 +204,7 @@ def render_skills_chart():
     st.plotly_chart(fig, use_container_width=True)
 
 def render_projects():
-    """Renderiza os projetos"""
-    from config import PROJECTS
-    
+    """Renderiza os projetos sem usar border=True"""
     st.markdown("""
     <div class="section-header">
         <span class="section-label">Portfólio</span>
@@ -227,14 +219,33 @@ def render_projects():
             if i + j < len(PROJECTS):
                 proj = PROJECTS[i + j]
                 with col:
-                    with st.container(border=True):
-                        st.markdown(f"#### {proj['icon']} {proj['title']}")
-                        st.write(proj['description'])
-                        st.page_link(proj['link'], label=proj['label'], icon="🔗")
+                    # Usando container sem border e adicionando CSS manualmente
+                    st.markdown(f"""
+                    <div style="
+                        background: rgba(59, 130, 246, 0.03);
+                        border: 1px solid rgba(59, 130, 246, 0.1);
+                        border-radius: 12px;
+                        padding: 1.5rem;
+                        margin-bottom: 1rem;
+                        transition: all 0.3s ease;
+                    ">
+                        <h4>{proj['icon']} {proj['title']}</h4>
+                        <p style="color: #94A3B8; margin: 0.5rem 0 1rem 0;">{proj['description']}</p>
+                        <a href="{proj['link']}" target="_blank" style="
+                            display: inline-block;
+                            background: rgba(59, 130, 246, 0.1);
+                            color: #3B82F6;
+                            padding: 0.4rem 1rem;
+                            border-radius: 6px;
+                            text-decoration: none;
+                            font-weight: 500;
+                            font-size: 0.9rem;
+                        ">🔗 {proj['label']}</a>
+                    </div>
+                    """, unsafe_allow_html=True)
 
 def render_footer():
     """Renderiza o footer"""
-    from config import SOCIAL_LINKS
     colors = get_colors()
     
     st.markdown(f"""
