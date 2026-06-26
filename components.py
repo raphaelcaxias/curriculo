@@ -3,7 +3,7 @@ import plotly.express as px
 import pandas as pd
 from config import get_colors
 
-# ===== Navbar =====
+# ===== NAVBAR (fixa com glass) =====
 def render_navbar(active_page):
     colors = get_colors()
     st.markdown(f"""
@@ -18,7 +18,7 @@ def render_navbar(active_page):
     </nav>
     """, unsafe_allow_html=True)
 
-# ===== Footer =====
+# ===== FOOTER =====
 def render_footer():
     st.markdown("""
     <div class="footer">
@@ -44,7 +44,7 @@ def render_footer():
     </div>
     """, unsafe_allow_html=True)
 
-# ===== Skills Chart =====
+# ===== GRÁFICO DE SKILLS =====
 def render_skills_chart():
     c = get_colors()
     df = pd.DataFrame({
