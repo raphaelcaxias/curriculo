@@ -13,14 +13,7 @@ def get_foto_path():
     Retorna o caminho se encontrar, ou None se não encontrar.
     """
     candidatos = [
-        "rapha.jpeg",
-        "rapha.jpg",
-        "assets/rapha.jpeg",
-        "assets/rapha.jpg",
-        "foto.jpeg",
-        "foto.jpg",
-        "perfil.jpeg",
-        "perfil.jpg"
+        "assets/rapha.jpeg"
     ]
     for caminho in candidatos:
         if os.path.exists(caminho):
