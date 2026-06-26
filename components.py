@@ -3,6 +3,22 @@ import plotly.express as px
 import pandas as pd
 from config import get_colors
 
+# ===== Navbar =====
+def render_navbar(active_page):
+    colors = get_colors()
+    st.markdown(f"""
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">Raphael <span>Pires</span></a>
+        <div class="navbar-links">
+            <a href="?page=home" class="nav-link {'active' if active_page == 'home' else ''}">Início</a>
+            <a href="?page=analytics" class="nav-link {'active' if active_page == 'analytics' else ''}">Análises</a>
+            <a href="?page=dashboard" class="nav-link {'active' if active_page == 'dashboard' else ''}">Dashboard</a>
+            <button class="nav-theme-btn" onclick="parent.postMessage({{type:'toggle_theme'}},'*')">🌓</button>
+        </div>
+    </nav>
+    """, unsafe_allow_html=True)
+
+# ===== Footer =====
 def render_footer():
     st.markdown("""
     <div class="footer">
@@ -28,6 +44,7 @@ def render_footer():
     </div>
     """, unsafe_allow_html=True)
 
+# ===== Skills Chart =====
 def render_skills_chart():
     c = get_colors()
     df = pd.DataFrame({
