@@ -223,7 +223,7 @@ def render_skills_chart():
     st.plotly_chart(fig, use_container_width=True)
 
 def render_projects():
-    """Renderiza os projetos - CORRIGIDO (sem link_button)"""
+    """Renderiza os projetos - Usando apenas st.write e st.markdown"""
     st.markdown("""
     <div class="section-header">
         <span class="section-label">Portfólio</span>
@@ -231,78 +231,35 @@ def render_projects():
     </div>
     """, unsafe_allow_html=True)
     
-    colors = get_colors()
-    
-    # Projeto 1
+    # Projetos usando colunas com markdown
     col1, col2 = st.columns(2)
     
     with col1:
+        # Projeto 1
         st.markdown("### 🇧🇷 Desenrola Brasil")
         st.write("Análise de dados do programa governamental, explorando renegociações e perfis de consumidores.")
-        # Usando HTML para o link
-        st.markdown(f"""
-        <a href="https://github.com/raphaelcaxias" target="_blank" style="
-            display: inline-block;
-            background: {colors['primary']};
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            margin: 0.5rem 0;
-        ">🔗 Acessar Repositório</a>
-        """, unsafe_allow_html=True)
+        st.markdown("[🔗 Acessar Repositório](https://github.com/raphaelcaxias)")
         st.markdown("---")
         
+        # Projeto 3
         st.markdown("### ⛽ Dashboard ANP")
         st.write("Inteligência de dados da ANP com análise de preços e produção de combustíveis.")
-        st.markdown(f"""
-        <a href="https://github.com/raphaelcaxias" target="_blank" style="
-            display: inline-block;
-            background: {colors['primary']};
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            margin: 0.5rem 0;
-        ">📊 Ver Dashboard</a>
-        """, unsafe_allow_html=True)
+        st.markdown("[📊 Ver Dashboard](https://github.com/raphaelcaxias)")
     
     with col2:
+        # Projeto 2
         st.markdown("### 🔬 CNPq Analytics")
         st.write("Dashboard analítico sobre bolsas e fomento do CNPq com cruzamento de dados de pesquisa.")
-        st.markdown(f"""
-        <a href="https://github.com/raphaelcaxias" target="_blank" style="
-            display: inline-block;
-            background: {colors['primary']};
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            margin: 0.5rem 0;
-        ">🔗 Acessar Repositório</a>
-        """, unsafe_allow_html=True)
+        st.markdown("[🔗 Acessar Repositório](https://github.com/raphaelcaxias)")
         st.markdown("---")
         
+        # Projeto 4
         st.markdown("### 💎 Portfólio Premium")
         st.write("Este portfólio construído em Streamlit com design premium e visualização de dados.")
-        st.markdown(f"""
-        <a href="https://github.com/raphaelcaxias" target="_blank" style="
-            display: inline-block;
-            background: {colors['primary']};
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            margin: 0.5rem 0;
-        ">💻 Ver Código</a>
-        """, unsafe_allow_html=True)
+        st.markdown("[💻 Ver Código](https://github.com/raphaelcaxias)")
 
 def render_footer():
-    """Renderiza o footer"""
+    """Renderiza o footer - com links diretos"""
     st.markdown("""
     <div class="footer">
         <div class="footer-status">
