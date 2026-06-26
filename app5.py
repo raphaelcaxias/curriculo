@@ -2,10 +2,11 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
+import plotly.graph_objects as go
 from datetime import datetime
 
 # ============================================================================
-# 1. CONFIGURAÇÃO DA PÁGINA
+# CONFIGURAÇÃO DA PÁGINA
 # ============================================================================
 st.set_page_config(
     page_title="Raphael Pires | Analista de Dados & BI",
@@ -15,7 +16,7 @@ st.set_page_config(
 )
 
 # ============================================================================
-# 2. MODO DARK / LIGHT
+# TEMA DARK/LIGHT
 # ============================================================================
 if "theme" not in st.session_state:
     st.session_state.theme = "dark"
@@ -23,244 +24,240 @@ if "theme" not in st.session_state:
 def toggle_theme():
     st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
 
-# Botão de alternar tema no topo direito
-col_t1, col_t2 = st.columns([11, 1])
-with col_t2:
-    theme_label = "☀️ Claro" if st.session_state.theme == "dark" else "🌙 Escuro"
-    st.button(theme_label, on_click=toggle_theme, key="theme_toggle", use_container_width=True)
+# Botão de tema no canto superior direito
+col_theme1, col_theme2, col_theme3 = st.columns([10, 1, 1])
+with col_theme3:
+    theme_label = "☀️" if st.session_state.theme == "dark" else "🌙"
+    st.button(theme_label, on_click=toggle_theme, key="theme_btn", use_container_width=True)
 
 is_dark = st.session_state.theme == "dark"
 
 # ============================================================================
-# 3. PALETA DE CORES (Inspirada em Stripe/Linear/Vercel)
+# CORES
 # ============================================================================
 if is_dark:
-    BG = "#0B1120"
-    SURFACE = "#111A2E"
-    SURFACE_2 = "#1A2540"
     PRIMARY = "#3B82F6"
     SECONDARY = "#0EA5E9"
-    ACCENT = "#60A5FA"
+    BG = "#0B1120"
     TEXT = "#E5E7EB"
     TEXT_MUTED = "#94A3B8"
-    BORDER = "rgba(59, 130, 246, 0.15)"
-    GLASS = "rgba(17, 26, 46, 0.6)"
-    SHADOW = "rgba(0, 0, 0, 0.4)"
-    GRADIENT_START = "#3B82F6"
-    GRADIENT_END = "#0EA5E9"
     PLOTLY_TEMPLATE = "plotly_dark"
-    CHART_COLORS = ["#3B82F6", "#0EA5E9", "#60A5FA", "#2563EB", "#0284C7", "#93C5FD"]
+    CHART_COLORS = ["#3B82F6", "#0EA5E9", "#60A5FA", "#2563EB", "#0284C7"]
 else:
-    BG = "#F8FAFC"
-    SURFACE = "#FFFFFF"
-    SURFACE_2 = "#F1F5F9"
     PRIMARY = "#2563EB"
     SECONDARY = "#0284C7"
-    ACCENT = "#3B82F6"
+    BG = "#F8FAFC"
     TEXT = "#0F172A"
     TEXT_MUTED = "#64748B"
-    BORDER = "rgba(37, 99, 235, 0.12)"
-    GLASS = "rgba(255, 255, 255, 0.7)"
-    SHADOW = "rgba(15, 23, 42, 0.08)"
-    GRADIENT_START = "#2563EB"
-    GRADIENT_END = "#0284C7"
     PLOTLY_TEMPLATE = "plotly_white"
-    CHART_COLORS = ["#2563EB", "#0284C7", "#3B82F6", "#1D4ED8", "#0369A1", "#60A5FA"]
+    CHART_COLORS = ["#2563EB", "#0284C7", "#3B82F6", "#1D4ED8", "#0369A1"]
 
 # ============================================================================
-# 4. CSS PREMIUM
+# CSS OTIMIZADO
 # ============================================================================
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
 
+/* Global */
 html, body, [class*="css"] {{
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    color: {TEXT};
+    font-family: 'Inter', sans-serif;
     background: {BG};
+    color: {TEXT};
 }}
 
 #MainMenu, header, footer, .stDeployButton {{ display: none !important; }}
 
 .stApp {{
-    background: 
-        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59, 130, 246, 0.15), transparent),
-        radial-gradient(ellipse 60% 50% at 80% 50%, rgba(14, 165, 233, 0.08), transparent),
-        {BG};
-    background-attachment: fixed;
+    background: {BG};
 }}
 
-.block-container {{ padding: 2rem 3rem 4rem 3rem; max-width: 1280px; }}
-@media (max-width: 768px) {{ .block-container {{ padding: 1.5rem 1.25rem 3rem 1.25rem; }} }}
-
-/* Botões */
-.stButton > button {{
-    background: {GLASS};
-    color: {TEXT};
-    border: 1px solid {BORDER};
-    border-radius: 12px;
-    padding: 0.5rem 1rem;
-    font-weight: 500;
-    backdrop-filter: blur(12px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px {SHADOW};
-}}
-.stButton > button:hover {{
-    background: {PRIMARY};
-    color: white;
-    border-color: {PRIMARY};
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
+.block-container {{
+    padding: 2rem 4rem 3rem 4rem;
+    max-width: 1200px;
 }}
 
-/* Download Button */
-.stDownloadButton > button {{
-    background: linear-gradient(135deg, {GRADIENT_START}, {GRADIENT_END});
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    font-size: 0.9375rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
-}}
-.stDownloadButton > button:hover {{
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.45);
+@media (max-width: 768px) {{
+    .block-container {{ padding: 1.5rem 1.5rem 2rem 1.5rem; }}
 }}
 
-/* Hero */
-.hero-container {{ padding: 3rem 0 2rem 0; text-align: center; }}
+/* Hero Section */
+.hero-section {{
+    text-align: center;
+    padding: 3rem 0;
+    margin-bottom: 3rem;
+}}
+
+.hero-photo {{
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid {PRIMARY};
+    box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3);
+    margin-bottom: 1.5rem;
+}}
 
 .hero-name {{
     font-family: 'Playfair Display', serif;
-    font-size: 3.5rem;
+    font-size: 2.75rem;
     font-weight: 700;
+    color: {TEXT};
+    margin: 0 0 0.5rem 0;
     letter-spacing: -0.02em;
-    line-height: 1.1;
-    margin: 1.5rem 0 0.75rem 0;
-    background: linear-gradient(135deg, {TEXT} 0%, {PRIMARY} 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
 }}
 
 .hero-title {{
-    font-size: 1.125rem;
-    font-weight: 500;
+    font-size: 1rem;
+    font-weight: 600;
     color: {PRIMARY};
-    letter-spacing: 0.08em;
     text-transform: uppercase;
-    margin-bottom: 1.25rem;
+    letter-spacing: 0.1em;
+    margin: 0 0 1.5rem 0;
 }}
 
 .hero-subtitle {{
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     color: {TEXT_MUTED};
-    max-width: 720px;
+    max-width: 700px;
     margin: 0 auto 2rem auto;
     line-height: 1.6;
 }}
 
-.hero-badges {{
+.tech-badges {{
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 1.5rem;
+    margin: 1.5rem 0;
 }}
 
-.hero-badge {{
-    background: {GLASS};
-    border: 1px solid {BORDER};
+.tech-badge {{
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
     padding: 0.5rem 1rem;
     border-radius: 999px;
-    font-size: 0.8125rem;
+    font-size: 0.85rem;
     font-weight: 500;
     color: {TEXT};
-    backdrop-filter: blur(12px);
-    transition: all 0.3s ease;
-}}
-.hero-badge:hover {{
-    border-color: {PRIMARY};
-    color: {PRIMARY};
-    transform: translateY(-2px);
-}}
-
-@media (max-width: 768px) {{
-    .hero-name {{ font-size: 2.25rem; }}
-    .hero-subtitle {{ font-size: 1.0625rem; }}
 }}
 
 /* Section Headers */
-.section-header {{ margin: 4rem 0 2rem 0; text-align: center; }}
+.section-header {{
+    margin: 3rem 0 2rem 0;
+    text-align: center;
+}}
 
 .section-label {{
     display: inline-block;
     font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.15em;
     text-transform: uppercase;
+    letter-spacing: 0.15em;
     color: {PRIMARY};
     background: rgba(59, 130, 246, 0.1);
-    padding: 0.375rem 0.875rem;
+    padding: 0.4rem 1rem;
     border-radius: 999px;
     margin-bottom: 1rem;
 }}
 
 .section-title {{
     font-family: 'Playfair Display', serif;
-    font-size: 2.25rem;
+    font-size: 2rem;
     font-weight: 700;
     color: {TEXT};
-    margin: 0 0 0.75rem 0;
-    letter-spacing: -0.02em;
+    margin: 0;
 }}
 
-.section-subtitle {{
-    font-size: 1.0625rem;
+/* KPIs */
+.kpi-container {{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin: 2rem 0;
+}}
+
+@media (max-width: 1024px) {{
+    .kpi-container {{ grid-template-columns: repeat(3, 1fr); }}
+}}
+@media (max-width: 640px) {{
+    .kpi-container {{ grid-template-columns: repeat(2, 1fr); }}
+}}
+
+.kpi-box {{
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: 12px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}}
+
+.kpi-box:hover {{
+    transform: translateY(-4px);
+    border-color: {PRIMARY};
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+}}
+
+.kpi-value {{
+    font-size: 2rem;
+    font-weight: 700;
+    color: {PRIMARY};
+    margin-bottom: 0.5rem;
+}}
+
+.kpi-label {{
+    font-size: 0.85rem;
     color: {TEXT_MUTED};
-    max-width: 640px;
-    margin: 0 auto;
-    line-height: 1.6;
+    font-weight: 500;
 }}
 
 /* Timeline */
-.timeline {{ position: relative; padding: 1rem 0; margin: 2rem 0; }}
+.timeline {{
+    position: relative;
+    padding: 2rem 0;
+}}
+
 .timeline::before {{
     content: '';
     position: absolute;
-    left: 24px;
-    top: 0; bottom: 0;
+    left: 30px;
+    top: 0;
+    bottom: 0;
     width: 2px;
     background: linear-gradient(180deg, {PRIMARY}, {SECONDARY}, transparent);
 }}
 
-.timeline-item {{ position: relative; padding-left: 64px; margin-bottom: 2rem; }}
+.timeline-item {{
+    position: relative;
+    padding-left: 80px;
+    margin-bottom: 2rem;
+}}
+
 .timeline-dot {{
     position: absolute;
-    left: 16px; top: 8px;
-    width: 18px; height: 18px;
+    left: 22px;
+    top: 5px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    background: {SURFACE};
-    border: 3px solid {PRIMARY};
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-    z-index: 2;
+    background: {PRIMARY};
+    border: 3px solid {BG};
+    box-shadow: 0 0 0 3px {PRIMARY};
 }}
 
 .timeline-card {{
-    background: {GLASS};
-    border: 1px solid {BORDER};
-    border-radius: 16px;
-    padding: 1.5rem 1.75rem;
-    backdrop-filter: blur(16px);
+    background: rgba(59, 130, 246, 0.03);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
     transition: all 0.3s ease;
 }}
+
 .timeline-card:hover {{
     border-color: {PRIMARY};
+    background: rgba(59, 130, 246, 0.06);
     transform: translateX(4px);
-    box-shadow: 0 12px 32px {SHADOW};
 }}
 
 .timeline-date {{
@@ -272,105 +269,130 @@ html, body, [class*="css"] {{
     padding: 0.25rem 0.75rem;
     border-radius: 999px;
     margin-bottom: 0.75rem;
-    letter-spacing: 0.05em;
 }}
 
-.timeline-role {{ font-size: 1.25rem; font-weight: 600; color: {TEXT}; margin: 0 0 0.25rem 0; }}
-.timeline-company {{ font-size: 0.9375rem; color: {SECONDARY}; font-weight: 500; margin-bottom: 0.75rem; }}
-.timeline-desc {{ font-size: 0.9375rem; color: {TEXT_MUTED}; line-height: 1.6; margin: 0; }}
+.timeline-role {{
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: {TEXT};
+    margin: 0 0 0.25rem 0;
+}}
 
-.timeline-tags {{ display: flex; flex-wrap: wrap; gap: 0.375rem; margin-top: 0.875rem; }}
+.timeline-company {{
+    font-size: 0.95rem;
+    color: {SECONDARY};
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+}}
+
+.timeline-desc {{
+    font-size: 0.95rem;
+    color: {TEXT_MUTED};
+    line-height: 1.6;
+    margin: 0;
+}}
+
+.timeline-tags {{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1rem;
+}}
+
 .timeline-tag {{
     font-size: 0.75rem;
-    color: {TEXT};
+    padding: 0.25rem 0.6rem;
     background: rgba(59, 130, 246, 0.08);
-    border: 1px solid {BORDER};
-    padding: 0.25rem 0.625rem;
+    border: 1px solid rgba(59, 130, 246, 0.15);
     border-radius: 6px;
+    color: {TEXT};
     font-weight: 500;
 }}
 
 /* AWS Grid */
 .aws-grid {{
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1rem;
     margin: 2rem 0;
 }}
-@media (max-width: 1024px) {{ .aws-grid {{ grid-template-columns: repeat(3, 1fr); }} }}
-@media (max-width: 640px) {{ .aws-grid {{ grid-template-columns: repeat(2, 1fr); }} }}
 
 .aws-card {{
-    background: {GLASS};
-    border: 1px solid {BORDER};
-    border-radius: 14px;
+    background: rgba(59, 130, 246, 0.03);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    border-radius: 12px;
     padding: 1.25rem;
-    backdrop-filter: blur(16px);
+    text-align: center;
     transition: all 0.3s ease;
-    text-align: center;
 }}
+
 .aws-card:hover {{
+    border-color: {PRIMARY};
     transform: translateY(-4px);
-    border-color: {SECONDARY};
-    box-shadow: 0 16px 32px {SHADOW};
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.1);
 }}
 
-.aws-icon {{ font-size: 1.75rem; margin-bottom: 0.625rem; }}
-.aws-title {{ font-size: 0.9375rem; font-weight: 600; color: {TEXT}; margin: 0; line-height: 1.3; }}
-
-.aws-banner {{
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(14, 165, 233, 0.1));
-    border: 1px solid {BORDER};
-    border-radius: 16px;
-    padding: 1.5rem 2rem;
-    margin: 2rem 0;
-    text-align: center;
-    backdrop-filter: blur(16px);
+.aws-icon {{
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
 }}
-.aws-banner-text {{ font-size: 1.0625rem; color: {TEXT}; font-weight: 500; margin: 0; }}
-.aws-banner-sub {{ font-size: 0.875rem; color: {TEXT_MUTED}; margin: 0.5rem 0 0 0; }}
+
+.aws-title {{
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: {TEXT};
+    margin: 0;
+}}
 
 /* Stack */
-.stack-category {{ margin-bottom: 2rem; }}
-.stack-category-title {{
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: {PRIMARY};
-    margin-bottom: 0.875rem;
-    padding-left: 0.25rem;
+.stack-section {{
+    margin: 2rem 0;
 }}
 
-.stack-grid {{ display: flex; flex-wrap: wrap; gap: 0.625rem; }}
+.stack-category {{
+    margin-bottom: 1.5rem;
+}}
+
+.stack-category-title {{
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: {PRIMARY};
+    margin-bottom: 0.75rem;
+}}
+
+.stack-chips {{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}}
+
 .stack-chip {{
-    background: {GLASS};
-    border: 1px solid {BORDER};
-    padding: 0.625rem 1.125rem;
-    border-radius: 10px;
-    font-size: 0.875rem;
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
     font-weight: 500;
     color: {TEXT};
-    backdrop-filter: blur(12px);
-    transition: all 0.25s ease;
-    cursor: default;
+    transition: all 0.2s ease;
 }}
+
 .stack-chip:hover {{
     background: {PRIMARY};
     color: white;
     border-color: {PRIMARY};
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
 }}
 
 /* Footer */
 .footer {{
-    margin-top: 5rem;
-    padding: 3rem 2rem 2rem 2rem;
-    background: {GLASS};
-    border: 1px solid {BORDER};
-    border-radius: 20px;
-    backdrop-filter: blur(16px);
+    margin-top: 4rem;
+    padding: 3rem 2rem;
+    background: rgba(59, 130, 246, 0.03);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    border-radius: 16px;
     text-align: center;
 }}
 
@@ -382,14 +404,15 @@ html, body, [class*="css"] {{
     border: 1px solid rgba(34, 197, 94, 0.3);
     padding: 0.5rem 1rem;
     border-radius: 999px;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
 }}
 
 .footer-status-dot {{
-    width: 8px; height: 8px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: #22C55E;
-    box-shadow: 0 0 12px #22C55E;
+    box-shadow: 0 0 10px #22C55E;
     animation: pulse 2s infinite;
 }}
 
@@ -398,30 +421,109 @@ html, body, [class*="css"] {{
     50% {{ opacity: 0.5; }}
 }}
 
-.footer-status-text {{ font-size: 0.875rem; font-weight: 600; color: #22C55E; }}
+.footer-status-text {{
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #22C55E;
+}}
 
 .footer-title {{
     font-family: 'Playfair Display', serif;
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: {TEXT};
     margin: 0 0 0.5rem 0;
 }}
 
-.footer-subtitle {{ font-size: 0.9375rem; color: {TEXT_MUTED}; margin: 0 0 1.75rem 0; }}
-
-/* Customização de containers nativos */
-div[data-testid="stVerticalBlockBorderWrapper"] {{
-    background-color: {GLASS} !important;
-    border: 1px solid {BORDER} !important;
-    border-radius: 16px !important;
-    backdrop-filter: blur(16px);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+.footer-subtitle {{
+    font-size: 0.95rem;
+    color: {TEXT_MUTED};
+    margin: 0 0 1.5rem 0;
 }}
-div[data-testid="stVerticalBlockBorderWrapper"]:hover {{
+
+.footer-modes {{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}}
+
+.footer-mode {{
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    color: {TEXT};
+    font-weight: 500;
+}}
+
+.footer-links {{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}}
+
+.footer-link {{
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    color: {TEXT};
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}}
+
+.footer-link:hover {{
+    background: {PRIMARY};
+    color: white;
+    border-color: {PRIMARY};
     transform: translateY(-2px);
-    box-shadow: 0 12px 24px {SHADOW};
+}}
+
+.footer-copy {{
+    font-size: 0.85rem;
+    color: {TEXT_MUTED};
+    margin: 1.5rem 0 0 0;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(59, 130, 246, 0.1);
+}}
+
+/* Insight Box */
+.insight-box {{
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.04));
+    border-left: 3px solid {PRIMARY};
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+    color: {TEXT};
+    line-height: 1.6;
+}}
+
+.insight-box strong {{
+    color: {PRIMARY};
+}}
+
+/* Custom containers */
+div[data-testid="stVerticalBlockBorderWrapper"] {{
+    background: rgba(59, 130, 246, 0.03) !important;
+    border: 1px solid rgba(59, 130, 246, 0.1) !important;
+    border-radius: 12px !important;
+    transition: all 0.3s ease;
+}}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:hover {{
     border-color: {PRIMARY} !important;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.1);
 }}
 
 /* Tabs */
@@ -429,169 +531,157 @@ div[data-testid="stVerticalBlockBorderWrapper"]:hover {{
     gap: 0.5rem;
     background: transparent;
 }}
+
 .stTabs [data-baseweb="tab"] {{
-    background: {GLASS};
-    border: 1px solid {BORDER};
-    border-radius: 10px;
-    padding: 0.625rem 1.25rem;
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
     color: {TEXT};
     font-weight: 500;
 }}
+
 .stTabs [aria-selected="true"] {{
     background: {PRIMARY} !important;
     color: white !important;
     border-color: {PRIMARY} !important;
 }}
 
-/* Selectbox e inputs */
-.stSelectbox [data-baseweb="select"] > div {{
-    background: {GLASS} !important;
-    border: 1px solid {BORDER} !important;
-    border-radius: 10px !important;
-}}
-
 /* Scrollbar */
-::-webkit-scrollbar {{ width: 10px; height: 10px; }}
+::-webkit-scrollbar {{ width: 8px; height: 8px; }}
 ::-webkit-scrollbar-track {{ background: {BG}; }}
-::-webkit-scrollbar-thumb {{ background: {SURFACE_2}; border-radius: 10px; }}
+::-webkit-scrollbar-thumb {{ background: rgba(59, 130, 246, 0.3); border-radius: 4px; }}
 ::-webkit-scrollbar-thumb:hover {{ background: {PRIMARY}; }}
 
 .stMarkdown, h1, h2, h3, h4 {{ color: {TEXT}; }}
-
-/* KPI card custom */
-.kpi-custom {{
-    background: {GLASS};
-    border: 1px solid {BORDER};
-    border-radius: 16px;
-    padding: 1.5rem;
-    text-align: center;
-    backdrop-filter: blur(16px);
-    transition: all 0.3s ease;
-}}
-.kpi-custom:hover {{
-    transform: translateY(-4px);
-    border-color: {PRIMARY};
-    box-shadow: 0 16px 32px {SHADOW};
-}}
-.kpi-custom-value {{
-    font-size: 2.25rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, {PRIMARY}, {SECONDARY});
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1.1;
-    margin-bottom: 0.5rem;
-}}
-.kpi-custom-label {{
-    font-size: 0.8125rem;
-    color: {TEXT_MUTED};
-    font-weight: 500;
-}}
 </style>
 """, unsafe_allow_html=True)
 
 # ============================================================================
-# 5. HERO SECTION
+# HERO SECTION - FOTO CENTRALIZADA
 # ============================================================================
-st.markdown('<div class="hero-container">', unsafe_allow_html=True)
+st.markdown('<div class="hero-section">', unsafe_allow_html=True)
 
-col_p1, col_p2, col_p3 = st.columns([3, 2, 3])
-with col_p2:
+# Foto centralizada
+col_f1, col_f2, col_f3 = st.columns([4, 2, 4])
+with col_f2:
     try:
         st.image("rapha.jpeg", use_container_width=True)
     except Exception:
+        # Placeholder se foto não existir
         st.markdown(f"""
         <div style="
-            width: 180px; height: 180px; border-radius: 50%;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
             background: linear-gradient(135deg, {PRIMARY}, {SECONDARY});
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-family: 'Playfair Display', serif;
-            font-size: 3.5rem; font-weight: 700; color: white;
-            box-shadow: 0 0 0 8px {GLASS}, 0 20px 60px {SHADOW};
-            margin: 0 auto 1.5rem auto;">
-            RP
-        </div>
+            font-size: 4rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3);
+            margin: 0 auto 1.5rem auto;
+            border: 3px solid {PRIMARY};
+        ">RP</div>
         """, unsafe_allow_html=True)
 
+# Nome e título
 st.markdown(f"""
 <h1 class="hero-name">Raphael Fernando da Silva Pires</h1>
 <div class="hero-title">Analista de Dados & Business Intelligence</div>
 <p class="hero-subtitle">
     Transformando dados brutos em decisões estratégicas. Mais de <strong>16 anos</strong> 
     construindo inteligência de negócios, automações e governança de dados que geram 
-    impacto real e mensurável em organizações de diferentes portes.
+    impacto real e mensurável.
 </p>
-<div class="hero-badges">
-    <span class="hero-badge">📊 Power BI</span>
-    <span class="hero-badge">🐍 Python</span>
-    <span class="hero-badge">🗄️ SQL</span>
-    <span class="hero-badge">☁️ AWS</span>
-    <span class="hero-badge">🤖 IA Generativa</span>
-    <span class="hero-badge">📈 Dashboards</span>
+<div class="tech-badges">
+    <span class="tech-badge">📊 Power BI</span>
+    <span class="tech-badge">🐍 Python</span>
+    <span class="tech-badge">🗄️ SQL</span>
+    <span class="tech-badge">☁️ AWS</span>
+    <span class="tech-badge">🤖 IA Generativa</span>
+    <span class="tech-badge">📈 Dashboards</span>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# Cache de Download do CV para evitar IO repetitivo do disco
-@st.cache_data
-def load_cv_file():
+# Download CV
+dl1, dl2, dl3 = st.columns([4, 2, 4])
+with dl2:
     try:
         with open("Curriculo_Raphael_v2.pdf", "rb") as pdf_file:
-            return pdf_file.read()
+            st.download_button(
+                label="📄 Download Currículo PDF",
+                data=pdf_file.read(),
+                file_name="Curriculo_Raphael_Pires.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
     except FileNotFoundError:
-        return None
-
-cv_data = load_cv_file()
-dc1, dc2, dc3 = st.columns([3, 2, 3])
-with dc2:
-    if cv_data:
-        st.download_button(
-            label="📄 Download Currículo PDF",
-            data=cv_data,
-            file_name="Curriculo_Raphael_Pires.pdf",
-            mime="application/pdf",
-            use_container_width=True
-        )
-    else:
-        st.info("📄 Currículo PDF disponível para download")
+        st.info("📄 Currículo PDF disponível")
 
 st.divider()
 
 # ============================================================================
-# 6. KPIs DE IMPACTO
+# KPIs DE IMPACTO
 # ============================================================================
 st.markdown(f"""
 <div class="section-header">
     <span class="section-label">Impacto Mensurável</span>
     <h2 class="section-title">Números que contam histórias</h2>
-    <p class="section-subtitle">Resultados construídos ao longo de uma trajetória consistente em dados e negócios.</p>
 </div>
 """, unsafe_allow_html=True)
 
 k1, k2, k3, k4, k5 = st.columns(5)
 with k1:
-    st.markdown(f'<div class="kpi-custom"><div class="kpi-custom-value">16+</div><div class="kpi-custom-label">anos de experiência</div></div>', unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="kpi-box">
+        <div class="kpi-value">16+</div>
+        <div class="kpi-label">anos de experiência</div>
+    </div>
+    """, unsafe_allow_html=True)
 with k2:
-    st.markdown(f'<div class="kpi-custom"><div class="kpi-custom-value">70%</div><div class="kpi-custom-label">redução operacional</div></div>', unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="kpi-box">
+        <div class="kpi-value">70%</div>
+        <div class="kpi-label">redução operacional</div>
+    </div>
+    """, unsafe_allow_html=True)
 with k3:
-    st.markdown(f'<div class="kpi-custom"><div class="kpi-custom-value">213k</div><div class="kpi-custom-label">registros processados</div></div>', unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="kpi-box">
+        <div class="kpi-value">213k</div>
+        <div class="kpi-label">registros processados</div>
+    </div>
+    """, unsafe_allow_html=True)
 with k4:
-    st.markdown(f'<div class="kpi-custom"><div class="kpi-custom-value">2h→15m</div><div class="kpi-custom-label">análises reduzidas</div></div>', unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="kpi-box">
+        <div class="kpi-value">2h→15m</div>
+        <div class="kpi-label">análises reduzidas</div>
+    </div>
+    """, unsafe_allow_html=True)
 with k5:
-    st.markdown(f'<div class="kpi-custom"><div class="kpi-custom-value">R$50bi</div><div class="kpi-custom-label">dados públicos analisados</div></div>', unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="kpi-box">
+        <div class="kpi-value">R$50bi</div>
+        <div class="kpi-label">dados analisados</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.divider()
 
 # ============================================================================
-# 7. TIMELINE — EXPERIÊNCIA
+# EXPERIÊNCIA PROFISSIONAL - TIMELINE
 # ============================================================================
 st.markdown(f"""
 <div class="section-header">
     <span class="section-label">Trajetória</span>
     <h2 class="section-title">Experiência profissional</h2>
-    <p class="section-subtitle">Uma jornada construída entre dados, automação e decisões de negócio.</p>
 </div>
 
 <div class="timeline">
@@ -602,13 +692,12 @@ st.markdown(f"""
             <h3 class="timeline-role">Automação de Processos com VBA</h3>
             <div class="timeline-company">Banco do Brasil</div>
             <p class="timeline-desc">
-                Desenvolvimento de automações em VBA que resultaram em redução de 70% do tempo 
-                operacional, liberando equipes para atividades de maior valor estratégico.
+                Desenvolvimento de automações em VBA que resultaram em redução de 70% do tempo operacional.
             </p>
             <div class="timeline-tags">
                 <span class="timeline-tag">VBA</span>
                 <span class="timeline-tag">Automação</span>
-                <span class="timeline-tag">Eficiência Operacional</span>
+                <span class="timeline-tag">Eficiência</span>
             </div>
         </div>
     </div>
@@ -616,19 +705,17 @@ st.markdown(f"""
     <div class="timeline-item">
         <div class="timeline-dot"></div>
         <div class="timeline-card">
-            <span class="timeline-date">Fundador & Analista de Dados</span>
+            <span class="timeline-date">Fundador & Analista</span>
             <h3 class="timeline-role">Fundador</h3>
             <div class="timeline-company">Jardim do Éden</div>
             <p class="timeline-desc">
-                Fundação de iniciativa própria com foco em dashboards, Power BI, Python, SQL, 
-                KPIs e IA Generativa. Redução de análises de 2 horas para 15 minutos.
+                Dashboards, Power BI, Python, SQL, KPIs e IA Generativa. Redução de 2h para 15min.
             </p>
             <div class="timeline-tags">
                 <span class="timeline-tag">Power BI</span>
                 <span class="timeline-tag">Python</span>
                 <span class="timeline-tag">SQL</span>
-                <span class="timeline-tag">IA Generativa</span>
-                <span class="timeline-tag">KPIs</span>
+                <span class="timeline-tag">IA</span>
             </div>
         </div>
     </div>
@@ -636,17 +723,15 @@ st.markdown(f"""
     <div class="timeline-item">
         <div class="timeline-dot"></div>
         <div class="timeline-card">
-            <span class="timeline-date">Gestão Comercial & BI</span>
-            <h3 class="timeline-role">Gestão Comercial</h3>
+            <span class="timeline-date">Gestão Comercial</span>
+            <h3 class="timeline-role">Gestão Comercial & BI</h3>
             <div class="timeline-company">J Sintonía</div>
             <p class="timeline-desc">
-                Atuação em Business Intelligence com construção de indicadores, dashboards 
-                e análise de viabilidade econômica, suportando decisões estratégicas com KPIs.
+                Business Intelligence, indicadores, dashboards e análise de viabilidade econômica.
             </p>
             <div class="timeline-tags">
-                <span class="timeline-tag">Business Intelligence</span>
-                <span class="timeline-tag">Indicadores</span>
-                <span class="timeline-tag">Viabilidade Econômica</span>
+                <span class="timeline-tag">BI</span>
+                <span class="timeline-tag">KPIs</span>
                 <span class="timeline-tag">Dashboards</span>
             </div>
         </div>
@@ -659,12 +744,11 @@ st.markdown(f"""
             <h3 class="timeline-role">Analista de Dados</h3>
             <div class="timeline-company">NSM</div>
             <p class="timeline-desc">
-                Centralização de dados e controle operacional com construção de indicadores 
-                que trouxeram visibilidade e governança para a operação.
+                Centralização de dados e controle operacional com construção de indicadores.
             </p>
             <div class="timeline-tags">
-                <span class="timeline-tag">Centralização de Dados</span>
-                <span class="timeline-tag">Controle Operacional</span>
+                <span class="timeline-tag">Dados</span>
+                <span class="timeline-tag">Governança</span>
                 <span class="timeline-tag">Indicadores</span>
             </div>
         </div>
@@ -675,40 +759,49 @@ st.markdown(f"""
 st.divider()
 
 # ============================================================================
-# 8. STACK TECNOLÓGICA
+# STACK TECNOLÓGICA
 # ============================================================================
 st.markdown(f"""
 <div class="section-header">
-    <span class="section-label">Toolkit</span>
-    <h2 class="section-title">Stack tecnológica</h2>
-    <p class="section-subtitle">Ferramentas que utilizo no dia a dia para transformar dados em valor.</p>
+    <span class="section-label">Stack</span>
+    <h2 class="section-title">Tecnologias</h2>
 </div>
 
-<div class="stack-category">
-    <div class="stack-category-title">📊 Dados</div>
-    <div class="stack-grid">
-        {"".join(f'<div class="stack-chip">{tech}</div>' for tech in ["SQL", "PostgreSQL", "Python", "Pandas", "NumPy"])}
+<div class="stack-section">
+    <div class="stack-category">📊 Dados</div>
+    <div class="stack-chips">
+        <div class="stack-chip">SQL</div>
+        <div class="stack-chip">PostgreSQL</div>
+        <div class="stack-chip">Python</div>
+        <div class="stack-chip">Pandas</div>
+        <div class="stack-chip">NumPy</div>
     </div>
 </div>
 
-<div class="stack-category">
-    <div class="stack-category-title">📈 Business Intelligence</div>
-    <div class="stack-grid">
-        {"".join(f'<div class="stack-chip">{tech}</div>' for tech in ["Power BI", "Plotly", "Looker Studio", "Streamlit"])}
+<div class="stack-section">
+    <div class="stack-category">📈 Business Intelligence</div>
+    <div class="stack-chips">
+        <div class="stack-chip">Power BI</div>
+        <div class="stack-chip">Plotly</div>
+        <div class="stack-chip">Looker Studio</div>
+        <div class="stack-chip">Streamlit</div>
     </div>
 </div>
 
-<div class="stack-category">
-    <div class="stack-category-title">☁️ Cloud & Versionamento</div>
-    <div class="stack-grid">
-        {"".join(f'<div class="stack-chip">{tech}</div>' for tech in ["AWS", "Git", "GitHub"])}
+<div class="stack-section">
+    <div class="stack-category">☁️ Cloud & Versionamento</div>
+    <div class="stack-chips">
+        <div class="stack-chip">AWS</div>
+        <div class="stack-chip">Git</div>
+        <div class="stack-chip">GitHub</div>
     </div>
 </div>
 
-<div class="stack-category">
-    <div class="stack-category-title">⚡ Automação & IA</div>
-    <div class="stack-grid">
-        {"".join(f'<div class="stack-chip">{tech}</div>' for tech in ["Excel VBA", "IA Generativa"])}
+<div class="stack-section">
+    <div class="stack-category">⚡ Automação & IA</div>
+    <div class="stack-chips">
+        <div class="stack-chip">Excel VBA</div>
+        <div class="stack-chip">IA Generativa</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -716,44 +809,37 @@ st.markdown(f"""
 st.divider()
 
 # ============================================================================
-# 9. GRÁFICO DE PROFICIÊNCIA
+# GRÁFICO DE COMPETÊNCIAS
 # ============================================================================
 st.markdown(f"""
 <div class="section-header">
     <span class="section-label">Competências</span>
     <h2 class="section-title">Domínio tecnológico</h2>
-    <p class="section-subtitle">Mapa de proficiência nas principais tecnologias utilizadas em projetos reais.</p>
 </div>
 """, unsafe_allow_html=True)
 
 skills_data = {
-    "Tecnologia": ["Power BI", "SQL / PostgreSQL", "Python (Pandas)", "Excel / VBA", "Streamlit", "AWS Cloud", "IA Generativa", "Plotly"],
-    "Proficiência (%)": [95, 92, 88, 95, 85, 60, 75, 82],
-    "Categoria": ["BI", "Dados", "Dados", "Automação", "BI", "Cloud", "Inovação", "BI"]
+    "Tecnologia": ["Power BI", "SQL/PostgreSQL", "Python", "Excel/VBA", "Streamlit", "AWS", "Plotly"],
+    "Proeficiência (%)": [95, 92, 88, 95, 85, 60, 82],
+    "Categoria": ["BI", "Dados", "Dados", "Automação", "BI", "Cloud", "BI"]
 }
 df_skills = pd.DataFrame(skills_data)
 
 fig_skills = px.bar(
     df_skills,
-    x="Proficiência (%)",
+    x="Proeficiência (%)",
     y="Tecnologia",
     color="Categoria",
     orientation="h",
-    color_discrete_map={
-        "BI": CHART_COLORS[0],
-        "Dados": CHART_COLORS[1],
-        "Automação": CHART_COLORS[2],
-        "Cloud": CHART_COLORS[3],
-        "Inovação": CHART_COLORS[4]
-    },
+    color_discrete_sequence=CHART_COLORS,
     template=PLOTLY_TEMPLATE,
-    text="Proficiência (%)"
+    text="Proeficiência (%)"
 )
 
 fig_skills.update_layout(
     margin=dict(l=20, r=40, t=20, b=40),
-    height=420,
-    xaxis=dict(range=[0, 105], showgrid=True, gridcolor=BORDER),
+    height=380,
+    xaxis=dict(range=[0, 105], showgrid=True, gridcolor="rgba(148, 163, 184, 0.1)"),
     yaxis=dict(showgrid=False),
     showlegend=True,
     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
@@ -761,20 +847,19 @@ fig_skills.update_layout(
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)"
 )
-fig_skills.update_traces(textposition="outside", textfont=dict(color=TEXT, size=12))
+fig_skills.update_traces(textposition="outside", textfont=dict(color=TEXT, size=11))
 
 st.plotly_chart(fig_skills, use_container_width=True)
 
 st.divider()
 
 # ============================================================================
-# 10. PROJETOS EM DESTAQUE
+# PROJETOS
 # ============================================================================
 st.markdown(f"""
 <div class="section-header">
     <span class="section-label">Portfólio</span>
     <h2 class="section-title">Projetos em destaque</h2>
-    <p class="section-subtitle">Soluções reais aplicadas a dados públicos, análises governamentais e inteligência de mercado.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -782,125 +867,247 @@ p1, p2 = st.columns(2)
 with p1:
     with st.container(border=True):
         st.markdown("#### 🇧🇷 Desenrola Brasil")
-        st.write("Análise exploratória avançada de dados do programa governamental, mapeando renegociações e perfis socioeconômicos de consumidores em larga escala.")
+        st.write("Análise de dados do programa governamental, explorando renegociações e perfis de consumidores.")
         st.page_link("https://github.com/raphaelcaxias", label="Acessar Repositório", icon="🔗")
 
 with p2:
     with st.container(border=True):
         st.markdown("#### 🔬 CNPq Analytics")
-        st.write("Painel de Business Intelligence focado na distribuição de bolsas e fomento à pesquisa científica, cruzando dados geográficos e áreas do conhecimento.")
+        st.write("Dashboard analítico sobre bolsas e fomento do CNPq com cruzamento de dados de pesquisa.")
         st.page_link("https://github.com/raphaelcaxias", label="Acessar Repositório", icon="🔗")
 
 p3, p4 = st.columns(2)
 with p3:
     with st.container(border=True):
         st.markdown("#### ⛽ Dashboard ANP")
-        st.write("Mapeamento e análise de preços, distribuição e comportamento do mercado de combustíveis nacional utilizando os dados da Agência Nacional do Petróleo.")
+        st.write("Inteligência de dados da ANP com análise de preços e produção de combustíveis.")
         st.page_link("https://github.com/raphaelcaxias", label="Ver Dashboard", icon="📊")
 
 with p4:
     with st.container(border=True):
         st.markdown("#### 💎 Portfólio Premium")
-        st.write("Este próprio portfólio — construído em Streamlit com design premium, demonstrando domínio de UX, visualização de dados e engenharia de front-end.")
-        st.page_link("https://github.com/raphaelcaxias", label="Ver Código Fonte", icon="💻")
+        st.write("Este portfólio construído em Streamlit com design premium e visualização de dados.")
+        st.page_link("https://github.com/raphaelcaxias", label="Ver Código", icon="💻")
 
 st.divider()
 
 # ============================================================================
-# 11. AWS CLOUD JOURNEY
+# AWS CLOUD JOURNEY
 # ============================================================================
 st.markdown(f"""
 <div class="section-header">
     <span class="section-label">Cloud Computing</span>
     <h2 class="section-title">AWS Cloud Journey</h2>
-    <p class="section-subtitle">Jornada de formação em computação em nuvem na maior plataforma cloud do mundo.</p>
 </div>
 
-<div class="aws-banner">
-    <p class="aws-banner-text">☁️ Preparando-me para a certificação <strong>AWS Cloud Practitioner</strong></p>
-    <p class="aws-banner-sub">Estudo contínuo dos fundamentos, serviços e boas práticas da Amazon Web Services.</p>
+<div style="
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(14, 165, 233, 0.05));
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    margin: 1.5rem 0;
+">
+    <p style="margin: 0; font-size: 1.05rem; color: {TEXT};">
+        ☁️ Preparando-me para a certificação <strong>AWS Cloud Practitioner</strong>
+    </p>
 </div>
 
 <div class="aws-grid">
-    <div class="aws-card"><div class="aws-icon">☁️</div><h4 class="aws-title">Cloud Computing</h4></div>
-    <div class="aws-card"><div class="aws-icon">📘</div><h4 class="aws-title">Cloud 101</h4></div>
-    <div class="aws-card"><div class="aws-icon">🖥️</div><h4 class="aws-title">AWS Console</h4></div>
-    <div class="aws-card"><div class="aws-icon">💾</div><h4 class="aws-title">Storage</h4></div>
+    <div class="aws-card">
+        <div class="aws-icon">☁️</div>
+        <div class="aws-title">Cloud Computing</div>
+    </div>
+    <div class="aws-card">
+        <div class="aws-icon">📘</div>
+        <div class="aws-title">Cloud 101</div>
+    </div>
+    <div class="aws-card">
+        <div class="aws-icon">🖥️</div>
+        <div class="aws-title">AWS Console</div>
+    </div>
+    <div class="aws-card">
+        <div class="aws-icon">💾</div>
+        <div class="aws-title">Storage</div>
+    </div>
+    <div class="aws-card">
+        <div class="aws-icon">🛟</div>
+        <div class="aws-title">Cloud Support</div>
+    </div>
+    <div class="aws-card">
+        <div class="aws-icon">🤖</div>
+        <div class="aws-title">ML Foundations</div>
+    </div>
+    <div class="aws-card">
+        <div class="aws-icon">🌱</div>
+        <div class="aws-title">Sustainability</div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
 st.divider()
 
 # ============================================================================
-# 12. ANÁLISE DE DADOS INTERATIVA (Cached)
+# ANÁLISE DE DADOS INTERATIVA
 # ============================================================================
 st.markdown(f"""
 <div class="section-header">
     <span class="section-label">Análise ao Vivo</span>
-    <h2 class="section-title">Demonstração de capacidade analítica</h2>
-    <p class="section-subtitle">Dashboards interativos construídos com dados simulados baseados em cenários reais dos meus projetos.</p>
+    <h2 class="section-title">Demonstração analítica</h2>
 </div>
 """, unsafe_allow_html=True)
 
-# Cache dos dados mockados para o app não re-gerar números aleatórios a cada clique
-@st.cache_data
-def get_mock_desenrola_data():
+analysis_tabs = st.tabs(["🇧🇷 Desenrola Brasil", "⛽ Combustíveis ANP", "📊 Impacto Operacional"])
+
+# TAB 1: DESENROLA BRASIL
+with analysis_tabs[0]:
+    st.markdown("### Análise de Renegociações")
+    
     np.random.seed(42)
     regioes = ["Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte"]
-    faixas_divida = ["Até R$ 5.000", "R$ 5.001 - R$ 15.000", "R$ 15.001 - R$ 50.000", "Acima de R$ 50.000"]
-    return pd.DataFrame({
-        "Região": np.random.choice(regioes, 500, p=[0.45, 0.28, 0.15, 0.07, 0.05]),
-        "Faixa de Dívida": np.random.choice(faixas_divida, 500, p=[0.55, 0.28, 0.12, 0.05]),
-        "Valor Renegociado (R$)": np.random.lognormal(mean=8.5, sigma=1.2, size=500),
-        "Status": np.random.choice(["Renegociado", "Em Negociação", "Inadimplente"], 500, p=[0.65, 0.25, 0.10])
-    })
-
-df_desenrola = get_mock_desenrola_data()
-
-analysis_tabs = st.tabs(["🇧🇷 Desenrola Brasil", "⛽ Mercado de Combustíveis", "🔬 Fomento à Pesquisa", "📊 Impacto Operacional"])
-
-with analysis_tabs[0]:
-    st.markdown("### 📈 Análise de Renegociações — Desenrola Brasil")
+    faixas = ["Até R$ 5k", "R$ 5k-15k", "R$ 15k-50k", "Acima R$ 50k"]
     
-    regioes_validas = list(df_desenrola["Região"].unique())
-    status_validos = list(df_desenrola["Status"].unique())
+    df_des = pd.DataFrame({
+        "Região": np.random.choice(regioes, 400, p=[0.45, 0.28, 0.15, 0.07, 0.05]),
+        "Faixa": np.random.choice(faixas, 400, p=[0.55, 0.28, 0.12, 0.05]),
+        "Valor": np.random.lognormal(mean=8.5, sigma=1.2, size=400),
+        "Status": np.random.choice(["Renegociado", "Em Negociação", "Inadimplente"], 400, p=[0.65, 0.25, 0.10])
+    })
     
     fc1, fc2 = st.columns(2)
     with fc1:
-        regiao_sel = st.multiselect("Filtrar por Região", regioes_validas, default=regioes_validas)
+        reg_sel = st.multiselect("Região", regioes, default=regioes)
     with fc2:
-        status_sel = st.multiselect("Filtrar por Status", status_validos, default=status_validos)
-        
-    # Filtragem segura evitando arrays vazios
-    if not regiao_sel: regiao_sel = regioes_validas
-    if not status_sel: status_sel = status_validos
-        
-    df_filtered = df_desenrola[
-        (df_desenrola["Região"].isin(regiao_sel)) & 
-        (df_desenrola["Status"].isin(status_sel))
-    ]
+        status_sel = st.multiselect("Status", df_des["Status"].unique(), default=df_des["Status"].unique())
     
-    fig_filtered = px.histogram(
-        df_filtered, 
-        x="Faixa de Dívida", 
-        y="Valor Renegociado (R$)", 
-        color="Status",
-        barmode="group",
-        template=PLOTLY_TEMPLATE,
-        color_discrete_sequence=CHART_COLORS
-    )
-    fig_filtered.update_layout(
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter", color=TEXT)
-    )
-    st.plotly_chart(fig_filtered, use_container_width=True)
+    df_f = df_des[(df_des["Região"].isin(reg_sel)) & (df_des["Status"].isin(status_sel))]
+    
+    mk1, mk2, mk3 = st.columns(3)
+    with mk1:
+        st.metric("Contratos", f"{len(df_f):,}".replace(",", "."))
+    with mk2:
+        st.metric("Valor Total", f"R$ {df_f['Valor'].sum()/1e6:.1f}M")
+    with mk3:
+        st.metric("Taxa Sucesso", f"{(df_f['Status']=='Renegociado').mean()*100:.1f}%")
+    
+    g1, g2 = st.columns(2)
+    with g1:
+        fig_reg = px.pie(df_f, names="Região", values="Valor", hole=0.55, 
+                        color_discrete_sequence=CHART_COLORS, template=PLOTLY_TEMPLATE)
+        fig_reg.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=320,
+                            paper_bgcolor="rgba(0,0,0,0)", font=dict(family="Inter", color=TEXT))
+        st.plotly_chart(fig_reg, use_container_width=True)
+    
+    with g2:
+        fig_faixa = px.bar(df_f.groupby("Faixa", observed=False)["Valor"].sum().reset_index(),
+                          x="Faixa", y="Valor", color_discrete_sequence=[CHART_COLORS[0]], 
+                          template=PLOTLY_TEMPLATE)
+        fig_faixa.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=320,
+                               paper_bgcolor="rgba(0,0,0,0)", font=dict(family="Inter", color=TEXT),
+                               xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="rgba(148,163,184,0.1)"))
+        st.plotly_chart(fig_faixa, use_container_width=True)
 
+# TAB 2: COMBUSTÍVEIS
 with analysis_tabs[1]:
-    st.info("⛽ Painel interativo do Mercado de Combustíveis (ANP) em desenvolvimento.")
+    st.markdown("### Preços de Combustíveis")
+    
+    np.random.seed(123)
+    estados = ["SP", "RJ", "MG", "RS", "PR", "BA"]
+    combustiveis = ["Gasolina", "Etanol", "Diesel"]
+    meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"]
+    
+    dados = []
+    for estado in estados:
+        for comb in combustiveis:
+            base = {"Gasolina": 5.8, "Etanol": 3.5, "Diesel": 5.2}[comb]
+            for mes in meses:
+                dados.append({
+                    "Estado": estado, "Combustível": comb, "Mês": mes,
+                    "Preço": base + np.random.normal(0, 0.15)
+                })
+    df_anp = pd.DataFrame(dados)
+    
+    fc1, fc2 = st.columns(2)
+    with fc1:
+        est_sel = st.selectbox("Estado", estados, index=0)
+    with fc2:
+        comb_sel = st.selectbox("Combustível", combustiveis, index=0)
+    
+    df_f = df_anp[(df_anp["Estado"] == est_sel) & (df_anp["Combustível"] == comb_sel)]
+    
+    mc1, mc2 = st.columns(2)
+    with mc1:
+        st.metric("Preço Atual", f"R$ {df_f[df_f['Mês']=='Jun']['Preço'].values[0]:.2f}")
+    with mc2:
+        variacao = ((df_f["Preço"].max() - df_f["Preço"].min()) / df_f["Preço"].min()) * 100
+        st.metric("Variação Semestral", f"{variacao:.1f}%")
+    
+    fig = px.line(df_f, x="Mês", y="Preço", markers=True, 
+                  color_discrete_sequence=[CHART_COLORS[0]], template=PLOTLY_TEMPLATE)
+    fig.update_layout(title=f"{comb_sel} - {est_sel}", margin=dict(l=20, r=20, t=50, b=20),
+                     height=350, paper_bgcolor="rgba(0,0,0,0)", font=dict(family="Inter", color=TEXT),
+                     xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="rgba(148,163,184,0.1)"))
+    st.plotly_chart(fig, use_container_width=True)
 
+# TAB 3: IMPACTO OPERACIONAL
 with analysis_tabs[2]:
-    st.info("🔬 Análise de Fomento à Pesquisa Científica (CNPq) em desenvolvimento.")
+    st.markdown("### Impacto da Automação")
+    
+    meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
+    df_evo = pd.DataFrame({
+        "Mês": meses * 2,
+        "Tipo": ["Antes"] * 12 + ["Após"] * 12,
+        "Horas": [120, 125, 118, 130, 122, 128, 126, 124, 129, 127, 125, 130] +
+                [95, 70, 55, 45, 38, 35, 33, 32, 30, 29, 28, 27]
+    })
+    
+    fig_evo = px.line(df_evo, x="Mês", y="Horas", color="Tipo", markers=True,
+                     color_discrete_sequence=[CHART_COLORS[3], CHART_COLORS[0]], template=PLOTLY_TEMPLATE)
+    fig_evo.update_layout(title="Evolução de Horas - Antes vs Após Automação",
+                         margin=dict(l=20, r=20, t=60, b=20), height=380,
+                         paper_bgcolor="rgba(0,0,0,0)", font=dict(family="Inter", color=TEXT),
+                         xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor="rgba(148,163,184,0.1)"))
+    st.plotly_chart(fig_evo, use_container_width=True)
+    
+    r1, r2, r3 = st.columns(3)
+    with r1:
+        st.metric("Horas Economizadas", "1.108 h", "+93% eficiência")
+    with r2:
+        st.metric("Custo Evitado", "R$ 185k", "vs. contratação")
+    with r3:
+        st.metric("Projetos Entregues", "24", "+60% vs. ano anterior")
 
-with analysis_tabs[3]:
-    st.info("📊 Mapeamento e métricas de ganho e impacto operacional em desenvolvimento.")
+st.divider()
+
+# ============================================================================
+# FOOTER
+# ============================================================================
+st.markdown(f"""
+<div class="footer">
+    <div class="footer-status">
+        <span class="footer-status-dot"></span>
+        <span class="footer-status-text">Disponível para oportunidades</span>
+    </div>
+    
+    <h3 class="footer-title">Vamos conversar sobre dados?</h3>
+    <p class="footer-subtitle">Aberto a projetos em Dados, BI e Cloud</p>
+    
+    <div class="footer-modes">
+        <span class="footer-mode">🏠 Remoto</span>
+        <span class="footer-mode">🏢 Híbrido</span>
+        <span class="footer-mode">📍 Presencial</span>
+        <span class="footer-mode">✈️ Viagens</span>
+    </div>
+    
+    <div class="footer-links">
+        <a href="https://www.linkedin.com/in/raphaelpires" target="_blank" class="footer-link">💼 LinkedIn</a>
+        <a href="https://github.com/raphaelcaxias" target="_blank" class="footer-link">💻 GitHub</a>
+        <a href="mailto:contato@raphaelpires.com" class="footer-link">✉️ E-mail</a>
+        <a href="tel:+5500000000000" class="footer-link">📱 Telefone</a>
+    </div>
+    
+    <p class="footer-copy">© {datetime.now().year} Raphael Fernando da Silva Pires</p>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("<div style='height: 2rem;'></div>", unsafe_allow_html=True)
