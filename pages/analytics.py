@@ -39,9 +39,12 @@ def render_analytics():
             k1.metric("Contratos", f"{len(filtro):,}")
             k2.metric("Valor Total", f"R$ {filtro['Valor'].sum()/1e6:.1f}M")
             k3.metric("Taxa Sucesso", f"{(filtro['Status']=='Renegociado').mean()*100:.1f}%")
-            fig1 = px.pie(filtro, names="Região", values="Valor", hole=0.5, color_discrete_sequence=c["chart_colors"], template=c["plotly_template"])
+            fig1 = px.pie(filtro, names="Região", values="Valor", hole=0.5,
+                          color_discrete_sequence=c["chart_colors"], template=c["plotly_template"])
             fig1.update_layout(height=350, margin=dict(l=10,r=10,t=10,b=10), paper_bgcolor="rgba(0,0,0,0)")
-            fig2 = px.bar(filtro.groupby("Faixa", observed=False)["Valor"].sum().reset_index(), x="Faixa", y="Valor", color_discrete_sequence=[c["chart_colors"][0]], template=c["plotly_template"])
+            fig2 = px.bar(filtro.groupby("Faixa", observed=False)["Valor"].sum().reset_index(),
+                          x="Faixa", y="Valor",
+                          color_discrete_sequence=[c["chart_colors"][0]], template=c["plotly_template"])
             fig2.update_layout(height=350, margin=dict(l=10,r=10,t=10,b=10), paper_bgcolor="rgba(0,0,0,0)")
             col1, col2 = st.columns(2)
             col1.plotly_chart(fig1, use_container_width=True)
@@ -66,26 +69,24 @@ def render_analytics():
             combustivel = st.selectbox("Combustível", df["Combustível"].unique())
         filtro = df[(df["Estado"]==estado) & (df["Combustível"]==combustivel)]
 
-        # ===== VERIFICAÇÃO ROBUSTA =====
-        if filtro is None or filtro.empty:
+        # ===== CORREÇÃO: verifica se filtro está vazio =====
+        if filtro.empty:
             st.warning("Nenhum dado disponível para a combinação selecionada. Tente outra região ou combustível.")
         else:
-            # Verifica se há dados para o mês máximo
-            if filtro["Mês"].nunique() == 0:
-                st.warning("Dados insuficientes para gerar o gráfico.")
+            # Verifica se há pelo menos 2 pontos para o gráfico
+            if len(filtro) < 2:
+                st.warning("Dados insuficientes para gerar o gráfico. Tente outra combinação.")
             else:
-                k1,k2 = st.columns(2)
+                k1, k2 = st.columns(2)
                 ultimo_mes = filtro["Mês"].max()
-                # Pega o preço do último mês
-                df_ultimo = filtro[filtro["Mês"]==ultimo_mes]
-                if not df_ultimo.empty:
-                    preco_atual = df_ultimo["Preço"].values[0]
-                else:
-                    preco_atual = filtro["Preço"].mean()
+                preco_atual = filtro[filtro["Mês"]==ultimo_mes]["Preço"].values[0]
                 k1.metric("Preço Atual", f"R$ {preco_atual:.2f}")
                 variacao = (filtro["Preço"].max() - filtro["Preço"].min()) / filtro["Preço"].min() * 100 if filtro["Preço"].min() > 0 else 0
                 k2.metric("Variação Semestral", f"{variacao:.1f}%")
-                fig = px.line(filtro, x="Mês", y="Preço", markers=True, color_discrete_sequence=[c["chart_colors"][0]], template=c["plotly_template"])
+
+                fig = px.line(filtro, x="Mês", y="Preço", markers=True,
+                              color_discrete_sequence=[c["chart_colors"][0]],
+                              template=c["plotly_template"])
                 fig.update_layout(height=400, margin=dict(l=20,r=20,t=40,b=20), paper_bgcolor="rgba(0,0,0,0)")
                 st.plotly_chart(fig, use_container_width=True)
 
@@ -94,9 +95,12 @@ def render_analytics():
         df = pd.DataFrame({
             "Mês": meses*2,
             "Tipo": ["Antes"]*12 + ["Após"]*12,
-            "Horas": [120,125,118,130,122,128,126,124,129,127,125,130] + [95,70,55,45,38,35,33,32,30,29,28,27]
+            "Horas": [120,125,118,130,122,128,126,124,129,127,125,130] +
+                     [95,70,55,45,38,35,33,32,30,29,28,27]
         })
-        fig = px.line(df, x="Mês", y="Horas", color="Tipo", markers=True, color_discrete_sequence=[c["chart_colors"][3], c["chart_colors"][0]], template=c["plotly_template"])
+        fig = px.line(df, x="Mês", y="Horas", color="Tipo", markers=True,
+                      color_discrete_sequence=[c["chart_colors"][3], c["chart_colors"][0]],
+                      template=c["plotly_template"])
         fig.update_layout(height=400, margin=dict(l=20,r=20,t=40,b=20), paper_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig, use_container_width=True)
         k1,k2,k3 = st.columns(3)
