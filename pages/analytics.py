@@ -16,7 +16,6 @@ def render_analytics():
     c = get_colors()
     tabs = st.tabs(["🇧🇷 Desenrola Brasil", "⛽ Combustíveis ANP", "📈 Impacto Operacional"])
 
-    # =========== TAB 1: DESENROLA ===========
     with tabs[0]:
         np.random.seed(42)
         regioes = ["Sudeste","Nordeste","Sul","Centro-Oeste","Norte"]
@@ -48,68 +47,48 @@ def render_analytics():
             col1.plotly_chart(fig1, use_container_width=True)
             col2.plotly_chart(fig2, use_container_width=True)
 
-    # =========== TAB 2: COMBUSTÍVEIS (CORRIGIDO) ===========
     with tabs[1]:
         np.random.seed(123)
         estados = ["SP","RJ","MG","RS","PR","BA"]
-        combustiveis = ["Gasolina","Etanol","Diesel"]
+        comb = ["Gasolina","Etanol","Diesel"]
         meses = ["Jan","Fev","Mar","Abr","Mai","Jun"]
-        data = []
+        data=[]
         for e in estados:
-            for c in combustiveis:
-                base = {"Gasolina":5.8, "Etanol":3.5, "Diesel":5.2}[c]
+            for c in comb:
+                base = {"Gasolina":5.8,"Etanol":3.5,"Diesel":5.2}[c]
                 for m in meses:
-                    data.append({
-                        "Estado": e,
-                        "Combustível": c,
-                        "Mês": m,
-                        "Preço": base + np.random.normal(0, 0.15)
-                    })
+                    data.append({"Estado":e,"Combustível":c,"Mês":m,"Preço":base+np.random.normal(0,0.15)})
         df = pd.DataFrame(data)
-        
         col1, col2 = st.columns(2)
         with col1:
             estado = st.selectbox("Estado", df["Estado"].unique())
         with col2:
             combustivel = st.selectbox("Combustível", df["Combustível"].unique())
-        
-        # Filtra os dados
-        filtro = df[(df["Estado"] == estado) & (df["Combustível"] == combustivel)]
-        
-        # Verifica se o filtro tem dados
-        if filtro.empty:
-            st.warning("Nenhum dado disponível para a combinação selecionada.")
+        filtro = df[(df["Estado"]==estado) & (df["Combustível"]==combustivel)]
+
+        # ===== VERIFICAÇÃO ROBUSTA =====
+        if filtro is None or filtro.empty:
+            st.warning("Nenhum dado disponível para a combinação selecionada. Tente outra região ou combustível.")
         else:
-            # Certifica-se de que as colunas existem
-            if "Mês" in filtro.columns and "Preço" in filtro.columns:
-                # Métricas
-                k1, k2 = st.columns(2)
+            # Verifica se há dados para o mês máximo
+            if filtro["Mês"].nunique() == 0:
+                st.warning("Dados insuficientes para gerar o gráfico.")
+            else:
+                k1,k2 = st.columns(2)
                 ultimo_mes = filtro["Mês"].max()
-                preco_atual = filtro[filtro["Mês"] == ultimo_mes]["Preço"].values[0] if not filtro[filtro["Mês"] == ultimo_mes].empty else 0
+                # Pega o preço do último mês
+                df_ultimo = filtro[filtro["Mês"]==ultimo_mes]
+                if not df_ultimo.empty:
+                    preco_atual = df_ultimo["Preço"].values[0]
+                else:
+                    preco_atual = filtro["Preço"].mean()
                 k1.metric("Preço Atual", f"R$ {preco_atual:.2f}")
                 variacao = (filtro["Preço"].max() - filtro["Preço"].min()) / filtro["Preço"].min() * 100 if filtro["Preço"].min() > 0 else 0
                 k2.metric("Variação Semestral", f"{variacao:.1f}%")
-                
-                # Gráfico
-                fig = px.line(
-                    filtro,
-                    x="Mês",
-                    y="Preço",
-                    markers=True,
-                    color_discrete_sequence=[c["chart_colors"][0]],
-                    template=c["plotly_template"]
-                )
-                fig.update_layout(
-                    height=400,
-                    margin=dict(l=20, r=20, t=40, b=20),
-                    paper_bgcolor="rgba(0,0,0,0)",
-                    font=dict(color=c["text"])
-                )
+                fig = px.line(filtro, x="Mês", y="Preço", markers=True, color_discrete_sequence=[c["chart_colors"][0]], template=c["plotly_template"])
+                fig.update_layout(height=400, margin=dict(l=20,r=20,t=40,b=20), paper_bgcolor="rgba(0,0,0,0)")
                 st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.error("Erro: colunas 'Mês' ou 'Preço' não encontradas nos dados.")
 
-    # =========== TAB 3: IMPACTO OPERACIONAL ===========
     with tabs[2]:
         meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"]
         df = pd.DataFrame({
@@ -117,11 +96,8 @@ def render_analytics():
             "Tipo": ["Antes"]*12 + ["Após"]*12,
             "Horas": [120,125,118,130,122,128,126,124,129,127,125,130] + [95,70,55,45,38,35,33,32,30,29,28,27]
         })
-        fig = px.line(df, x="Mês", y="Horas", color="Tipo", markers=True,
-                      color_discrete_sequence=[c["chart_colors"][3], c["chart_colors"][0]],
-                      template=c["plotly_template"])
-        fig.update_layout(height=400, margin=dict(l=20,r=20,t=40,b=20),
-                          paper_bgcolor="rgba(0,0,0,0)", font=dict(color=c["text"]))
+        fig = px.line(df, x="Mês", y="Horas", color="Tipo", markers=True, color_discrete_sequence=[c["chart_colors"][3], c["chart_colors"][0]], template=c["plotly_template"])
+        fig.update_layout(height=400, margin=dict(l=20,r=20,t=40,b=20), paper_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig, use_container_width=True)
         k1,k2,k3 = st.columns(3)
         k1.metric("Horas Economizadas", "1.108 h", "+93% eficiência")
