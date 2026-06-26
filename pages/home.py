@@ -1,162 +1,187 @@
 import streamlit as st
-from components import render_hero, render_kpis, render_skills_chart, render_footer
+import os
 from config import get_colors
+from components import render_skills_chart
 
-def render_testimonials():
-    st.markdown("""
-    <div class="section-header">
-        <span class="section-label">Depoimentos</span>
-        <h2 class="section-title">O que dizem sobre meu trabalho</h2>
-    </div>
-    """, unsafe_allow_html=True)
-    col1, col2, col3 = st.columns(3)
-    testimonials = [
-        ("O Raphael revolucionou nossa área de dados. Reduzimos custos operacionais em 30% com suas automações.", "— Diretor de Operações, Empresa X"),
-        ("Graças ao dashboard de KPIs criado pelo Raphael, passamos a tomar decisões em tempo real com segurança.", "— Gerente de BI, Empresa Y"),
-        ("A expertise do Raphael em AWS e Python nos permitiu processar 1M de registros por dia com custo mínimo.", "— CTO, Startup Z")
-    ]
-    for col, (text, author) in zip([col1, col2, col3], testimonials):
-        with col:
-            st.markdown(f"""
-            <div class="testimonial-card">
-                <p class="testimonial-text">“{text}”</p>
-                <p class="testimonial-author">{author}</p>
-            </div>
-            """, unsafe_allow_html=True)
+def render_home():
+    c = get_colors()
 
-def render_certification():
-    colors = get_colors()
-    st.markdown("""
-    <div class="section-header">
-        <span class="section-label">Certificação</span>
-        <h2 class="section-title">Objetivo para 2026</h2>
-    </div>
-    """, unsafe_allow_html=True)
+    # ===== HERO =====
     st.markdown(f"""
-    <div class="cert-card">
-        <div class="cert-badge">🎯</div>
-        <div class="cert-title">AWS Cloud Practitioner</div>
-        <div class="cert-sub">Meta: <strong>Dezembro de 2026</strong> — em preparação ativa</div>
-        <div style="margin-top: 0.5rem;">
-            <span style="background:{colors['primary']};color:white;padding:0.2rem 1rem;border-radius:999px;font-size:0.8rem;font-weight:600;">Em andamento</span>
+    <section class="hero-full">
+        <div class="hero-content">
+            <div class="hero-photo">
+                <img src="{'rapha.jpeg' if os.path.exists('rapha.jpeg') else 'https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=1D4ED8&color=fff'}" alt="Raphael Pires">
+            </div>
+            <div class="hero-text">
+                <h1>Raphael <span>Pires</span></h1>
+                <p class="subtitle">Analista de Dados &amp; Business Intelligence<br>Mais de <strong>16 anos</strong> transformando dados em decisões estratégicas.</p>
+                <div class="badge-group">
+                    <span class="badge">📊 Power BI</span>
+                    <span class="badge">🐍 Python</span>
+                    <span class="badge">🗄️ SQL</span>
+                    <span class="badge">☁️ AWS</span>
+                    <span class="badge">🤖 IA Generativa</span>
+                    <span class="badge">📈 Dashboards</span>
+                </div>
+                <div class="cta-group">
+                    <a href="#experiencia" class="btn-primary">Ver trajetória ↓</a>
+                    <a href="{'Curriculo_Raphael_v2.pdf' if os.path.exists('Curriculo_Raphael_v2.pdf') else '#'}" download class="btn-secondary">📄 Baixar CV</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    """, unsafe_allow_html=True)
+
+    # ===== KPIS =====
+    st.markdown("""
+    <div class="section-glass">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">Impacto Mensurável</span>
+                <h2>Números que contam histórias</h2>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;">
+                <div class="glass-card" style="text-align:center;"><div style="font-size:2.4rem;font-weight:700;color:var(--primary);">16+</div><div style="color:var(--text-muted);">anos de experiência</div></div>
+                <div class="glass-card" style="text-align:center;"><div style="font-size:2.4rem;font-weight:700;color:var(--primary);">70%</div><div style="color:var(--text-muted);">redução operacional</div></div>
+                <div class="glass-card" style="text-align:center;"><div style="font-size:2.4rem;font-weight:700;color:var(--primary);">213k</div><div style="color:var(--text-muted);">registros processados</div></div>
+                <div class="glass-card" style="text-align:center;"><div style="font-size:2.4rem;font-weight:700;color:var(--primary);">2h→15m</div><div style="color:var(--text-muted);">tempo de análise</div></div>
+                <div class="glass-card" style="text-align:center;"><div style="font-size:2.4rem;font-weight:700;color:var(--primary);">R$50bi</div><div style="color:var(--text-muted);">dados analisados</div></div>
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-def render_home():
-    render_hero()
-    st.divider()
-    render_kpis()
-    st.divider()
-
-    # ================= EXPERIÊNCIA (NSM em primeiro) =================
+    # ===== EXPERIÊNCIA (ordem: NSM, Jardim do Éden, J Sintonía, Banco do Brasil) =====
     st.markdown("""
-    <div class="section-header">
-        <span class="section-label">Trajetória</span>
-        <h2 class="section-title">Experiência profissional</h2>
-    </div>
-    <div class="timeline">
+    <div class="section-glass" id="experiencia">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">Trajetória</span>
+                <h2>Experiência profissional</h2>
+            </div>
+            <div class="timeline">
     """, unsafe_allow_html=True)
 
     experiences = [
-        {
-            "date": "2014 – Presente · 10+ anos",
-            "role": "Analista de Dados & BI",
-            "company": "NSM",
-            "desc": "Centralização de dados, construção de indicadores estratégicos, automação de relatórios e governança de dados. Redução de 70% do tempo operacional.",
-            "tags": ["Dados", "Governança", "Indicadores", "Automação"],
-            "badge": "Atual"
-        },
-        {
-            "date": "2012 – Presente · 12+ anos",
-            "role": "Fundador & Analista de Dados",
-            "company": "Jardim do Éden",
-            "desc": "Desenvolvimento de dashboards em Power BI, automações com Python e SQL, uso de IA Generativa para análises preditivas. Redução de 2h para 15min por análise.",
-            "tags": ["Power BI", "Python", "SQL", "IA Generativa"],
-            "badge": ""
-        },
-        {
-            "date": "2010 – 2014 · 4 anos",
-            "role": "Gestão Comercial & BI",
-            "company": "J Sintonía",
-            "desc": "Implementação de Business Intelligence, criação de KPIs, dashboards gerenciais e análise de viabilidade econômica.",
-            "tags": ["BI", "KPIs", "Dashboards"],
-            "badge": ""
-        },
-        {
-            "date": "2009 – 2010 · 1 ano",
-            "role": "Automação de Processos",
-            "company": "Banco do Brasil",
-            "desc": "Desenvolvimento de automações em VBA que reduziram o tempo operacional em 70%.",
-            "tags": ["VBA", "Automação", "Eficiência"],
-            "badge": ""
-        }
+        {"date":"2014 – Presente · 10+ anos","role":"Analista de Dados & BI","company":"NSM Comércio","desc":"Centralização de dados, construção de indicadores estratégicos, automação de relatórios e governança. Redução de 70% do tempo operacional.","tags":["Dados","Governança","Indicadores","Automação"],"badge":"Atual"},
+        {"date":"2012 – Presente · 12+ anos","role":"Fundador & Analista de Dados","company":"Jardim do Éden (Varejo de Moda)","desc":"Estruturação da base de dados, modelagem, limpeza, integração e desenvolvimento de dashboards gerenciais com SQL, Python, Power BI e Looker Studio — reduzindo ciclo de análise de 2h para 15 min.","tags":["Power BI","Python","SQL","IA Generativa"],"badge":""},
+        {"date":"2010 – 2014 · 4 anos","role":"Fundador & Analista de KPIs","company":"J Sintonía (Varejo Especializado)","desc":"Monitoramento de KPIs de vendas, margem e rentabilidade com relatórios automatizados. Análise de viabilidade econômica que fundamentou encerramento estratégico planejado em 2026, evitando prejuízo.","tags":["BI","KPIs","Dashboards"],"badge":""},
+        {"date":"2009 – 2010 · 1 ano","role":"Estagiário de Automação e Dados","company":"Banco do Brasil S.A.","desc":"Desenvolvimento de macros VBA em 20 agências, reduzindo 70% do tempo operacional. Saneou e padronizou bases de dados gerenciais internas.","tags":["VBA","Automação","Eficiência"],"badge":""}
     ]
-
     for exp in experiences:
-        tags_html = "".join([f'<span class="timeline-tag">{t}</span>' for t in exp["tags"]])
-        badge_html = f'<span class="timeline-badge">{exp["badge"]}</span>' if exp["badge"] else ""
+        tags = "".join([f'<span class="timeline-tag">{t}</span>' for t in exp["tags"]])
+        badge = f'<span class="timeline-badge">{exp["badge"]}</span>' if exp["badge"] else ""
         st.markdown(f"""
         <div class="timeline-item">
             <div class="timeline-dot"></div>
             <div class="timeline-card">
-                <span class="timeline-date">{exp["date"]}</span>
-                {badge_html}
-                <h3 class="timeline-role">{exp["role"]}</h3>
+                <span class="timeline-date">{exp["date"]}</span> {badge}
+                <div class="timeline-role">{exp["role"]}</div>
                 <div class="timeline-company">{exp["company"]}</div>
-                <p class="timeline-desc">{exp["desc"]}</p>
-                <div>{tags_html}</div>
+                <div class="timeline-desc">{exp["desc"]}</div>
+                <div>{tags}</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.divider()
+    st.markdown("</div></div></div>", unsafe_allow_html=True)
 
-    # ================= CASES =================
+    # ===== PROJETOS (baseado no currículo) =====
     st.markdown("""
-    <div class="section-header">
-        <span class="section-label">Portfólio</span>
-        <h2 class="section-title">Cases de sucesso</h2>
+    <div class="section-glass">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">Portfólio</span>
+                <h2>Projetos de Analytics</h2>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+                <div class="glass-card">
+                    <h3>🇧🇷 Desenrola Brasil</h3>
+                    <p style="color:var(--text-muted);">Painel analítico executivo com Python, Pandas, Plotly e Streamlit. Processamento de dados oficiais do Banco Central com KPIs, séries temporais e análise de concentração de mercado (HHI).</p>
+                    <a href="https://desenrolabrasil.streamlit.app" target="_blank" class="btn-primary" style="display:inline-block;margin-top:0.5rem;padding:0.4rem 1.2rem;font-size:0.85rem;">🔗 Ver App</a>
+                </div>
+                <div class="glass-card">
+                    <h3>🔬 CNPq Analytics</h3>
+                    <p style="color:var(--text-muted);">ETL e análise de mais de 213 mil bolsas e R$ 1,2 bi em investimentos públicos, evidenciando desigualdades regionais. Dashboard interativo com filtros dinâmicos.</p>
+                    <a href="https://cnpa-analytics.streamlit.app" target="_blank" class="btn-primary" style="display:inline-block;margin-top:0.5rem;padding:0.4rem 1.2rem;font-size:0.85rem;">🔗 Ver App</a>
+                </div>
+                <div class="glass-card">
+                    <h3>⛽ Análise de Preços de Combustíveis (ANP)</h3>
+                    <p style="color:var(--text-muted);">Dashboard interativo com filtros temporais e regionais utilizando dados oficiais da Agência Nacional do Petróleo.</p>
+                    <a href="https://github.com/raphaelcaxias" target="_blank" class="btn-primary" style="display:inline-block;margin-top:0.5rem;padding:0.4rem 1.2rem;font-size:0.85rem;">📊 Ver Projeto</a>
+                </div>
+                <div class="glass-card">
+                    <h3>💎 Portfólio Premium</h3>
+                    <p style="color:var(--text-muted);">Este portfólio construído em Streamlit com design premium, glassmorphism e navegação fixa. Código aberto no GitHub.</p>
+                    <a href="https://github.com/raphaelcaxias" target="_blank" class="btn-primary" style="display:inline-block;margin-top:0.5rem;padding:0.4rem 1.2rem;font-size:0.85rem;">💻 Ver Código</a>
+                </div>
+            </div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("### 📊 Automação de Relatórios Financeiros")
-        st.write("**Economia:** R$ 500 mil/ano | **Redução:** 70% do tempo operacional")
-        st.write("Automatizei a geração de relatórios financeiros usando Python e Power BI, eliminando tarefas manuais e permitindo análises em tempo real.")
-        st.markdown("[🔗 Ver Case](https://github.com/raphaelcaxias)")
-        st.markdown("---")
-        st.markdown("### 📈 Modelo de Previsão de Demanda")
-        st.write("**Acurácia:** 92% | **Impacto:** Redução de 25% em estoques")
-        st.write("Desenvolvi um modelo preditivo com Python e AWS que prevê demanda com alta precisão, otimizando a cadeia de suprimentos.")
-        st.markdown("[📊 Ver Projeto](https://github.com/raphaelcaxias)")
+    # ===== CERTIFICAÇÕES =====
+    st.markdown("""
+    <div class="section-glass">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">Certificações</span>
+                <h2>Formação contínua</h2>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;">
+                <div class="glass-card" style="text-align:center;">
+                    <div style="font-size:2rem;">📘</div>
+                    <h4>Hashtag Treinamentos</h4>
+                    <p style="color:var(--text-muted);font-size:0.9rem;">SQL Avançado · Power BI · Python para Análise de Dados · Algoritmos e IA Aplicada</p>
+                </div>
+                <div class="glass-card" style="text-align:center;">
+                    <div style="font-size:2rem;">☁️</div>
+                    <h4>AWS Educate</h4>
+                    <p style="color:var(--text-muted);font-size:0.9rem;">8 módulos concluídos: Cloud Computing, Console, Storage, ML Foundations, Sustainability, Cloud Support</p>
+                    <span style="background:var(--primary);color:white;padding:0.2rem 0.8rem;border-radius:999px;font-size:0.7rem;font-weight:600;">40%</span>
+                </div>
+                <div class="glass-card" style="text-align:center;">
+                    <div style="font-size:2rem;">🎯</div>
+                    <h4>Meta 2026</h4>
+                    <p style="color:var(--text-muted);font-size:0.9rem;">Certificação AWS Cloud Practitioner — em preparação ativa</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    with col2:
-        st.markdown("### 🎯 Dashboard de KPIs Operacionais")
-        st.write("**Aumento de eficiência:** 40% | **Adoção:** 12 times")
-        st.write("Criei um dashboard interativo em Power BI com KPIs estratégicos que permitiu aos gestores monitorar desempenho em tempo real.")
-        st.markdown("[🔗 Ver Dashboard](https://github.com/raphaelcaxias)")
-        st.markdown("---")
-        st.markdown("### ☁️ Pipeline de Dados em AWS")
-        st.write("**Volume:** 1M registros/dia | **Custo:** Reduzido em 30%")
-        st.write("Projetei e implementei um pipeline de dados usando AWS (S3, Glue, Athena) para processamento de grandes volumes com baixo custo.")
-        st.markdown("[💻 Ver Código](https://github.com/raphaelcaxias)")
+    # ===== AWS CLOUD JOURNEY =====
+    st.markdown(f"""
+    <div class="section-glass">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">Cloud Journey</span>
+                <h2>☁️ AWS em progresso</h2>
+                <p style="color:var(--text-muted);">Atualmente em trilha de certificação, com foco em arquitetura de dados e machine learning na nuvem.</p>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;text-align:center;">
+                <div class="glass-card" style="padding:1rem;"><div style="font-size:2rem;">📘</div><div>Cloud 101</div></div>
+                <div class="glass-card" style="padding:1rem;"><div style="font-size:2rem;">🖥️</div><div>AWS Console</div></div>
+                <div class="glass-card" style="padding:1rem;"><div style="font-size:2rem;">💾</div><div>Storage</div></div>
+                <div class="glass-card" style="padding:1rem;"><div style="font-size:2rem;">🤖</div><div>ML Foundations</div></div>
+                <div class="glass-card" style="padding:1rem;"><div style="font-size:2rem;">🌱</div><div>Sustainability</div></div>
+            </div>
+            <div style="text-align:center;margin-top:1.5rem;">
+                <span style="background:{c['primary_light']};color:{c['primary']};padding:0.2rem 1.2rem;border-radius:999px;font-size:0.8rem;font-weight:600;">🎯 Meta 2026: AWS Cloud Practitioner</span>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.divider()
-
-    # Depoimentos
-    render_testimonials()
-    st.divider()
-
-    # Certificação
-    render_certification()
-    st.divider()
-
-    # Gráfico de habilidades
+    # ===== SKILLS =====
+    st.markdown("""
+    <div class="section-glass">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">Competências</span>
+                <h2>Domínio tecnológico</h2>
+            </div>
+    """, unsafe_allow_html=True)
     render_skills_chart()
-    st.divider()
-
-    # Footer
-    render_footer()
+    st.markdown("</div></div>", unsafe_allow_html=True)
