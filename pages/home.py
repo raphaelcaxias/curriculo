@@ -6,7 +6,6 @@ from components import render_skills_chart
 def render_home():
     c = get_colors()
 
-    # ===== HERO =====
     st.markdown(f"""
     <section class="hero-full">
         <div class="hero-content">
@@ -33,7 +32,7 @@ def render_home():
     </section>
     """, unsafe_allow_html=True)
 
-    # ===== KPIS =====
+    # KPIs
     st.markdown("""
     <div class="section-glass">
         <div class="container">
@@ -52,7 +51,7 @@ def render_home():
     </div>
     """, unsafe_allow_html=True)
 
-    # ===== EXPERIÊNCIA (ordem: NSM, Jardim do Éden, J Sintonía, Banco do Brasil) =====
+    # Experiência
     st.markdown("""
     <div class="section-glass" id="experiencia">
         <div class="container">
@@ -87,7 +86,7 @@ def render_home():
 
     st.markdown("</div></div></div>", unsafe_allow_html=True)
 
-    # ===== PROJETOS (baseado no currículo) =====
+    # Projetos
     st.markdown("""
     <div class="section-glass">
         <div class="container">
@@ -121,7 +120,7 @@ def render_home():
     </div>
     """, unsafe_allow_html=True)
 
-    # ===== CERTIFICAÇÕES =====
+    # Certificações
     st.markdown("""
     <div class="section-glass">
         <div class="container">
@@ -151,7 +150,7 @@ def render_home():
     </div>
     """, unsafe_allow_html=True)
 
-    # ===== AWS CLOUD JOURNEY =====
+    # AWS Journey
     st.markdown(f"""
     <div class="section-glass">
         <div class="container">
@@ -174,7 +173,7 @@ def render_home():
     </div>
     """, unsafe_allow_html=True)
 
-    # ===== SKILLS =====
+    # Skills
     st.markdown("""
     <div class="section-glass">
         <div class="container">
