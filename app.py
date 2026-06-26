@@ -11,7 +11,7 @@ st.set_page_config(
 
 init_theme()
 
-# ===== CSS principal =====
+# ===== CSS =====
 def load_css():
     from config import get_colors
     colors = get_colors()
@@ -30,7 +30,7 @@ def load_css():
         .stApp {{ background: {colors['bg']}; }}
         .block-container {{ padding: 0; max-width: 100%; }}
 
-        /* Navbar fixa */
+        /* Navbar */
         .navbar {{
             position: fixed; top: 0; left: 0; right: 0; z-index: 999;
             background: {colors['navbar_bg']};
@@ -68,7 +68,7 @@ def load_css():
         }}
         .nav-theme-btn:hover {{ background: {colors['nav_hover']}; }}
 
-        /* Hero full-screen */
+        /* Hero */
         .hero-full {{
             min-height: 100vh;
             display: flex; align-items: center; justify-content: center;
@@ -168,7 +168,7 @@ def load_css():
             margin: 0.5rem auto 0;
         }}
 
-        /* Cards glass */
+        /* Cards */
         .glass-card {{
             background: {colors['card_bg']};
             backdrop-filter: blur(8px);
@@ -224,7 +224,7 @@ def load_css():
             border-radius: 6px; display: inline-block; margin: 0.2rem;
         }}
 
-        /* Depoimentos */
+        /* Testimonials */
         .testimonial-grid {{
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
         }}
@@ -278,10 +278,13 @@ def load_css():
 
 load_css()
 
-# ===== Controle de página =====
+# ===== PÁGINA ATUAL =====
 page = st.query_params.get("page", "home")
+
+# Renderiza navbar
 render_navbar(page)
 
+# Conteúdo
 if page == "home":
     from pages.home import render_home
     render_home()
@@ -295,5 +298,5 @@ else:
     from pages.home import render_home
     render_home()
 
-# Footer global
+# Footer
 render_footer()
