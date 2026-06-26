@@ -2,6 +2,7 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 from config import get_colors, SOCIAL_LINKS, TECH_STACK, SKILLS_DATA, EXPERIENCES, PROJECTS
+import os
 
 # ============================================================================
 # COMPONENTES DE UI
@@ -29,26 +30,21 @@ def render_hero():
     # Foto
     col1, col2, col3 = st.columns([4, 2, 4])
     with col2:
-        # Tenta carregar a foto
-        foto_carregada = False
+        # Verifica se o arquivo existe
+        foto_path = None
+        if os.path.exists("rapha.jpeg"):
+            foto_path = "rapha.jpeg"
+        elif os.path.exists("assets/rapha.jpeg"):
+            foto_path = "assets/rapha.jpeg"
+        elif os.path.exists("rapha.jpg"):
+            foto_path = "rapha.jpg"
+        elif os.path.exists("assets/rapha.jpg"):
+            foto_path = "assets/rapha.jpg"
         
-        # Tenta 1: rapha.jpeg na raiz
-        try:
-            st.image("rapha.jpeg", width=180)
-            foto_carregada = True
-        except:
-            pass
-        
-        # Tenta 2: assets/rapha.jpeg
-        if not foto_carregada:
-            try:
-                st.image("assets/rapha.jpeg", width=180)
-                foto_carregada = True
-            except:
-                pass
-        
-        # Placeholder se nenhuma foto for encontrada
-        if not foto_carregada:
+        if foto_path:
+            st.image(foto_path, width=180)
+        else:
+            # Placeholder
             st.markdown(f"""
             <div style="
                 width: 180px;
@@ -92,8 +88,14 @@ def render_hero():
     # Download CV
     col1, col2, col3 = st.columns([4, 2, 4])
     with col2:
-        try:
-            with open("Curriculo_Raphael_v2.pdf", "rb") as pdf:
+        cv_path = None
+        if os.path.exists("Curriculo_Raphael_v2.pdf"):
+            cv_path = "Curriculo_Raphael_v2.pdf"
+        elif os.path.exists("assets/Curriculo_Raphael_v2.pdf"):
+            cv_path = "assets/Curriculo_Raphael_v2.pdf"
+        
+        if cv_path:
+            with open(cv_path, "rb") as pdf:
                 st.download_button(
                     label="📄 Download Currículo PDF",
                     data=pdf.read(),
@@ -101,18 +103,8 @@ def render_hero():
                     mime="application/pdf",
                     use_container_width=True
                 )
-        except:
-            try:
-                with open("assets/Curriculo_Raphael_v2.pdf", "rb") as pdf:
-                    st.download_button(
-                        label="📄 Download Currículo PDF",
-                        data=pdf.read(),
-                        file_name="Curriculo_Raphael_Pires.pdf",
-                        mime="application/pdf",
-                        use_container_width=True
-                    )
-            except:
-                st.info("📄 Currículo PDF disponível")
+        else:
+            st.info("📄 Currículo PDF disponível")
 
 # ============================================================================
 # COMPONENTES DE CONTEÚDO
@@ -231,7 +223,7 @@ def render_skills_chart():
     st.plotly_chart(fig, use_container_width=True)
 
 def render_projects():
-    """Renderiza os projetos - CORRIGIDO sem border=True"""
+    """Renderiza os projetos - CORRIGIDO (sem link_button)"""
     st.markdown("""
     <div class="section-header">
         <span class="section-label">Portfólio</span>
@@ -239,34 +231,79 @@ def render_projects():
     </div>
     """, unsafe_allow_html=True)
     
-    # Projetos usando columns
+    colors = get_colors()
+    
+    # Projeto 1
     col1, col2 = st.columns(2)
     
     with col1:
         st.markdown("### 🇧🇷 Desenrola Brasil")
         st.write("Análise de dados do programa governamental, explorando renegociações e perfis de consumidores.")
-        st.link_button("🔗 Acessar Repositório", "https://github.com/raphaelcaxias")
+        # Usando HTML para o link
+        st.markdown(f"""
+        <a href="https://github.com/raphaelcaxias" target="_blank" style="
+            display: inline-block;
+            background: {colors['primary']};
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 0.5rem 0;
+        ">🔗 Acessar Repositório</a>
+        """, unsafe_allow_html=True)
         st.markdown("---")
         
         st.markdown("### ⛽ Dashboard ANP")
         st.write("Inteligência de dados da ANP com análise de preços e produção de combustíveis.")
-        st.link_button("📊 Ver Dashboard", "https://github.com/raphaelcaxias")
+        st.markdown(f"""
+        <a href="https://github.com/raphaelcaxias" target="_blank" style="
+            display: inline-block;
+            background: {colors['primary']};
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 0.5rem 0;
+        ">📊 Ver Dashboard</a>
+        """, unsafe_allow_html=True)
     
     with col2:
         st.markdown("### 🔬 CNPq Analytics")
         st.write("Dashboard analítico sobre bolsas e fomento do CNPq com cruzamento de dados de pesquisa.")
-        st.link_button("🔗 Acessar Repositório", "https://github.com/raphaelcaxias")
+        st.markdown(f"""
+        <a href="https://github.com/raphaelcaxias" target="_blank" style="
+            display: inline-block;
+            background: {colors['primary']};
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 0.5rem 0;
+        ">🔗 Acessar Repositório</a>
+        """, unsafe_allow_html=True)
         st.markdown("---")
         
         st.markdown("### 💎 Portfólio Premium")
         st.write("Este portfólio construído em Streamlit com design premium e visualização de dados.")
-        st.link_button("💻 Ver Código", "https://github.com/raphaelcaxias")
+        st.markdown(f"""
+        <a href="https://github.com/raphaelcaxias" target="_blank" style="
+            display: inline-block;
+            background: {colors['primary']};
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 0.5rem 0;
+        ">💻 Ver Código</a>
+        """, unsafe_allow_html=True)
 
 def render_footer():
-    """Renderiza o footer - CORRIGIDO"""
-    colors = get_colors()
-    
-    st.markdown(f"""
+    """Renderiza o footer"""
+    st.markdown("""
     <div class="footer">
         <div class="footer-status">
             <span class="footer-status-dot"></span>
@@ -284,10 +321,10 @@ def render_footer():
         </div>
         
         <div class="footer-links">
-            <a href="{SOCIAL_LINKS['linkedin']}" target="_blank" class="footer-link">💼 LinkedIn</a>
-            <a href="{SOCIAL_LINKS['github']}" target="_blank" class="footer-link">💻 GitHub</a>
-            <a href="{SOCIAL_LINKS['email']}" class="footer-link">✉️ E-mail</a>
-            <a href="{SOCIAL_LINKS['phone']}" class="footer-link">📱 Telefone</a>
+            <a href="https://www.linkedin.com/in/raphaelpires" target="_blank" class="footer-link">💼 LinkedIn</a>
+            <a href="https://github.com/raphaelcaxias" target="_blank" class="footer-link">💻 GitHub</a>
+            <a href="mailto:contato@raphaelpires.com" class="footer-link">✉️ E-mail</a>
+            <a href="tel:+5511999999999" class="footer-link">📱 Telefone</a>
         </div>
         
         <p class="footer-copy">© 2026 Raphael Fernando da Silva Pires</p>
