@@ -1,6 +1,14 @@
-streamlit
-pandas
-numpy
-plotly
-Pillow
-requests
+# ============================================================================
+# DEPENDÊNCIAS - Portfólio Raphael Pires
+# Analista de Dados & Business Intelligence
+# ============================================================================
+
+# Framework principal
+streamlit>=1.30.0
+
+# Manipulação e análise de dados
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Visualização de dados interativa
+plotly>=5.18.0
