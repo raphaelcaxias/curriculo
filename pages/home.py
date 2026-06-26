@@ -49,7 +49,7 @@ def render_home():
     render_kpis()
     st.divider()
 
-    # Experiência – ordem reordenada (NSM primeiro)
+    # ================= EXPERIÊNCIA (NSM em primeiro) =================
     st.markdown("""
     <div class="section-header">
         <span class="section-label">Trajetória</span>
@@ -113,7 +113,7 @@ def render_home():
     st.markdown('</div>', unsafe_allow_html=True)
     st.divider()
 
-    # Projetos com cases reais
+    # ================= CASES =================
     st.markdown("""
     <div class="section-header">
         <span class="section-label">Portfólio</span>
