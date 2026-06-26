@@ -26,31 +26,23 @@ def render_hero():
     
     st.markdown('<div class="hero-section">', unsafe_allow_html=True)
     
-    # Foto - CORRIGIDO
+    # Foto
     col1, col2, col3 = st.columns([4, 2, 4])
     with col2:
-        # Tenta carregar a foto de diferentes lugares
+        # Tenta carregar a foto
         foto_carregada = False
         
-        # Tenta 1: assets/rapha.jpeg
+        # Tenta 1: rapha.jpeg na raiz
         try:
-            st.image("assets/rapha.jpeg", use_container_width=True)
+            st.image("rapha.jpeg", width=180)
             foto_carregada = True
         except:
             pass
         
-        # Tenta 2: rapha.jpeg na raiz
+        # Tenta 2: assets/rapha.jpeg
         if not foto_carregada:
             try:
-                st.image("rapha.jpeg", use_container_width=True)
-                foto_carregada = True
-            except:
-                pass
-        
-        # Tenta 3: assets/raphael.jpeg
-        if not foto_carregada:
-            try:
-                st.image("assets/raphael.jpeg", use_container_width=True)
+                st.image("assets/rapha.jpeg", width=180)
                 foto_carregada = True
             except:
                 pass
@@ -101,7 +93,7 @@ def render_hero():
     col1, col2, col3 = st.columns([4, 2, 4])
     with col2:
         try:
-            with open("assets/Curriculo_Raphael_v2.pdf", "rb") as pdf:
+            with open("Curriculo_Raphael_v2.pdf", "rb") as pdf:
                 st.download_button(
                     label="📄 Download Currículo PDF",
                     data=pdf.read(),
@@ -111,7 +103,7 @@ def render_hero():
                 )
         except:
             try:
-                with open("Curriculo_Raphael_v2.pdf", "rb") as pdf:
+                with open("assets/Curriculo_Raphael_v2.pdf", "rb") as pdf:
                     st.download_button(
                         label="📄 Download Currículo PDF",
                         data=pdf.read(),
@@ -247,39 +239,31 @@ def render_projects():
     </div>
     """, unsafe_allow_html=True)
     
-    # Projetos usando columns com st.container sem border
+    # Projetos usando columns
     col1, col2 = st.columns(2)
     
     with col1:
-        # Projeto 1
-        with st.container():
-            st.markdown("### 🇧🇷 Desenrola Brasil")
-            st.write("Análise de dados do programa governamental, explorando renegociações e perfis de consumidores.")
-            st.link_button("🔗 Acessar Repositório", "https://github.com/raphaelcaxias")
-            st.markdown("---")
+        st.markdown("### 🇧🇷 Desenrola Brasil")
+        st.write("Análise de dados do programa governamental, explorando renegociações e perfis de consumidores.")
+        st.link_button("🔗 Acessar Repositório", "https://github.com/raphaelcaxias")
+        st.markdown("---")
         
-        # Projeto 3
-        with st.container():
-            st.markdown("### ⛽ Dashboard ANP")
-            st.write("Inteligência de dados da ANP com análise de preços e produção de combustíveis.")
-            st.link_button("📊 Ver Dashboard", "https://github.com/raphaelcaxias")
+        st.markdown("### ⛽ Dashboard ANP")
+        st.write("Inteligência de dados da ANP com análise de preços e produção de combustíveis.")
+        st.link_button("📊 Ver Dashboard", "https://github.com/raphaelcaxias")
     
     with col2:
-        # Projeto 2
-        with st.container():
-            st.markdown("### 🔬 CNPq Analytics")
-            st.write("Dashboard analítico sobre bolsas e fomento do CNPq com cruzamento de dados de pesquisa.")
-            st.link_button("🔗 Acessar Repositório", "https://github.com/raphaelcaxias")
-            st.markdown("---")
+        st.markdown("### 🔬 CNPq Analytics")
+        st.write("Dashboard analítico sobre bolsas e fomento do CNPq com cruzamento de dados de pesquisa.")
+        st.link_button("🔗 Acessar Repositório", "https://github.com/raphaelcaxias")
+        st.markdown("---")
         
-        # Projeto 4
-        with st.container():
-            st.markdown("### 💎 Portfólio Premium")
-            st.write("Este portfólio construído em Streamlit com design premium e visualização de dados.")
-            st.link_button("💻 Ver Código", "https://github.com/raphaelcaxias")
+        st.markdown("### 💎 Portfólio Premium")
+        st.write("Este portfólio construído em Streamlit com design premium e visualização de dados.")
+        st.link_button("💻 Ver Código", "https://github.com/raphaelcaxias")
 
 def render_footer():
-    """Renderiza o footer"""
+    """Renderiza o footer - CORRIGIDO"""
     colors = get_colors()
     
     st.markdown(f"""
