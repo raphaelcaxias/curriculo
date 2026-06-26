@@ -1,8 +1,5 @@
 import streamlit as st
-from components import (
-    render_hero, render_kpis, render_experience, 
-    render_tech_stack, render_skills_chart, render_projects, render_footer
-)
+from components import render_hero, render_kpis, render_experience, render_tech_stack, render_skills_chart, render_projects, render_footer
 
 def main():
     render_hero()
