@@ -1,0 +1,13 @@
+# Entre na pasta do projeto
+cd curriculo
+
+# Atualize os arquivos
+echo "python-3.10" > runtime.txt
+
+# Crie o __init__.py se não existir
+touch pages/__init__.py
+
+# Adicione as mudanças
+git add .
+git commit -m "Fix: runtime para python-3.10 e estrutura corrigida"
+git push origin main
