@@ -3,48 +3,6 @@ import plotly.express as px
 import pandas as pd
 from config import get_colors
 
-# ===== NAVBAR (fixa com glass) =====
-def render_navbar(active_page):
-    colors = get_colors()
-    st.markdown(f"""
-    <nav class="navbar">
-        <a href="/" class="navbar-brand">Raphael <span>Pires</span></a>
-        <div class="navbar-links">
-            <a href="?page=home" class="nav-link {'active' if active_page == 'home' else ''}">Início</a>
-            <a href="?page=analytics" class="nav-link {'active' if active_page == 'analytics' else ''}">Análises</a>
-            <a href="?page=dashboard" class="nav-link {'active' if active_page == 'dashboard' else ''}">Dashboard</a>
-            <button class="nav-theme-btn" onclick="parent.postMessage({{type:'toggle_theme'}},'*')">🌓</button>
-        </div>
-    </nav>
-    """, unsafe_allow_html=True)
-
-# ===== FOOTER =====
-def render_footer():
-    st.markdown("""
-    <div class="footer">
-        <div class="status">
-            <span class="status-dot"></span>
-            Disponível para oportunidades
-        </div>
-        <h3 style="font-size:1.5rem;font-weight:700;margin:1rem 0 0.3rem;">Vamos conversar sobre dados?</h3>
-        <p style="color:var(--text-muted);margin-bottom:1.5rem;">Aberto a projetos em Dados, BI e Cloud</p>
-        <div style="display:flex;justify-content:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;">
-            <span class="footer-mode" style="background:var(--tag-bg);border:1px solid var(--tag-border);padding:0.3rem 0.8rem;border-radius:999px;font-size:0.8rem;">🏠 Remoto</span>
-            <span class="footer-mode" style="background:var(--tag-bg);border:1px solid var(--tag-border);padding:0.3rem 0.8rem;border-radius:999px;font-size:0.8rem;">🏢 Híbrido</span>
-            <span class="footer-mode" style="background:var(--tag-bg);border:1px solid var(--tag-border);padding:0.3rem 0.8rem;border-radius:999px;font-size:0.8rem;">📍 Presencial</span>
-            <span class="footer-mode" style="background:var(--tag-bg);border:1px solid var(--tag-border);padding:0.3rem 0.8rem;border-radius:999px;font-size:0.8rem;">✈️ Viagens</span>
-        </div>
-        <div class="footer-links">
-            <a href="https://www.linkedin.com/in/raphaelpires" target="_blank" class="footer-link">💼 LinkedIn</a>
-            <a href="https://github.com/raphaelcaxias" target="_blank" class="footer-link">💻 GitHub</a>
-            <a href="mailto:contato@raphaelpires.com" class="footer-link">✉️ E-mail</a>
-            <a href="tel:+5511999999999" class="footer-link">📱 Telefone</a>
-        </div>
-        <p class="footer-copy">© 2026 Raphael Fernando da Silva Pires</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-# ===== GRÁFICO DE SKILLS =====
 def render_skills_chart():
     c = get_colors()
     df = pd.DataFrame({
