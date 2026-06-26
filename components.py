@@ -222,38 +222,6 @@ def render_skills_chart():
     
     st.plotly_chart(fig, use_container_width=True)
 
-def render_projects():
-    """Renderiza os projetos - SOMENTE st.write e st.markdown com links markdown"""
-    st.markdown("""
-    <div class="section-header">
-        <span class="section-label">Portfólio</span>
-        <h2 class="section-title">Projetos em destaque</h2>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Usando apenas st.write e markdown links
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.write("### 🇧🇷 Desenrola Brasil")
-        st.write("Análise de dados do programa governamental, explorando renegociações e perfis de consumidores.")
-        st.write("[🔗 Acessar Repositório](https://github.com/raphaelcaxias)")
-        st.write("---")
-        
-        st.write("### ⛽ Dashboard ANP")
-        st.write("Inteligência de dados da ANP com análise de preços e produção de combustíveis.")
-        st.write("[📊 Ver Dashboard](https://github.com/raphaelcaxias)")
-    
-    with col2:
-        st.write("### 🔬 CNPq Analytics")
-        st.write("Dashboard analítico sobre bolsas e fomento do CNPq com cruzamento de dados de pesquisa.")
-        st.write("[🔗 Acessar Repositório](https://github.com/raphaelcaxias)")
-        st.write("---")
-        
-        st.write("### 💎 Portfólio Premium")
-        st.write("Este portfólio construído em Streamlit com design premium e visualização de dados.")
-        st.write("[💻 Ver Código](https://github.com/raphaelcaxias)")
-
 def render_footer():
     """Renderiza o footer"""
     st.markdown("""
