@@ -2,11 +2,9 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 import os
-from config import get_colors, toggle_theme
+from config import get_colors
 
-# ============================================================================
-# FUNÇÃO PARA DETECTAR FOTO
-# ============================================================================
+# ===== DETECÇÃO DE FOTO =====
 def get_foto_path():
     candidatos = [
         "assets/rapha.jpeg", "assets/rapha.jpg",
@@ -25,6 +23,7 @@ def get_foto_url():
         return caminho
     return "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=1D4ED8&color=fff"
 
+# ===== DETECÇÃO DE PDF =====
 def get_pdf_path():
     candidatos = [
         "Curriculo_Raphael_v2.pdf",
@@ -38,37 +37,7 @@ def get_pdf_path():
             return caminho
     return None
 
-# ============================================================================
-# NAVBAR
-# ============================================================================
-def render_navbar(active_page):
-    colors = get_colors()
-    st.markdown(f"""
-    <nav class="navbar">
-        <a href="/" class="navbar-brand">Raphael <span>Pires</span></a>
-        <div class="navbar-links">
-            <a href="?page=home" class="nav-link {'active' if active_page == 'home' else ''}">Início</a>
-            <a href="?page=analytics" class="nav-link {'active' if active_page == 'analytics' else ''}">Análises</a>
-            <a href="?page=dashboard" class="nav-link {'active' if active_page == 'dashboard' else ''}">Dashboard</a>
-        </div>
-        <div>
-            <button class="nav-theme-btn" id="theme-toggle">🌓</button>
-        </div>
-    </nav>
-    """, unsafe_allow_html=True)
-
-    # ===== Botão de tema via JavaScript (alternativa) =====
-    # Como o st.button com on_click pode não funcionar dentro de HTML,
-    # usamos um st.button separado fora do HTML, mas com estilo semelhante.
-    # Vou colocar o botão real logo abaixo, mas escondido? Melhor: usar st.button
-    # diretamente no layout. Vou remover o HTML e colocar um st.button real.
-
-    # Na verdade, vou deixar o HTML apenas para estilo e colocar um st.button real
-    # no canto superior direito. Vou ajustar no app.py.
-
-# ============================================================================
-# FOOTER
-# ============================================================================
+# ===== RODAPÉ =====
 def render_footer():
     st.markdown("""
     <div class="footer">
@@ -94,9 +63,7 @@ def render_footer():
     </div>
     """, unsafe_allow_html=True)
 
-# ============================================================================
-# GRÁFICO DE HABILIDADES
-# ============================================================================
+# ===== GRÁFICO DE HABILIDADES =====
 def render_skills_chart():
     c = get_colors()
     df = pd.DataFrame({
