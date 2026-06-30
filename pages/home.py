@@ -1,43 +1,67 @@
 import streamlit as st
 import os
 from config import get_colors
-from components import render_skills_chart, get_foto_url, get_pdf_path
+from components import render_skills_chart, get_pdf_path
 
 def render_home():
     c = get_colors()
 
-    # ===== FOTO =====
-    foto_url = get_foto_url()
+    # ===== DETECÇÃO DA FOTO (com diagnóstico) =====
+    foto_path = None
+    candidatos = [
+        "rapha.jpeg", "rapha.jpg",
+        "assets/rapha.jpeg", "assets/rapha.jpg",
+        "foto.jpeg", "foto.jpg",
+        "perfil.jpeg", "perfil.jpg"
+    ]
+    for caminho in candidatos:
+        if os.path.exists(caminho):
+            foto_path = caminho
+            break
+
+    # Se não encontrou, exibe um aviso no canto (apenas para diagnóstico)
+    if not foto_path:
+        st.warning("⚠️ Foto não encontrada. Verifique se o arquivo está em 'assets/rapha.jpeg' ou na raiz.", icon="🔍")
+        # Fallback para avatar gerado
+        foto_url = "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=1D4ED8&color=fff"
+    else:
+        foto_url = foto_path
 
     # ===== PDF =====
     pdf_path = get_pdf_path()
 
-    # ===== HERO =====
-    st.markdown(f"""
-    <section class="hero-full">
-        <div class="hero-content">
-            <div class="hero-photo">
-                <img src="{foto_url}" alt="Raphael Pires">
+    # ===== HERO (usando st.image para a foto) =====
+    st.markdown('<section class="hero-full">', unsafe_allow_html=True)
+    col1, col2 = st.columns([1, 2])
+
+    with col1:
+        # Usa st.image para carregar a foto (mais confiável que HTML)
+        if foto_path:
+            st.image(foto_path, width=220)
+        else:
+            st.image(foto_url, width=220)  # fallback
+
+    with col2:
+        st.markdown(f"""
+        <div class="hero-text">
+            <h1>Raphael <span>Pires</span></h1>
+            <p class="subtitle">Analista de Dados &amp; Business Intelligence<br>Mais de <strong>16 anos</strong> transformando dados em decisões estratégicas.</p>
+            <div class="badge-group">
+                <span class="badge">📊 Power BI</span>
+                <span class="badge">🐍 Python</span>
+                <span class="badge">🗄️ SQL</span>
+                <span class="badge">☁️ AWS</span>
+                <span class="badge">🤖 IA Generativa</span>
+                <span class="badge">📈 Dashboards</span>
             </div>
-            <div class="hero-text">
-                <h1>Raphael <span>Pires</span></h1>
-                <p class="subtitle">Analista de Dados &amp; Business Intelligence<br>Mais de <strong>16 anos</strong> transformando dados em decisões estratégicas.</p>
-                <div class="badge-group">
-                    <span class="badge">📊 Power BI</span>
-                    <span class="badge">🐍 Python</span>
-                    <span class="badge">🗄️ SQL</span>
-                    <span class="badge">☁️ AWS</span>
-                    <span class="badge">🤖 IA Generativa</span>
-                    <span class="badge">📈 Dashboards</span>
-                </div>
-                <div class="cta-group">
-                    <a href="#experiencia" class="btn-primary">Ver trajetória ↓</a>
-                    {'<a href="' + pdf_path + '" download class="btn-secondary">📄 Baixar CV</a>' if pdf_path else ''}
-                </div>
+            <div class="cta-group">
+                <a href="#experiencia" class="btn-primary">Ver trajetória ↓</a>
+                {'<a href="' + pdf_path + '" download class="btn-secondary">📄 Baixar CV</a>' if pdf_path else ''}
             </div>
         </div>
-    </section>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+
+    st.markdown('</section>', unsafe_allow_html=True)
 
     # ===== KPIS (com métricas nativas) =====
     st.markdown("""
