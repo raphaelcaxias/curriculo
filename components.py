@@ -5,20 +5,49 @@ import os
 from config import get_colors
 
 # ============================================================================
-# FUNÇÃO AUXILIAR PARA DETECTAR FOTO
+# FUNÇÃO PARA DETECTAR FOTO (MAIS ROBUSTA)
 # ============================================================================
 def get_foto_path():
     """
     Detecta automaticamente o caminho da foto do perfil.
-    Retorna o caminho se encontrar, ou None se não encontrar.
+    Tenta várias combinações de pastas e extensões.
+    Retorna o caminho relativo ou None.
     """
+    # Lista de possíveis caminhos (relativos à raiz do projeto)
     candidatos = [
-        "assets/rapha.jpeg"
+        # Nomes comuns na raiz
+        "rapha.jpeg", "rapha.jpg",
+        "foto.jpeg", "foto.jpg",
+        "perfil.jpeg", "perfil.jpg",
+        "profile.jpeg", "profile.jpg",
+        # Dentro da pasta assets
+        "assets/rapha.jpeg", "assets/rapha.jpg",
+        "assets/foto.jpeg", "assets/foto.jpg",
+        "assets/perfil.jpeg", "assets/perfil.jpg",
+        # Dentro da pasta images
+        "images/rapha.jpeg", "images/rapha.jpg",
+        "images/foto.jpeg", "images/foto.jpg",
+        # Com caminho absoluto (se necessário)
+        os.path.join("assets", "rapha.jpeg"),
+        os.path.join("assets", "rapha.jpg"),
     ]
+    
     for caminho in candidatos:
         if os.path.exists(caminho):
             return caminho
+    
+    # Se não encontrou, retorna None
     return None
+
+def get_foto_url():
+    """
+    Retorna a URL da foto (caminho local ou avatar gerado).
+    """
+    caminho = get_foto_path()
+    if caminho:
+        return caminho
+    # Fallback: avatar gerado
+    return "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=1D4ED8&color=fff"
 
 # ============================================================================
 # NAVBAR (fixa com glassmorphism)
@@ -102,14 +131,19 @@ def render_skills_chart():
     st.plotly_chart(fig, use_container_width=True)
 
 # ============================================================================
-# (OPCIONAL) FUNÇÃO PARA OBTER URL DA FOTO (com fallback)
+# FUNÇÃO PARA DETECTAR PDF
 # ============================================================================
-def get_foto_url():
-    """
-    Retorna a URL da foto (caminho local ou avatar gerado).
-    Útil para usar no HTML do hero sem repetir lógica.
-    """
-    caminho = get_foto_path()
-    if caminho:
-        return caminho
-    return "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=1D4ED8&color=fff"
+def get_pdf_path():
+    """Detecta o caminho do currículo PDF."""
+    candidatos = [
+        "Curriculo_Raphael_v2.pdf",
+        "Curriculo_Raphael.pdf",
+        "cv.pdf",
+        "assets/Curriculo_Raphael_v2.pdf",
+        "assets/Curriculo_Raphael.pdf",
+        "docs/Curriculo_Raphael_v2.pdf",
+    ]
+    for caminho in candidatos:
+        if os.path.exists(caminho):
+            return caminho
+    return None
