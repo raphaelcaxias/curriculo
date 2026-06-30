@@ -1,6 +1,6 @@
 import streamlit as st
 from config import init_theme, toggle_theme, get_colors
-from components import render_navbar, render_footer
+from components import render_navbar, render_footer, get_foto_url, get_pdf_path
 
 st.set_page_config(
     page_title="Raphael Pires · Analista de Dados & BI",
@@ -26,9 +26,9 @@ def load_css():
         }}
         #MainMenu, header, footer, .stDeployButton {{ display: none !important; }}
         .stApp {{ background: {colors['bg']}; }}
-        .block-container {{ padding: 0; max-width: 100%; }}
+        .block-container {{ padding: 0 !important; max-width: 100%; }}
 
-        /* ===== NAVBAR ===== */
+        /* Navbar */
         .navbar {{
             position: fixed; top: 0; left: 0; right: 0; z-index: 999;
             background: {colors['navbar_bg']};
@@ -54,13 +54,21 @@ def load_css():
             background: {colors['primary']}; color: white;
             box-shadow: 0 4px 12px rgba(59,130,246,0.3);
         }}
+        .nav-theme-btn {{
+            background: {colors['card_bg']}; border: 1px solid {colors['border']};
+            border-radius: 999px; padding: 0.3rem 0.8rem; font-size: 1rem;
+            cursor: pointer; transition: 0.2s; color: {colors['text']};
+            margin-left: 0.5rem;
+        }}
+        .nav-theme-btn:hover {{ background: {colors['nav_hover']}; }}
 
-        /* Botão de tema na sidebar (vai ser renderizado pelo Streamlit) */
-        /* Não precisamos de estilo especial aqui */
-
-        /* ===== HERO ===== */
+        /* Hero – espaçamento reduzido */
         .hero-full {{
-            padding: 5rem 2rem 2rem;  /* reduzido */
+            min-height: 70vh; /* antes era 100vh */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem 2rem; /* antes era 6rem 2rem 4rem */
             background: {colors['hero_bg']};
             position: relative;
             overflow: hidden;
@@ -71,16 +79,14 @@ def load_css():
             opacity: 0.4; pointer-events: none;
         }}
         .hero-content {{
-            max-width: 1200px; margin: 0 auto;
+            max-width: 1200px; width: 100%;
             display: grid; grid-template-columns: 1fr 2fr;
-            gap: 2rem; align-items: center;
+            gap: 2rem;
+            align-items: center;
             position: relative; z-index: 1;
         }}
         @media (max-width: 768px) {{
             .hero-content {{ grid-template-columns: 1fr; text-align: center; }}
-        }}
-        .hero-photo {{
-            display: flex; justify-content: center; align-items: center;
         }}
         .hero-photo img {{
             width: 220px; height: 220px; border-radius: 50%;
@@ -90,13 +96,13 @@ def load_css():
         .hero-text h1 {{ font-size: 2.8rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: {colors['text']}; }}
         .hero-text h1 span {{ color: {colors['primary']}; }}
         .hero-text .subtitle {{ font-size: 1.1rem; color: {colors['text_muted']}; margin: 0.5rem 0 1rem; line-height: 1.6; }}
-        .hero-text .badge-group {{ display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }}
+        .hero-text .badge-group {{ display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }}
         .hero-text .badge {{
             background: {colors['tag_bg']}; border: 1px solid {colors['tag_border']};
             padding: 0.3rem 1rem; border-radius: 999px;
             font-size: 0.8rem; font-weight: 500; color: {colors['text']};
         }}
-        .hero-text .cta-group {{ display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }}
+        .hero-text .cta-group {{ display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }}
         .btn-primary {{
             background: {colors['primary']}; color: white;
             padding: 0.6rem 1.5rem; border-radius: 999px;
@@ -112,14 +118,13 @@ def load_css():
         }}
         .btn-secondary:hover {{ background: {colors['nav_hover']}; }}
 
-        /* ===== SEÇÕES ===== */
+        /* Seções */
         .section-glass {{
             padding: 3rem 2rem;
             background: {colors['section_bg']};
             backdrop-filter: blur(4px);
             border-top: 1px solid {colors['border']};
         }}
-        .section-glass:nth-child(even) {{ background: {colors['section_alt_bg']}; }}
         .container {{ max-width: 1200px; margin: 0 auto; }}
         .section-header {{ text-align: center; margin-bottom: 2rem; }}
         .section-header .label {{
@@ -129,14 +134,12 @@ def load_css():
             font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
             letter-spacing: 0.08em; color: {colors['primary']};
         }}
-        .section-header h2 {{ font-size: 2rem; font-weight: 700; margin-top: 0.5rem; color: {colors['text']}; letter-spacing: -0.02em; }}
+        .section-header h2 {{ font-size: 2.2rem; font-weight: 700; margin-top: 0.5rem; color: {colors['text']}; letter-spacing: -0.02em; }}
         .section-header p {{ color: {colors['text_muted']}; max-width: 600px; margin: 0.5rem auto 0; }}
 
-        /* ===== CARDS ===== */
         .glass-card {{
             background: {colors['card_bg']};
             backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
             border: 1px solid {colors['border']};
             border-radius: 24px;
             padding: 1.5rem;
@@ -145,8 +148,7 @@ def load_css():
         }}
         .glass-card:hover {{ transform: translateY(-6px); border-color: {colors['primary']}; box-shadow: {colors['shadow_hover']}; }}
 
-        /* ===== TIMELINE ===== */
-        .timeline {{ position: relative; padding: 1.5rem 0; }}
+        .timeline {{ position: relative; padding: 2rem 0; }}
         .timeline::before {{
             content: ''; position: absolute; left: 28px; top: 0; bottom: 0;
             width: 2px; background: linear-gradient(to bottom, {colors['primary']}, {colors['secondary']}, transparent);
@@ -175,7 +177,7 @@ def load_css():
             font-size: 0.6rem; font-weight: 700; padding: 0.15rem 0.6rem;
             border-radius: 999px; margin-left: 0.5rem; display: inline-block;
         }}
-        .timeline-role {{ font-size: 1.2rem; font-weight: 700; margin: 0.4rem 0; }}
+        .timeline-role {{ font-size: 1.1rem; font-weight: 700; margin: 0.3rem 0; }}
         .timeline-company {{ color: {colors['secondary']}; font-weight: 600; }}
         .timeline-desc {{ color: {colors['text_muted']}; line-height: 1.6; }}
         .timeline-tag {{
@@ -184,9 +186,11 @@ def load_css():
             border-radius: 6px; display: inline-block; margin: 0.2rem;
         }}
 
-        /* ===== FOOTER ===== */
+        .testimonial-grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }}
+        @media (max-width: 768px) {{ .testimonial-grid {{ grid-template-columns: 1fr; }} }}
+
         .footer {{
-            padding: 2rem 2rem; text-align: center;
+            padding: 2.5rem 2rem; text-align: center;
             border-top: 1px solid {colors['border']};
             background: {colors['card_bg']};
             backdrop-filter: blur(4px);
@@ -203,7 +207,7 @@ def load_css():
             animation: pulse 2s infinite;
         }}
         @keyframes pulse {{ 0%,100% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} }}
-        .footer-links {{ display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }}
+        .footer-links {{ display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }}
         .footer-link {{
             background: {colors['tag_bg']}; border: 1px solid {colors['tag_border']};
             padding: 0.4rem 1rem; border-radius: 999px;
@@ -216,9 +220,9 @@ def load_css():
         @media (max-width: 768px) {{
             .navbar {{ padding: 0.5rem 1rem; flex-wrap: wrap; }}
             .navbar-links {{ gap: 0.3rem; flex-wrap: wrap; }}
-            .hero-full {{ padding: 4rem 1rem 1rem; }}
-            .hero-text h1 {{ font-size: 2rem; }}
-            .hero-photo img {{ width: 150px; height: 150px; }}
+            .hero-full {{ padding: 3rem 1rem 1.5rem; min-height: auto; }}
+            .hero-text h1 {{ font-size: 1.8rem; }}
+            .hero-photo img {{ width: 140px; height: 140px; }}
             .section-glass {{ padding: 2rem 1rem; }}
         }}
     </style>
@@ -226,20 +230,36 @@ def load_css():
 
 load_css()
 
-# ===== SIDEBAR =====
-# Removemos a sidebar padrão, mas podemos colocar o botão de tema no canto superior direito usando st.button com CSS.
-# Como alternativa, vamos colocar o botão de tema na sidebar que aparece apenas para o toggle.
+# ===== BOTÃO DE TEMA (fora da navbar HTML) =====
+# Colocar o botão no canto superior direito, usando st.button
+col1, col2, col3 = st.columns([10, 1, 1])
+with col3:
+    theme_label = "☀️" if st.session_state.theme == "dark" else "🌙"
+    st.button(theme_label, on_click=toggle_theme, key="theme_btn", use_container_width=True)
 
-# Na verdade, podemos usar st.sidebar para isso:
-with st.sidebar:
-    st.markdown("### 🌓 Tema")
-    if st.button("Alternar tema", use_container_width=True):
-        toggle_theme()
-        st.rerun()
+# ===== NAVBAR (sem o botão de tema, que já foi colocado) =====
+# A navbar agora não precisa do botão, então removemos da função ou ajustamos.
+# Vamos usar a função render_navbar sem o botão.
+# Precisamos modificar a função para não renderizar o botão.
 
-# ===== NAVBAR =====
+# Vou redefinir a navbar localmente para não incluir o botão.
+# Como a função render_navbar está em components, vou ignorar e criar uma versão local.
+# Na verdade, vou modificar o render_navbar em components para remover o botão.
+
+# ===== NAVEGAÇÃO =====
 page = st.query_params.get("page", "home")
-render_navbar(page)
+
+# ===== RENDER NAVBAR (sem botão) =====
+st.markdown(f"""
+<nav class="navbar">
+    <a href="/" class="navbar-brand">Raphael <span>Pires</span></a>
+    <div class="navbar-links">
+        <a href="?page=home" class="nav-link {'active' if page == 'home' else ''}">Início</a>
+        <a href="?page=analytics" class="nav-link {'active' if page == 'analytics' else ''}">Análises</a>
+        <a href="?page=dashboard" class="nav-link {'active' if page == 'dashboard' else ''}">Dashboard</a>
+    </div>
+</nav>
+""", unsafe_allow_html=True)
 
 # ===== CONTEÚDO =====
 if page == "home":
