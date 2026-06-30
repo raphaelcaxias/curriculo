@@ -11,7 +11,6 @@ st.set_page_config(
 
 init_theme()
 
-# ===== CSS =====
 def load_css():
     from config import get_colors
     colors = get_colors()
@@ -30,7 +29,7 @@ def load_css():
         .stApp {{ background: {colors['bg']}; }}
         .block-container {{ padding: 0; max-width: 100%; }}
 
-        /* Navbar */
+        /* ===== NAVBAR ===== */
         .navbar {{
             position: fixed; top: 0; left: 0; right: 0; z-index: 999;
             background: {colors['navbar_bg']};
@@ -68,7 +67,7 @@ def load_css():
         }}
         .nav-theme-btn:hover {{ background: {colors['nav_hover']}; }}
 
-        /* Hero */
+        /* ===== HERO ===== */
         .hero-full {{
             min-height: 100vh;
             display: flex; align-items: center; justify-content: center;
@@ -84,7 +83,7 @@ def load_css():
         }}
         .hero-content {{
             max-width: 1200px; width: 100%;
-            display: grid; grid-template-columns: 1fr 1fr;
+            display: grid; grid-template-columns: 1fr 2fr;
             gap: 3rem; align-items: center;
             position: relative; z-index: 1;
         }}
@@ -136,19 +135,15 @@ def load_css():
         }}
         .btn-secondary:hover {{ background: {colors['nav_hover']}; }}
 
-        /* Seções */
+        /* ===== SEÇÕES ===== */
         .section-glass {{
             padding: 4rem 2rem;
             background: {colors['section_bg']};
             backdrop-filter: blur(4px);
             border-top: 1px solid {colors['border']};
         }}
-        .section-glass:nth-child(even) {{
-            background: {colors['section_alt_bg']};
-        }}
-        .container {{
-            max-width: 1200px; margin: 0 auto;
-        }}
+        .section-glass:nth-child(even) {{ background: {colors['section_alt_bg']}; }}
+        .container {{ max-width: 1200px; margin: 0 auto; }}
         .section-header {{
             text-align: center; margin-bottom: 3rem;
         }}
@@ -163,12 +158,9 @@ def load_css():
             font-size: 2.4rem; font-weight: 700; margin-top: 0.5rem;
             color: {colors['text']}; letter-spacing: -0.02em;
         }}
-        .section-header p {{
-            color: {colors['text_muted']}; max-width: 600px;
-            margin: 0.5rem auto 0;
-        }}
+        .section-header p {{ color: {colors['text_muted']}; max-width: 600px; margin: 0.5rem auto 0; }}
 
-        /* Cards */
+        /* ===== CARDS ===== */
         .glass-card {{
             background: {colors['card_bg']};
             backdrop-filter: blur(8px);
@@ -185,7 +177,7 @@ def load_css():
             box-shadow: {colors['shadow_hover']};
         }}
 
-        /* Timeline */
+        /* ===== TIMELINE ===== */
         .timeline {{ position: relative; padding: 2rem 0; }}
         .timeline::before {{
             content: ''; position: absolute; left: 28px; top: 0; bottom: 0;
@@ -224,15 +216,7 @@ def load_css():
             border-radius: 6px; display: inline-block; margin: 0.2rem;
         }}
 
-        /* Testimonials */
-        .testimonial-grid {{
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
-        }}
-        @media (max-width: 768px) {{
-            .testimonial-grid {{ grid-template-columns: 1fr; }}
-        }}
-
-        /* Footer */
+        /* ===== FOOTER ===== */
         .footer {{
             padding: 3rem 2rem; text-align: center;
             border-top: 1px solid {colors['border']};
@@ -251,10 +235,7 @@ def load_css():
             animation: pulse 2s infinite;
         }}
         @keyframes pulse {{ 0%,100% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} }}
-        .footer-links {{
-            display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem;
-            margin: 1.5rem 0;
-        }}
+        .footer-links {{ display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }}
         .footer-link {{
             background: {colors['tag_bg']}; border: 1px solid {colors['tag_border']};
             padding: 0.4rem 1rem; border-radius: 999px;
@@ -264,7 +245,7 @@ def load_css():
         .footer-link:hover {{ background: {colors['primary']}; color: white; }}
         .footer-copy {{ color: {colors['text_muted']}; font-size: 0.8rem; }}
 
-        /* Responsivo */
+        /* ===== RESPONSIVO ===== */
         @media (max-width: 768px) {{
             .navbar {{ padding: 0.5rem 1rem; flex-wrap: wrap; }}
             .navbar-links {{ gap: 0.3rem; flex-wrap: wrap; }}
