@@ -147,7 +147,7 @@ def get_pdf_base64(pdf_path):
     return None
 
 # ============================================================================
-# CSS PROFISSIONAL COM TODAS AS SEÇÕES
+# CSS PROFISSIONAL
 # ============================================================================
 def load_css():
     colors = get_colors()
@@ -193,10 +193,12 @@ def load_css():
             color: var(--text);
         }}
         
+        /* Esconder elementos padrão Streamlit */
         #MainMenu, header, footer, .stDeployButton {{ display: none !important; }}
         .stApp {{ background: var(--bg); }}
         .block-container {{ padding: 0 !important; max-width: 100%; }}
         
+        /* Esconder botões do Streamlit que interferem */
         .stButton > button {{ 
             background: transparent !important; 
             border: none !important; 
@@ -264,42 +266,18 @@ def load_css():
             color: white !important;
             box-shadow: 0 4px 16px rgba(59,130,246,0.35);
         }}
-        
-        /* ============ THEME TOGGLE ANIMADO ============ */
         .theme-toggle {{
-            width: 44px; height: 44px; border-radius: 50%;
+            width: 40px; height: 40px; border-radius: 50%;
             background: var(--card-bg); border: 1px solid var(--border);
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            font-size: 1.2rem; margin-left: 0.5rem;
-            position: relative;
-            overflow: hidden;
+            cursor: pointer; transition: all 0.25s ease;
+            font-size: 1.1rem; margin-left: 0.5rem;
         }}
         .theme-toggle:hover {{
             background: var(--nav-hover);
             border-color: var(--primary);
-            transform: rotate(360deg) scale(1.1);
+            transform: rotate(15deg) scale(1.05);
             box-shadow: var(--shadow-glow);
-        }}
-        .theme-toggle .icon {{
-            transition: all 0.4s ease;
-            position: absolute;
-        }}
-        .theme-toggle .icon.sun {{
-            opacity: 0;
-            transform: rotate(-180deg) scale(0);
-        }}
-        .theme-toggle .icon.moon {{
-            opacity: 1;
-            transform: rotate(0deg) scale(1);
-        }}
-        .theme-toggle.light .icon.sun {{
-            opacity: 1;
-            transform: rotate(0deg) scale(1);
-        }}
-        .theme-toggle.light .icon.moon {{
-            opacity: 0;
-            transform: rotate(180deg) scale(0);
         }}
 
         /* ============ HERO SECTION ============ */
@@ -424,21 +402,6 @@ def load_css():
             line-height: 1.7; 
             max-width: 540px;
         }}
-        
-        /* ============ CITAÇÃO PESSOAL ============ */
-        .hero-quote {{
-            font-style: italic;
-            color: var(--text-subtle);
-            font-size: 0.95rem;
-            margin: 1.5rem 0;
-            padding-left: 1.5rem;
-            border-left: 3px solid var(--primary);
-            max-width: 500px;
-        }}
-        @media (max-width: 900px) {{
-            .hero-quote {{ margin-left: auto; margin-right: auto; text-align: left; }}
-        }}
-        
         .hero-text .badge-group {{ 
             display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; 
         }}
@@ -492,29 +455,6 @@ def load_css():
             background: var(--card-bg-hover);
             border-color: var(--primary);
             transform: translateY(-2px);
-        }}
-        
-        /* ============ BOTÃO COMPARTILHAR ============ */
-        .share-buttons {{
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }}
-        .share-btn {{
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            text-decoration: none;
-            font-size: 1rem;
-            transition: all 0.25s ease;
-        }}
-        .share-btn:hover {{
-            background: var(--gradient-primary);
-            border-color: transparent;
-            transform: translateY(-3px) scale(1.1);
-            box-shadow: 0 6px 20px rgba(59,130,246,0.3);
         }}
 
         /* ============ SEÇÕES ============ */
@@ -615,429 +555,6 @@ def load_css():
             font-weight: 500;
         }}
 
-        /* ============ EMPRESAS / CLIENTES ============ */
-        .companies-grid {{
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-        }}
-        @media (max-width: 900px) {{ .companies-grid {{ grid-template-columns: repeat(2, 1fr); }} }}
-        @media (max-width: 500px) {{ .companies-grid {{ grid-template-columns: 1fr; }} }}
-        
-        .company-card {{
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 2rem 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }}
-        .company-card::before {{
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--gradient-primary);
-            transform: scaleX(0);
-            transition: transform 0.4s ease;
-        }}
-        .company-card:hover {{
-            transform: translateY(-6px);
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-hover);
-        }}
-        .company-card:hover::before {{ transform: scaleX(1); }}
-        
-        .company-logo {{
-            width: 80px; height: 80px;
-            border-radius: 20px;
-            background: var(--gradient-primary);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 1.25rem;
-            font-size: 2.2rem;
-            box-shadow: 0 8px 24px rgba(59,130,246,0.25);
-        }}
-        .company-card h4 {{
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text);
-        }}
-        .company-card .company-sector {{
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            margin-bottom: 0.75rem;
-        }}
-        .company-card .company-period {{
-            display: inline-block;
-            background: var(--primary-light);
-            border: 1px solid var(--tag-border);
-            padding: 0.25rem 0.8rem;
-            border-radius: 999px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--primary);
-        }}
-
-        /* ============ NÚMEROS DE IMPACTO DETALHADOS ============ */
-        .impact-grid {{
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-        }}
-        @media (max-width: 768px) {{ .impact-grid {{ grid-template-columns: 1fr; }} }}
-        
-        .impact-card {{
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }}
-        .impact-card::before {{
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, var(--primary-light) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }}
-        .impact-card:hover {{
-            transform: translateY(-6px);
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-hover);
-        }}
-        .impact-card:hover::before {{ opacity: 0.3; }}
-        
-        .impact-icon {{
-            width: 72px; height: 72px;
-            border-radius: 20px;
-            background: var(--gradient-primary);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 1.25rem;
-            font-size: 2rem;
-            box-shadow: 0 12px 32px rgba(59,130,246,0.3);
-            position: relative;
-            z-index: 1;
-        }}
-        .impact-value {{
-            font-size: 2.5rem;
-            font-weight: 900;
-            letter-spacing: -0.03em;
-            background: var(--gradient-text);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.1;
-            margin-bottom: 0.5rem;
-            position: relative;
-            z-index: 1;
-        }}
-        .impact-label {{
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            margin-bottom: 0.75rem;
-            position: relative;
-            z-index: 1;
-        }}
-        .impact-detail {{
-            font-size: 0.82rem;
-            color: var(--text-subtle);
-            line-height: 1.5;
-            position: relative;
-            z-index: 1;
-        }}
-
-        /* ============ DEPOIMENTOS EM VÍDEO ============ */
-        .video-testimonials {{
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-        }}
-        @media (max-width: 768px) {{ .video-testimonials {{ grid-template-columns: 1fr; }} }}
-        
-        .video-card {{
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }}
-        .video-card:hover {{
-            transform: translateY(-6px);
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-hover);
-        }}
-        .video-placeholder {{
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: var(--gradient-primary);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.25rem;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }}
-        .video-placeholder::before {{
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
-        }}
-        .play-button {{
-            width: 72px; height: 72px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.95);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: var(--primary);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            z-index: 1;
-        }}
-        .video-placeholder:hover .play-button {{
-            transform: scale(1.15);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-        }}
-        .video-card h4 {{
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text);
-        }}
-        .video-card .video-author {{
-            font-size: 0.88rem;
-            color: var(--text-muted);
-        }}
-
-        /* ============ TIMELINE DE PROJETOS ============ */
-        .project-timeline {{
-            position: relative;
-            padding: 2rem 0;
-        }}
-        .project-timeline::before {{
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 0; bottom: 0;
-            width: 2px;
-            background: linear-gradient(to bottom, var(--primary), var(--secondary), var(--accent), transparent);
-            transform: translateX(-50%);
-        }}
-        @media (max-width: 768px) {{
-            .project-timeline::before {{ left: 28px; }}
-        }}
-        
-        .project-timeline-item {{
-            position: relative;
-            margin-bottom: 3rem;
-            display: flex;
-            align-items: center;
-        }}
-        .project-timeline-item:nth-child(odd) {{
-            flex-direction: row;
-        }}
-        .project-timeline-item:nth-child(even) {{
-            flex-direction: row-reverse;
-        }}
-        @media (max-width: 768px) {{
-            .project-timeline-item,
-            .project-timeline-item:nth-child(even) {{
-                flex-direction: row;
-                padding-left: 60px;
-            }}
-        }}
-        
-        .project-timeline-content {{
-            width: 45%;
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 1.75rem;
-            transition: all 0.3s ease;
-        }}
-        @media (max-width: 768px) {{
-            .project-timeline-content {{ width: 100%; }}
-        }}
-        .project-timeline-content:hover {{
-            transform: translateY(-4px);
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-hover);
-        }}
-        
-        .project-timeline-dot {{
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px; height: 20px;
-            border-radius: 50%;
-            background: var(--gradient-primary);
-            border: 3px solid var(--bg);
-            box-shadow: 0 0 0 4px var(--primary), 0 0 20px rgba(59,130,246,0.4);
-            z-index: 2;
-        }}
-        @media (max-width: 768px) {{
-            .project-timeline-dot {{ left: 28px; }}
-        }}
-        
-        .project-status {{
-            display: inline-block;
-            padding: 0.25rem 0.8rem;
-            border-radius: 999px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.75rem;
-        }}
-        .project-status.completed {{
-            background: rgba(34,197,94,0.15);
-            border: 1px solid rgba(34,197,94,0.3);
-            color: var(--success);
-        }}
-        .project-status.in-progress {{
-            background: rgba(245,158,11,0.15);
-            border: 1px solid rgba(245,158,11,0.3);
-            color: var(--warning);
-            animation: pulse-status 2s infinite;
-        }}
-        .project-status.planned {{
-            background: rgba(139,92,246,0.15);
-            border: 1px solid rgba(139,92,246,0.3);
-            color: var(--accent);
-        }}
-        
-        .project-timeline-content h4 {{
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text);
-        }}
-        .project-timeline-content .project-date {{
-            font-size: 0.82rem;
-            color: var(--text-subtle);
-            margin-bottom: 0.75rem;
-        }}
-        .project-timeline-content p {{
-            color: var(--text-muted);
-            font-size: 0.92rem;
-            line-height: 1.6;
-        }}
-
-        /* ============ TECNOLOGIAS POR NÍVEL ============ */
-        .tech-levels {{
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-        }}
-        @media (max-width: 768px) {{ .tech-levels {{ grid-template-columns: 1fr; }} }}
-        
-        .tech-level-group {{
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-        }}
-        .tech-level-group:hover {{
-            transform: translateY(-4px);
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-hover);
-        }}
-        
-        .tech-level-header {{
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }}
-        .tech-level-icon {{
-            width: 48px; height: 48px;
-            border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem;
-        }}
-        .tech-level-icon.expert {{
-            background: linear-gradient(135deg, #22C55E, #16A34A);
-            box-shadow: 0 6px 20px rgba(34,197,94,0.3);
-        }}
-        .tech-level-icon.advanced {{
-            background: linear-gradient(135deg, #3B82F6, #2563EB);
-            box-shadow: 0 6px 20px rgba(59,130,246,0.3);
-        }}
-        .tech-level-icon.intermediate {{
-            background: linear-gradient(135deg, #F59E0B, #D97706);
-            box-shadow: 0 6px 20px rgba(245,158,11,0.3);
-        }}
-        
-        .tech-level-title {{
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text);
-        }}
-        .tech-level-subtitle {{
-            font-size: 0.82rem;
-            color: var(--text-muted);
-        }}
-        
-        .tech-list {{
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }}
-        .tech-item {{
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            background: var(--bg);
-            border-radius: 12px;
-            transition: all 0.2s ease;
-        }}
-        .tech-item:hover {{
-            background: var(--primary-light);
-            transform: translateX(4px);
-        }}
-        .tech-item-icon {{
-            width: 36px; height: 36px;
-            border-radius: 10px;
-            background: var(--primary-light);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem;
-        }}
-        .tech-item-name {{
-            font-size: 0.92rem;
-            font-weight: 600;
-            color: var(--text);
-        }}
-        .tech-item-years {{
-            margin-left: auto;
-            font-size: 0.75rem;
-            color: var(--text-subtle);
-            font-weight: 500;
-        }}
-
         /* ============ GLASS CARDS ============ */
         .glass-card {{
             background: var(--card-bg);
@@ -1077,6 +594,14 @@ def load_css():
             color: var(--text-muted);
             line-height: 1.65;
             font-size: 0.92rem;
+        }}
+        .glass-card .card-icon {{
+            width: 56px; height: 56px;
+            border-radius: 16px;
+            background: var(--primary-light);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
         }}
 
         /* ============ PROJECT GRID ============ */
@@ -1382,7 +907,7 @@ def load_css():
             color: var(--text-subtle);
         }}
 
-        /* ============ FOOTER EXPANDIDO ============ */
+        /* ============ FOOTER ============ */
         .footer {{
             padding: 4rem 2rem 2.5rem; 
             text-align: center;
@@ -1444,33 +969,6 @@ def load_css():
             background: var(--primary-light);
             border-color: var(--primary);
         }}
-        
-        /* Footer Links Rápidos */
-        .footer-quick-links {{
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            margin: 2rem 0;
-            padding: 2rem 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }}
-        .footer-quick-link {{
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.88rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }}
-        .footer-quick-link:hover {{
-            color: var(--primary);
-            transform: translateY(-2px);
-        }}
-        
         .footer-links {{ 
             display: flex; justify-content: center; flex-wrap: wrap; 
             gap: 0.6rem; margin: 2rem 0 1.5rem; 
@@ -1530,6 +1028,40 @@ def load_css():
             margin: 0 auto;
         }}
         
+        /* Tabs customizados */
+        .custom-tabs {{
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 0.5rem;
+            backdrop-filter: blur(12px);
+            flex-wrap: wrap;
+        }}
+        .custom-tab {{
+            padding: 0.65rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border: none;
+            background: transparent;
+        }}
+        .custom-tab:hover {{
+            color: var(--text);
+            background: var(--nav-hover);
+        }}
+        .custom-tab.active {{
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+        }}
+
+        /* Metric cards customizados */
         .metric-card {{
             background: var(--card-bg);
             backdrop-filter: blur(12px);
@@ -1568,6 +1100,7 @@ def load_css():
             margin-top: 0.35rem;
         }}
 
+        /* Chart containers */
         .chart-container {{
             background: var(--card-bg);
             backdrop-filter: blur(12px);
@@ -1591,22 +1124,6 @@ def load_css():
             gap: 0.5rem;
         }}
 
-        /* ============ LOADING SKELETON ============ */
-        .skeleton {{
-            background: linear-gradient(90deg, var(--card-bg) 25%, var(--card-bg-hover) 50%, var(--card-bg) 75%);
-            background-size: 200% 100%;
-            animation: skeleton-loading 1.5s infinite;
-            border-radius: 12px;
-        }}
-        @keyframes skeleton-loading {{
-            0% {{ background-position: 200% 0; }}
-            100% {{ background-position: -200% 0; }}
-        }}
-        .skeleton-chart {{
-            height: 300px;
-            margin: 1rem 0;
-        }}
-
         /* ============ SCROLL TO TOP ============ */
         .scroll-top {{
             position: fixed;
@@ -1628,13 +1145,25 @@ def load_css():
             box-shadow: 0 12px 32px rgba(59,130,246,0.5);
         }}
 
+        /* ============ ANIMAÇÕES GLOBAIS ============ */
+        @keyframes fadeIn {{
+            from {{ opacity: 0; }}
+            to {{ opacity: 1; }}
+        }}
+        @keyframes slideUp {{
+            from {{ opacity: 0; transform: translateY(30px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
+        }}
+        .fade-in {{ animation: fadeIn 0.6s ease backwards; }}
+        .slide-up {{ animation: slideUp 0.6s ease backwards; }}
+
         /* ============ RESPONSIVIDADE ============ */
         @media (max-width: 768px) {{
             .navbar {{ padding: 0.75rem 1rem; }}
             .navbar-brand {{ font-size: 1.1rem; }}
             .navbar-links {{ gap: 0.25rem; }}
             .nav-link {{ padding: 0.4rem 0.75rem; font-size: 0.8rem; }}
-            .theme-toggle {{ width: 40px; height: 40px; font-size: 1.1rem; }}
+            .theme-toggle {{ width: 36px; height: 36px; font-size: 1rem; }}
             .hero-full {{ padding: 6rem 1rem 2rem; min-height: auto; }}
             .hero-text h1 {{ font-size: 2.2rem; }}
             .hero-photo-wrapper {{ width: 200px; height: 200px; }}
@@ -1643,7 +1172,6 @@ def load_css():
             .section-header h2 {{ font-size: 1.8rem; }}
             .kpi-value {{ font-size: 1.5rem; }}
             .footer h3 {{ font-size: 1.5rem; }}
-            .impact-value {{ font-size: 2rem; }}
         }}
 
         /* ============ CUSTOMIZAÇÃO STREAMLIT ============ */
@@ -1701,9 +1229,6 @@ def render_home():
                     Especialista em <strong>Power BI, Python e Cloud</strong>, com foco em automação, 
                     governança de dados e dashboards que geram impacto real no negócio.
                 </p>
-                <div class="hero-quote">
-                    "Dados sem contexto são apenas números. Meu trabalho é transformá-los em histórias que orientam decisões."
-                </div>
                 <div class="badge-group">
                     <span class="badge">📊 Power BI</span>
                     <span class="badge">🐍 Python</span>
@@ -1717,12 +1242,6 @@ def render_home():
                     <a href="#experiencia" class="btn-primary">Ver trajetória ↓</a>
                     {'<a href="' + pdf_b64 + '" download="Curriculo_Raphael_Pires.pdf" class="btn-secondary">📄 Baixar CV</a>' if pdf_b64 else ''}
                     <a href="#contato" class="btn-secondary">💬 Contato</a>
-                </div>
-                <div class="share-buttons">
-                    <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://raphaelpires.streamlit.app" target="_blank" class="share-btn" title="Compartilhar no LinkedIn">💼</a>
-                    <a href="https://twitter.com/intent/tweet?text=Confira o portfólio de Raphael Pires - Analista de Dados & BI&url=https://raphaelpires.streamlit.app" target="_blank" class="share-btn" title="Compartilhar no Twitter">🐦</a>
-                    <a href="https://wa.me/?text=Confira o portfólio de Raphael Pires - Analista de Dados & BI https://raphaelpires.streamlit.app" target="_blank" class="share-btn" title="Compartilhar no WhatsApp">📱</a>
-                    <a href="mailto:?subject=Portfólio Raphael Pires&body=Confira o portfólio de Raphael Pires - Analista de Dados & BI https://raphaelpires.streamlit.app" class="share-btn" title="Compartilhar por E-mail">✉️</a>
                 </div>
             </div>
         </div>
@@ -1741,17 +1260,17 @@ def render_home():
             <div class="kpi-grid">
                 <div class="kpi-card">
                     <div class="kpi-icon">⏱️</div>
-                    <div class="kpi-value"><span class="counter" data-target="16">0</span>+</div>
+                    <div class="kpi-value">16+</div>
                     <div class="kpi-label">Anos de experiência</div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-icon">⚡</div>
-                    <div class="kpi-value"><span class="counter" data-target="70">0</span>%</div>
+                    <div class="kpi-value">70%</div>
                     <div class="kpi-label">Redução operacional</div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-icon">📊</div>
-                    <div class="kpi-value"><span class="counter" data-target="213">0</span>k</div>
+                    <div class="kpi-value">213k</div>
                     <div class="kpi-label">Registros processados</div>
                 </div>
                 <div class="kpi-card">
@@ -1761,98 +1280,8 @@ def render_home():
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-icon">💰</div>
-                    <div class="kpi-value">R$<span class="counter" data-target="50">0</span>bi</div>
+                    <div class="kpi-value">R$50bi</div>
                     <div class="kpi-label">Dados analisados</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # NÚMEROS DE IMPACTO DETALHADOS
-    st.markdown("""
-    <div class="section-glass alt">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">🎯 Impacto Detalhado</span>
-                <h2>Resultados que fazem a diferença</h2>
-                <p>Métricas específicas de projetos e iniciativas de grande impacto</p>
-            </div>
-            <div class="impact-grid">
-                <div class="impact-card">
-                    <div class="impact-icon">🏢</div>
-                    <div class="impact-value"><span class="counter" data-target="4">0</span></div>
-                    <div class="impact-label">Empresas Atendidas</div>
-                    <div class="impact-detail">De startups a grandes corporações, incluindo varejo, bancos e comércio</div>
-                </div>
-                <div class="impact-card">
-                    <div class="impact-icon">📊</div>
-                    <div class="impact-value"><span class="counter" data-target="50">0</span>+</div>
-                    <div class="impact-label">Dashboards Criados</div>
-                    <div class="impact-detail">Painéis interativos em Power BI, Streamlit e Looker Studio</div>
-                </div>
-                <div class="impact-card">
-                    <div class="impact-icon">⚙️</div>
-                    <div class="impact-value"><span class="counter" data-target="120">0</span>+</div>
-                    <div class="impact-label">Automações Implementadas</div>
-                    <div class="impact-detail">Scripts Python, macros VBA e pipelines ETL automatizados</div>
-                </div>
-                <div class="impact-card">
-                    <div class="impact-icon">💾</div>
-                    <div class="impact-value"><span class="counter" data-target="15">0</span> TB</div>
-                    <div class="impact-label">Dados Processados</div>
-                    <div class="impact-detail">Volume total de dados tratados em projetos de ETL e análise</div>
-                </div>
-                <div class="impact-card">
-                    <div class="impact-icon">⏰</div>
-                    <div class="impact-value"><span class="counter" data-target="2500">0</span>h</div>
-                    <div class="impact-label">Horas Economizadas</div>
-                    <div class="impact-detail">Tempo poupado através de automações e otimizações de processos</div>
-                </div>
-                <div class="impact-card">
-                    <div class="impact-icon">🎓</div>
-                    <div class="impact-value"><span class="counter" data-target="8">0</span></div>
-                    <div class="impact-label">Certificações</div>
-                    <div class="impact-detail">Cursos e certificações em BI, Cloud, Python e IA</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # EMPRESAS / CLIENTES
-    st.markdown("""
-    <div class="section-glass">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">🏢 Onde Atuei</span>
-                <h2>Empresas e setores</h2>
-                <p>Experiência diversificada em diferentes segmentos de mercado</p>
-            </div>
-            <div class="companies-grid">
-                <div class="company-card">
-                    <div class="company-logo">🏪</div>
-                    <h4>NSM Comércio</h4>
-                    <div class="company-sector">Comércio & Distribuição</div>
-                    <div class="company-period">2014 – Presente · 10+ anos</div>
-                </div>
-                <div class="company-card">
-                    <div class="company-logo">👗</div>
-                    <h4>Jardim do Éden</h4>
-                    <div class="company-sector">Varejo de Moda</div>
-                    <div class="company-period">2012 – Presente · 12+ anos</div>
-                </div>
-                <div class="company-card">
-                    <div class="company-logo">🎯</div>
-                    <h4>J Sintonía</h4>
-                    <div class="company-sector">Varejo Especializado</div>
-                    <div class="company-period">2010 – 2014 · 4 anos</div>
-                </div>
-                <div class="company-card">
-                    <div class="company-logo">🏦</div>
-                    <h4>Banco do Brasil</h4>
-                    <div class="company-sector">Setor Bancário</div>
-                    <div class="company-period">2009 – 2010 · 1 ano</div>
                 </div>
             </div>
         </div>
@@ -1896,47 +1325,12 @@ def render_home():
 
     st.markdown("</div></div></div>", unsafe_allow_html=True)
 
-    # TIMELINE DE PROJETOS
+    # Projetos
     st.markdown("""
     <div class="section-glass">
         <div class="container">
             <div class="section-header">
-                <span class="label">🚀 Timeline de Projetos</span>
-                <h2>Projetos em destaque</h2>
-                <p>Acompanhe a evolução dos principais projetos e iniciativas</p>
-            </div>
-            <div class="project-timeline">
-    """, unsafe_allow_html=True)
-
-    projects_timeline = [
-        {"name": "Desenrola Brasil Analytics", "date": "2024 – Presente", "status": "in-progress", "status_label": "Em Andamento", "desc": "Painel analítico executivo com dados do Banco Central. Análise de renegociação de dívidas com KPIs, séries temporais e índice HHI."},
-        {"name": "CNPq Research Analytics", "date": "2023 – 2024", "status": "completed", "status_label": "Concluído", "desc": "ETL e análise de 213 mil bolsas de pesquisa. Dashboard interativo evidenciando desigualdades regionais em investimentos públicos."},
-        {"name": "ANP Fuel Price Monitor", "date": "2023", "status": "completed", "status_label": "Concluído", "desc": "Dashboard de monitoramento de preços de combustíveis com dados oficiais da ANP. Filtros temporais e regionais."},
-        {"name": "AWS Cloud Migration", "date": "2025 – Presente", "status": "in-progress", "status_label": "Em Andamento", "desc": "Migração de infraestrutura de dados para AWS. Implementação de S3, Glue, Athena e preparação para certificação Cloud Practitioner."},
-        {"name": "AI-Powered Insights", "date": "2026", "status": "planned", "status_label": "Planejado", "desc": "Integração de IA generativa em dashboards para geração automática de insights e recomendações estratégicas."}
-    ]
-
-    for i, proj in enumerate(projects_timeline):
-        st.markdown(f"""
-        <div class="project-timeline-item">
-            <div class="project-timeline-content">
-                <div class="project-status {proj['status']}">{proj['status_label']}</div>
-                <h4>{proj['name']}</h4>
-                <div class="project-date">{proj['date']}</div>
-                <p>{proj['desc']}</p>
-            </div>
-            <div class="project-timeline-dot"></div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("</div></div></div>", unsafe_allow_html=True)
-
-    # Projetos
-    st.markdown("""
-    <div class="section-glass alt">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">💻 Portfólio</span>
+                <span class="label">🚀 Portfólio</span>
                 <h2>Projetos de Analytics</h2>
                 <p>Aplicações reais construídas com Python, Streamlit e visualizações interativas</p>
             </div>
@@ -1993,150 +1387,9 @@ def render_home():
     </div>
     """, unsafe_allow_html=True)
 
-    # DEPOIMENTOS EM VÍDEO
-    st.markdown("""
-    <div class="section-glass">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">🎥 Depoimentos</span>
-                <h2>O que dizem sobre meu trabalho</h2>
-                <p>Feedback de colegas e líderes em vídeo</p>
-            </div>
-            <div class="video-testimonials">
-                <div class="video-card">
-                    <div class="video-placeholder">
-                        <div class="play-button">▶️</div>
-                    </div>
-                    <h4>Transformação Digital com Dados</h4>
-                    <div class="video-author">Gestor de Operações · NSM Comércio</div>
-                </div>
-                <div class="video-card">
-                    <div class="video-placeholder">
-                        <div class="play-button">▶️</div>
-                    </div>
-                    <h4>Automação e Eficiência Operacional</h4>
-                    <div class="video-author">Coordenador Bancário · Banco do Brasil</div>
-                </div>
-            </div>
-            <div style="text-align:center;margin-top:2rem;">
-                <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:1rem;">Quer deixar um depoimento?</p>
-                <a href="mailto:contato@raphaelpires.com?subject=Depoimento" class="btn-primary">✉️ Enviar Depoimento</a>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # TECNOLOGIAS POR NÍVEL
-    st.markdown("""
-    <div class="section-glass alt">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">⚡ Stack Tecnológica</span>
-                <h2>Tecnologias por nível de domínio</h2>
-                <p>Conhecimentos organizados por nível de proficiência e anos de experiência</p>
-            </div>
-            <div class="tech-levels">
-                <div class="tech-level-group">
-                    <div class="tech-level-header">
-                        <div class="tech-level-icon expert">🏆</div>
-                        <div>
-                            <div class="tech-level-title">Expert</div>
-                            <div class="tech-level-subtitle">5+ anos de experiência</div>
-                        </div>
-                    </div>
-                    <div class="tech-list">
-                        <div class="tech-item">
-                            <div class="tech-item-icon">📊</div>
-                            <div class="tech-item-name">Power BI</div>
-                            <div class="tech-item-years">8 anos</div>
-                        </div>
-                        <div class="tech-item">
-                            <div class="tech-item-icon">🗄️</div>
-                            <div class="tech-item-name">SQL/PostgreSQL</div>
-                            <div class="tech-item-years">10 anos</div>
-                        </div>
-                        <div class="tech-item">
-                            <div class="tech-item-icon">📈</div>
-                            <div class="tech-item-name">Excel/VBA</div>
-                            <div class="tech-item-years">15 anos</div>
-                        </div>
-                        <div class="tech-item">
-                            <div class="tech-item-icon">🔄</div>
-                            <div class="tech-item-name">ETL Pipelines</div>
-                            <div class="tech-item-years">7 anos</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tech-level-group">
-                    <div class="tech-level-header">
-                        <div class="tech-level-icon advanced">🚀</div>
-                        <div>
-                            <div class="tech-level-title">Avançado</div>
-                            <div class="tech-level-subtitle">3-5 anos de experiência</div>
-                        </div>
-                    </div>
-                    <div class="tech-list">
-                        <div class="tech-item">
-                            <div class="tech-item-icon">🐍</div>
-                            <div class="tech-item-name">Python</div>
-                            <div class="tech-item-years">5 anos</div>
-                        </div>
-                        <div class="tech-item">
-                            <div class="tech-item-icon">📉</div>
-                            <div class="tech-item-name">Plotly</div>
-                            <div class="tech-item-years">4 anos</div>
-                        </div>
-                        <div class="tech-item">
-                            <div class="tech-item-icon">🎈</div>
-                            <div class="tech-item-name">Streamlit</div>
-                            <div class="tech-item-years">3 anos</div>
-                        </div>
-                        <div class="tech-item">
-                            <div class="tech-item-icon">📊</div>
-                            <div class="tech-item-name">Looker Studio</div>
-                            <div class="tech-item-years">4 anos</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tech-level-group">
-                    <div class="tech-level-header">
-                        <div class="tech-level-icon intermediate">📚</div>
-                        <div>
-                            <div class="tech-level-title">Intermediário</div>
-                            <div class="tech-level-subtitle">1-3 anos de experiência</div>
-                        </div>
-                    </div>
-                    <div class="tech-list">
-                        <div class="tech-item">
-                            <div class="tech-item-icon">☁️</div>
-                            <div class="tech-item-name">AWS</div>
-                            <div class="tech-item-years">2 anos</div>
-                        </div>
-                        <div class="tech-item">
-                            <div class="tech-item-icon">🤖</div>
-                            <div class="tech-item-name">IA Generativa</div>
-                            <div class="tech-item-years">1 ano</div>
-                        </div>
-                        <div class="tech-item">
-                            <div class="tech-item-icon">🐳</div>
-                            <div class="tech-item-name">Docker</div>
-                            <div class="tech-item-years">1 ano</div>
-                        </div>
-                        <div class="tech-item">
-                            <div class="tech-item-icon">🔧</div>
-                            <div class="tech-item-name">Git/GitHub</div>
-                            <div class="tech-item-years">3 anos</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
     # Certificações
     st.markdown(f"""
-    <div class="section-glass">
+    <div class="section-glass alt">
         <div class="container">
             <div class="section-header">
                 <span class="label">🎓 Certificações</span>
@@ -2170,7 +1423,7 @@ def render_home():
 
     # AWS Journey
     st.markdown(f"""
-    <div class="section-glass alt">
+    <div class="section-glass">
         <div class="container">
             <div class="section-header">
                 <span class="label">☁️ Cloud Journey</span>
@@ -2218,11 +1471,11 @@ def render_home():
 
     # Testimonials
     st.markdown("""
-    <div class="section-glass">
+    <div class="section-glass alt">
         <div class="container">
             <div class="section-header">
                 <span class="label">💬 Recomendações</span>
-                <h2>Depoimentos textuais</h2>
+                <h2>O que dizem sobre meu trabalho</h2>
                 <p>Feedback de colegas e líderes com quem tive o prazer de colaborar</p>
             </div>
             <div class="testimonial-grid">
@@ -2263,22 +1516,14 @@ def render_home():
 
     # Skills
     st.markdown("""
-    <div class="section-glass alt">
+    <div class="section-glass">
         <div class="container">
             <div class="section-header">
-                <span class="label">📊 Competências Visuais</span>
-                <h2>Domínio tecnológico em gráficos</h2>
-                <p>Visualização detalhada do nível de proficiência em cada tecnologia</p>
+                <span class="label">⚡ Competências</span>
+                <h2>Domínio tecnológico</h2>
+                <p>Stack tecnológica refinada ao longo de 16+ anos de atuação</p>
             </div>
     """, unsafe_allow_html=True)
-    
-    # Loading skeleton
-    st.markdown("""
-    <div class="chart-container">
-        <div class="skeleton skeleton-chart"></div>
-    </div>
-    """, unsafe_allow_html=True)
-    
     render_skills_chart()
     st.markdown("</div></div>", unsafe_allow_html=True)
 
@@ -2638,15 +1883,6 @@ def render_footer():
             <span class="footer-mode">📍 Presencial</span>
             <span class="footer-mode">✈️ Viagens</span>
         </div>
-        
-        <div class="footer-quick-links">
-            <a href="#topo" class="footer-quick-link">🏠 Início</a>
-            <a href="#experiencia" class="footer-quick-link">💼 Experiência</a>
-            <a href="?page=analytics" class="footer-quick-link">📊 Análises</a>
-            <a href="?page=dashboard" class="footer-quick-link">📈 Dashboard</a>
-            <a href="https://github.com/raphaelcaxias" target="_blank" class="footer-quick-link">💻 GitHub</a>
-        </div>
-        
         <div class="footer-links">
             <a href="https://www.linkedin.com/in/raphaelpires" target="_blank" class="footer-link">💼 LinkedIn</a>
             <a href="https://github.com/raphaelcaxias" target="_blank" class="footer-link">💻 GitHub</a>
@@ -2660,64 +1896,6 @@ def render_footer():
 
 
 # ============================================================================
-# JAVASCRIPT PARA CONTADORES ANIMADOS
-# ============================================================================
-def add_counter_animation():
-    st.markdown("""
-    <script>
-        // Contador animado
-        const counters = document.querySelectorAll('.counter');
-        const speed = 200;
-        
-        const animateCounter = (counter) => {
-            const target = +counter.getAttribute('data-target');
-            const count = +counter.innerText;
-            const inc = target / speed;
-            
-            if (count < target) {
-                counter.innerText = Math.ceil(count + inc);
-                setTimeout(() => animateCounter(counter), 20);
-            } else {
-                counter.innerText = target;
-            }
-        };
-        
-        // Iniciar animação quando os elementos estiverem visíveis
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const counter = entry.target.querySelector('.counter');
-                    if (counter && !counter.classList.contains('animated')) {
-                        counter.classList.add('animated');
-                        animateCounter(counter);
-                    }
-                }
-            });
-        }, { threshold: 0.5 });
-        
-        // Observar todos os cards com contadores
-        document.querySelectorAll('.kpi-card, .impact-card').forEach(card => {
-            observer.observe(card);
-        });
-        
-        // Smooth scroll para links de âncora
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-    </script>
-    """, unsafe_allow_html=True)
-
-
-# ============================================================================
 # MAIN
 # ============================================================================
 def main():
@@ -2726,7 +1904,6 @@ def main():
     # Navbar com botão de tema integrado
     page = st.query_params.get("page", "home")
     theme_label = "☀️" if st.session_state.theme == "dark" else "🌙"
-    theme_class = "light" if st.session_state.theme == "light" else ""
     
     st.markdown(f"""
     <nav class="navbar">
@@ -2739,9 +1916,8 @@ def main():
             <a href="/?page=analytics" class="nav-link {'active' if page == 'analytics' else ''}">Análises</a>
             <a href="/?page=dashboard" class="nav-link {'active' if page == 'dashboard' else ''}">Dashboard</a>
             <a href="#contato" class="nav-link">Contato</a>
-            <div class="theme-toggle {theme_class}" onclick="window.location.href='?theme_toggle=1&page={page}'" title="Alternar tema">
-                <span class="icon sun">☀️</span>
-                <span class="icon moon">🌙</span>
+            <div class="theme-toggle" onclick="window.location.href='?theme_toggle=1&page={page}'" title="Alternar tema">
+                {theme_label}
             </div>
         </div>
     </nav>
@@ -2768,9 +1944,6 @@ def main():
         render_home()
 
     render_footer()
-    
-    # Adicionar JavaScript para contadores animados
-    add_counter_animation()
 
 if __name__ == "__main__":
     main()
