@@ -16,13 +16,23 @@ st.set_page_config(
 )
 
 # ============================================================================
-# TEMA (DARK / LIGHT)
+# TEMA (DARK / LIGHT) - via query params
 # ============================================================================
+# Lê o tema da URL (ex: ?theme=light) ou usa o session_state
 if "theme" not in st.session_state:
-    st.session_state.theme = "dark"
+    # Se houver parâmetro na URL, usa ele
+    theme_param = st.query_params.get("theme")
+    if theme_param in ["light", "dark"]:
+        st.session_state.theme = theme_param
+    else:
+        st.session_state.theme = "dark"
 
 def toggle_theme():
-    st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
+    # Alterna o tema e atualiza a URL
+    new_theme = "light" if st.session_state.theme == "dark" else "dark"
+    st.session_state.theme = new_theme
+    st.query_params["theme"] = new_theme
+    st.rerun()
 
 def get_colors():
     dark = st.session_state.theme == "dark"
@@ -38,7 +48,7 @@ def get_colors():
             "tag_bg": "rgba(59,130,246,0.15)",
             "tag_border": "rgba(59,130,246,0.25)",
             "primary_light": "rgba(59,130,246,0.2)",
-            "navbar_bg": "rgba(11,15,26,0.75)",
+            "navbar_bg": "rgba(11,15,26,0.8)",
             "navbar_border": "rgba(255,255,255,0.06)",
             "nav_hover": "rgba(255,255,255,0.06)",
             "hero_bg": "radial-gradient(ellipse at 50% 30%, rgba(59,130,246,0.08) 0%, transparent 70%)",
@@ -76,7 +86,7 @@ def get_colors():
         }
 
 # ============================================================================
-# FUNÇÕES AUXILIARES (FOTO, PDF)
+# FUNÇÕES AUXILIARES
 # ============================================================================
 def get_foto_path():
     candidatos = [
@@ -110,7 +120,7 @@ def get_pdf_path():
     return None
 
 # ============================================================================
-# CSS (com espaçamento reduzido)
+# CSS
 # ============================================================================
 def load_css():
     colors = get_colors()
@@ -141,28 +151,49 @@ def load_css():
             align-items: center;
             justify-content: space-between;
         }}
-        .navbar-brand {{ font-weight: 700; font-size: 1.25rem; letter-spacing: -0.02em; color: {colors['text']}; text-decoration: none; }}
+        .navbar-brand {{
+            font-weight: 700; font-size: 1.25rem; letter-spacing: -0.02em;
+            color: {colors['text']}; text-decoration: none;
+        }}
         .navbar-brand span {{ color: {colors['primary']}; }}
-        .navbar-links {{ display: flex; gap: 0.5rem; align-items: center; }}
+        .navbar-links {{
+            display: flex; gap: 0.5rem; align-items: center;
+        }}
         .nav-link {{
             padding: 0.4rem 1rem; border-radius: 999px; font-size: 0.875rem;
             font-weight: 500; text-decoration: none; transition: all 0.2s;
             color: {colors['text_muted']}; background: transparent;
             cursor: pointer;
         }}
-        .nav-link:hover {{ background: {colors['nav_hover']}; color: {colors['text']}; }}
+        .nav-link:hover {{
+            background: {colors['nav_hover']}; color: {colors['text']};
+        }}
         .nav-link.active {{
             background: {colors['primary']}; color: white;
             box-shadow: 0 4px 12px rgba(59,130,246,0.3);
         }}
+        .theme-toggle {{
+            background: {colors['card_bg']};
+            border: 1px solid {colors['border']};
+            border-radius: 999px;
+            padding: 0.3rem 0.8rem;
+            font-size: 1rem;
+            cursor: pointer;
+            color: {colors['text']};
+            transition: 0.2s;
+            margin-left: 0.5rem;
+        }}
+        .theme-toggle:hover {{
+            background: {colors['nav_hover']};
+        }}
 
-        /* Hero – espaçamento reduzido */
+        /* Hero */
         .hero-full {{
             min-height: 70vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 4rem 2rem 2rem;
+            padding: 5rem 2rem 2rem;
             background: {colors['hero_bg']};
             position: relative;
             overflow: hidden;
@@ -187,23 +218,35 @@ def load_css():
             object-fit: cover; border: 4px solid {colors['primary']};
             box-shadow: 0 20px 60px rgba(59,130,246,0.25);
         }}
-        .hero-text h1 {{ font-size: 2.8rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: {colors['text']}; }}
+        .hero-text h1 {{
+            font-size: 2.8rem; font-weight: 800; letter-spacing: -0.03em;
+            line-height: 1.1; color: {colors['text']};
+        }}
         .hero-text h1 span {{ color: {colors['primary']}; }}
-        .hero-text .subtitle {{ font-size: 1.1rem; color: {colors['text_muted']}; margin: 0.5rem 0 1rem; line-height: 1.6; }}
-        .hero-text .badge-group {{ display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }}
+        .hero-text .subtitle {{
+            font-size: 1.1rem; color: {colors['text_muted']};
+            margin: 0.5rem 0 1rem; line-height: 1.6;
+        }}
+        .hero-text .badge-group {{
+            display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;
+        }}
         .hero-text .badge {{
             background: {colors['tag_bg']}; border: 1px solid {colors['tag_border']};
             padding: 0.3rem 1rem; border-radius: 999px;
             font-size: 0.8rem; font-weight: 500; color: {colors['text']};
         }}
-        .hero-text .cta-group {{ display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }}
+        .hero-text .cta-group {{
+            display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem;
+        }}
         .btn-primary {{
             background: {colors['primary']}; color: white;
             padding: 0.6rem 1.5rem; border-radius: 999px;
             font-weight: 600; text-decoration: none; transition: 0.2s;
             display: inline-block; border: none; cursor: pointer;
         }}
-        .btn-primary:hover {{ transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59,130,246,0.35); }}
+        .btn-primary:hover {{
+            transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59,130,246,0.35);
+        }}
         .btn-secondary {{
             background: {colors['card_bg']}; border: 1px solid {colors['border']};
             padding: 0.6rem 1.5rem; border-radius: 999px;
@@ -220,7 +263,9 @@ def load_css():
             border-top: 1px solid {colors['border']};
         }}
         .container {{ max-width: 1200px; margin: 0 auto; }}
-        .section-header {{ text-align: center; margin-bottom: 2rem; }}
+        .section-header {{
+            text-align: center; margin-bottom: 2rem;
+        }}
         .section-header .label {{
             display: inline-block;
             background: {colors['primary_light']};
@@ -228,8 +273,14 @@ def load_css():
             font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
             letter-spacing: 0.08em; color: {colors['primary']};
         }}
-        .section-header h2 {{ font-size: 2.2rem; font-weight: 700; margin-top: 0.5rem; color: {colors['text']}; letter-spacing: -0.02em; }}
-        .section-header p {{ color: {colors['text_muted']}; max-width: 600px; margin: 0.5rem auto 0; }}
+        .section-header h2 {{
+            font-size: 2.2rem; font-weight: 700; margin-top: 0.5rem;
+            color: {colors['text']}; letter-spacing: -0.02em;
+        }}
+        .section-header p {{
+            color: {colors['text_muted']}; max-width: 600px;
+            margin: 0.5rem auto 0;
+        }}
 
         .glass-card {{
             background: {colors['card_bg']};
@@ -240,7 +291,11 @@ def load_css():
             transition: all 0.25s ease;
             box-shadow: {colors['shadow']};
         }}
-        .glass-card:hover {{ transform: translateY(-6px); border-color: {colors['primary']}; box-shadow: {colors['shadow_hover']}; }}
+        .glass-card:hover {{
+            transform: translateY(-6px);
+            border-color: {colors['primary']};
+            box-shadow: {colors['shadow_hover']};
+        }}
 
         .timeline {{ position: relative; padding: 2rem 0; }}
         .timeline::before {{
@@ -314,7 +369,7 @@ def load_css():
         @media (max-width: 768px) {{
             .navbar {{ padding: 0.5rem 1rem; flex-wrap: wrap; }}
             .navbar-links {{ gap: 0.3rem; flex-wrap: wrap; }}
-            .hero-full {{ padding: 3rem 1rem 1.5rem; min-height: auto; }}
+            .hero-full {{ padding: 4rem 1rem 1.5rem; min-height: auto; }}
             .hero-text h1 {{ font-size: 1.8rem; }}
             .hero-photo img {{ width: 140px; height: 140px; }}
             .section-glass {{ padding: 2rem 1rem; }}
@@ -719,14 +774,12 @@ def render_footer():
 def main():
     load_css()
 
-    # Botão de tema
-    col1, col2, col3 = st.columns([10, 1, 1])
-    with col3:
-        theme_label = "☀️" if st.session_state.theme == "dark" else "🌙"
-        st.button(theme_label, on_click=toggle_theme, key="theme_btn", use_container_width=True)
-
-    # Navbar
+    # ===== BARRA DE NAVEGAÇÃO COM BOTÃO DE TEMA =====
     page = st.query_params.get("page", "home")
+    theme_icon = "☀️" if st.session_state.theme == "dark" else "🌙"
+
+    # Colocamos o botão de tema na navbar usando HTML com link para alternar via query params
+    # O clique recarrega a página com ?theme=light ou ?theme=dark
     st.markdown(f"""
     <nav class="navbar">
         <a href="/" class="navbar-brand">Raphael <span>Pires</span></a>
@@ -734,6 +787,11 @@ def main():
             <a href="?page=home" class="nav-link {'active' if page == 'home' else ''}">Início</a>
             <a href="?page=analytics" class="nav-link {'active' if page == 'analytics' else ''}">Análises</a>
             <a href="?page=dashboard" class="nav-link {'active' if page == 'dashboard' else ''}">Dashboard</a>
+        </div>
+        <div>
+            <a href="?page={page}&theme={'light' if st.session_state.theme == 'dark' else 'dark'}" class="theme-toggle" title="Alternar tema">
+                {theme_icon}
+            </a>
         </div>
     </nav>
     """, unsafe_allow_html=True)
