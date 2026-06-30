@@ -1,5 +1,5 @@
 import streamlit as st
-from config import init_theme
+from config import init_theme, toggle_theme, get_colors
 from components import render_navbar, render_footer
 
 st.set_page_config(
@@ -12,7 +12,6 @@ st.set_page_config(
 init_theme()
 
 def load_css():
-    from config import get_colors
     colors = get_colors()
     st.markdown(f"""
     <style>
@@ -41,14 +40,9 @@ def load_css():
             align-items: center;
             justify-content: space-between;
         }}
-        .navbar-brand {{
-            font-weight: 700; font-size: 1.25rem; letter-spacing: -0.02em;
-            color: {colors['text']}; text-decoration: none;
-        }}
+        .navbar-brand {{ font-weight: 700; font-size: 1.25rem; letter-spacing: -0.02em; color: {colors['text']}; text-decoration: none; }}
         .navbar-brand span {{ color: {colors['primary']}; }}
-        .navbar-links {{
-            display: flex; gap: 0.5rem; align-items: center;
-        }}
+        .navbar-links {{ display: flex; gap: 0.5rem; align-items: center; }}
         .nav-link {{
             padding: 0.4rem 1rem; border-radius: 999px; font-size: 0.875rem;
             font-weight: 500; text-decoration: none; transition: all 0.2s;
@@ -60,18 +54,13 @@ def load_css():
             background: {colors['primary']}; color: white;
             box-shadow: 0 4px 12px rgba(59,130,246,0.3);
         }}
-        .nav-theme-btn {{
-            background: {colors['card_bg']}; border: 1px solid {colors['border']};
-            border-radius: 999px; padding: 0.3rem 0.8rem; font-size: 1rem;
-            cursor: pointer; transition: 0.2s; color: {colors['text']};
-        }}
-        .nav-theme-btn:hover {{ background: {colors['nav_hover']}; }}
+
+        /* Botão de tema na sidebar (vai ser renderizado pelo Streamlit) */
+        /* Não precisamos de estilo especial aqui */
 
         /* ===== HERO ===== */
         .hero-full {{
-            min-height: 100vh;
-            display: flex; align-items: center; justify-content: center;
-            padding: 6rem 2rem 4rem;
+            padding: 5rem 2rem 2rem;  /* reduzido */
             background: {colors['hero_bg']};
             position: relative;
             overflow: hidden;
@@ -82,9 +71,9 @@ def load_css():
             opacity: 0.4; pointer-events: none;
         }}
         .hero-content {{
-            max-width: 1200px; width: 100%;
+            max-width: 1200px; margin: 0 auto;
             display: grid; grid-template-columns: 1fr 2fr;
-            gap: 3rem; align-items: center;
+            gap: 2rem; align-items: center;
             position: relative; z-index: 1;
         }}
         @media (max-width: 768px) {{
@@ -94,32 +83,20 @@ def load_css():
             display: flex; justify-content: center; align-items: center;
         }}
         .hero-photo img {{
-            width: 280px; height: 280px; border-radius: 50%;
+            width: 220px; height: 220px; border-radius: 50%;
             object-fit: cover; border: 4px solid {colors['primary']};
             box-shadow: 0 20px 60px rgba(59,130,246,0.25);
         }}
-        .hero-text h1 {{
-            font-size: 3.2rem; font-weight: 800; letter-spacing: -0.03em;
-            line-height: 1.1; color: {colors['text']};
-        }}
+        .hero-text h1 {{ font-size: 2.8rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: {colors['text']}; }}
         .hero-text h1 span {{ color: {colors['primary']}; }}
-        .hero-text .subtitle {{
-            font-size: 1.2rem; color: {colors['text_muted']};
-            margin: 1rem 0 1.5rem; line-height: 1.6;
-        }}
-        .hero-text .badge-group {{
-            display: flex; flex-wrap: wrap; gap: 0.5rem;
-            margin-top: 1.5rem;
-        }}
+        .hero-text .subtitle {{ font-size: 1.1rem; color: {colors['text_muted']}; margin: 0.5rem 0 1rem; line-height: 1.6; }}
+        .hero-text .badge-group {{ display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }}
         .hero-text .badge {{
             background: {colors['tag_bg']}; border: 1px solid {colors['tag_border']};
             padding: 0.3rem 1rem; border-radius: 999px;
             font-size: 0.8rem; font-weight: 500; color: {colors['text']};
         }}
-        .hero-text .cta-group {{
-            display: flex; gap: 0.75rem; flex-wrap: wrap;
-            margin-top: 2rem;
-        }}
+        .hero-text .cta-group {{ display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }}
         .btn-primary {{
             background: {colors['primary']}; color: white;
             padding: 0.6rem 1.5rem; border-radius: 999px;
@@ -137,16 +114,14 @@ def load_css():
 
         /* ===== SEÇÕES ===== */
         .section-glass {{
-            padding: 4rem 2rem;
+            padding: 3rem 2rem;
             background: {colors['section_bg']};
             backdrop-filter: blur(4px);
             border-top: 1px solid {colors['border']};
         }}
         .section-glass:nth-child(even) {{ background: {colors['section_alt_bg']}; }}
         .container {{ max-width: 1200px; margin: 0 auto; }}
-        .section-header {{
-            text-align: center; margin-bottom: 3rem;
-        }}
+        .section-header {{ text-align: center; margin-bottom: 2rem; }}
         .section-header .label {{
             display: inline-block;
             background: {colors['primary_light']};
@@ -154,10 +129,7 @@ def load_css():
             font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
             letter-spacing: 0.08em; color: {colors['primary']};
         }}
-        .section-header h2 {{
-            font-size: 2.4rem; font-weight: 700; margin-top: 0.5rem;
-            color: {colors['text']}; letter-spacing: -0.02em;
-        }}
+        .section-header h2 {{ font-size: 2rem; font-weight: 700; margin-top: 0.5rem; color: {colors['text']}; letter-spacing: -0.02em; }}
         .section-header p {{ color: {colors['text_muted']}; max-width: 600px; margin: 0.5rem auto 0; }}
 
         /* ===== CARDS ===== */
@@ -171,19 +143,15 @@ def load_css():
             transition: all 0.25s ease;
             box-shadow: {colors['shadow']};
         }}
-        .glass-card:hover {{
-            transform: translateY(-6px);
-            border-color: {colors['primary']};
-            box-shadow: {colors['shadow_hover']};
-        }}
+        .glass-card:hover {{ transform: translateY(-6px); border-color: {colors['primary']}; box-shadow: {colors['shadow_hover']}; }}
 
         /* ===== TIMELINE ===== */
-        .timeline {{ position: relative; padding: 2rem 0; }}
+        .timeline {{ position: relative; padding: 1.5rem 0; }}
         .timeline::before {{
             content: ''; position: absolute; left: 28px; top: 0; bottom: 0;
             width: 2px; background: linear-gradient(to bottom, {colors['primary']}, {colors['secondary']}, transparent);
         }}
-        .timeline-item {{ position: relative; padding-left: 80px; margin-bottom: 2.5rem; }}
+        .timeline-item {{ position: relative; padding-left: 80px; margin-bottom: 2rem; }}
         .timeline-dot {{
             position: absolute; left: 20px; top: 6px; width: 18px; height: 18px;
             border-radius: 50%; background: {colors['primary']};
@@ -218,7 +186,7 @@ def load_css():
 
         /* ===== FOOTER ===== */
         .footer {{
-            padding: 3rem 2rem; text-align: center;
+            padding: 2rem 2rem; text-align: center;
             border-top: 1px solid {colors['border']};
             background: {colors['card_bg']};
             backdrop-filter: blur(4px);
@@ -235,7 +203,7 @@ def load_css():
             animation: pulse 2s infinite;
         }}
         @keyframes pulse {{ 0%,100% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} }}
-        .footer-links {{ display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }}
+        .footer-links {{ display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }}
         .footer-link {{
             background: {colors['tag_bg']}; border: 1px solid {colors['tag_border']};
             padding: 0.4rem 1rem; border-radius: 999px;
@@ -245,27 +213,35 @@ def load_css():
         .footer-link:hover {{ background: {colors['primary']}; color: white; }}
         .footer-copy {{ color: {colors['text_muted']}; font-size: 0.8rem; }}
 
-        /* ===== RESPONSIVO ===== */
         @media (max-width: 768px) {{
             .navbar {{ padding: 0.5rem 1rem; flex-wrap: wrap; }}
             .navbar-links {{ gap: 0.3rem; flex-wrap: wrap; }}
-            .hero-full {{ min-height: auto; padding: 5rem 1rem 2rem; }}
-            .hero-text h1 {{ font-size: 2.2rem; }}
-            .hero-photo img {{ width: 180px; height: 180px; }}
-            .section-glass {{ padding: 3rem 1rem; }}
+            .hero-full {{ padding: 4rem 1rem 1rem; }}
+            .hero-text h1 {{ font-size: 2rem; }}
+            .hero-photo img {{ width: 150px; height: 150px; }}
+            .section-glass {{ padding: 2rem 1rem; }}
         }}
     </style>
     """, unsafe_allow_html=True)
 
 load_css()
 
-# ===== PÁGINA ATUAL =====
-page = st.query_params.get("page", "home")
+# ===== SIDEBAR =====
+# Removemos a sidebar padrão, mas podemos colocar o botão de tema no canto superior direito usando st.button com CSS.
+# Como alternativa, vamos colocar o botão de tema na sidebar que aparece apenas para o toggle.
 
-# Renderiza navbar
+# Na verdade, podemos usar st.sidebar para isso:
+with st.sidebar:
+    st.markdown("### 🌓 Tema")
+    if st.button("Alternar tema", use_container_width=True):
+        toggle_theme()
+        st.rerun()
+
+# ===== NAVBAR =====
+page = st.query_params.get("page", "home")
 render_navbar(page)
 
-# Conteúdo
+# ===== CONTEÚDO =====
 if page == "home":
     from pages.home import render_home
     render_home()
@@ -279,5 +255,4 @@ else:
     from pages.home import render_home
     render_home()
 
-# Footer
 render_footer()
