@@ -5,15 +5,19 @@ import os
 from config import get_colors
 
 # ============================================================================
-# FUNÇÃO PARA DETECTAR FOTO
+# FUNÇÃO PARA DETECTAR FOTO (MAIS ROBUSTA)
 # ============================================================================
 def get_foto_path():
-    """Detecta a foto em múltiplos caminhos."""
+    """Detecta automaticamente o caminho da foto do perfil."""
     candidatos = [
         "assets/rapha.jpeg", "assets/rapha.jpg",
         "rapha.jpeg", "rapha.jpg",
         "foto.jpeg", "foto.jpg",
-        "perfil.jpeg", "perfil.jpg"
+        "perfil.jpeg", "perfil.jpg",
+        "profile.jpeg", "profile.jpg",
+        # Caminhos absolutos para garantir
+        os.path.join(os.getcwd(), "assets", "rapha.jpeg"),
+        os.path.join(os.getcwd(), "rapha.jpeg"),
     ]
     for caminho in candidatos:
         if os.path.exists(caminho):
@@ -21,20 +25,21 @@ def get_foto_path():
     return None
 
 def get_foto_url():
+    """Retorna a URL da foto (caminho local ou avatar gerado)."""
     caminho = get_foto_path()
     if caminho:
         return caminho
     return "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=1D4ED8&color=fff"
 
-# ============================================================================
-# FUNÇÃO PARA DETECTAR PDF
-# ============================================================================
 def get_pdf_path():
+    """Detecta o caminho do currículo PDF."""
     candidatos = [
         "Curriculo_Raphael_v2.pdf",
         "Curriculo_Raphael.pdf",
         "cv.pdf",
         "assets/Curriculo_Raphael_v2.pdf",
+        "assets/Curriculo_Raphael.pdf",
+        "docs/Curriculo_Raphael_v2.pdf",
     ]
     for caminho in candidatos:
         if os.path.exists(caminho):
@@ -42,10 +47,10 @@ def get_pdf_path():
     return None
 
 # ============================================================================
-# NAVBAR
+# NAVBAR (sem botão de tema)
 # ============================================================================
 def render_navbar(active_page):
-    """Renderiza a barra de navegação fixa com botão de tema."""
+    """Renderiza a barra de navegação fixa no topo."""
     colors = get_colors()
     st.markdown(f"""
     <nav class="navbar">
@@ -54,7 +59,7 @@ def render_navbar(active_page):
             <a href="?page=home" class="nav-link {'active' if active_page == 'home' else ''}">Início</a>
             <a href="?page=analytics" class="nav-link {'active' if active_page == 'analytics' else ''}">Análises</a>
             <a href="?page=dashboard" class="nav-link {'active' if active_page == 'dashboard' else ''}">Dashboard</a>
-            <button class="nav-theme-btn" onclick="parent.postMessage({{type:'toggle_theme'}},'*')">🌓</button>
+            <!-- O botão de tema foi movido para a sidebar -->
         </div>
     </nav>
     """, unsafe_allow_html=True)
@@ -63,6 +68,7 @@ def render_navbar(active_page):
 # FOOTER
 # ============================================================================
 def render_footer():
+    """Renderiza o rodapé com informações de contato e disponibilidade."""
     st.markdown("""
     <div class="footer">
         <div class="status">
@@ -88,9 +94,10 @@ def render_footer():
     """, unsafe_allow_html=True)
 
 # ============================================================================
-# SKILLS CHART
+# GRÁFICO DE HABILIDADES
 # ============================================================================
 def render_skills_chart():
+    """Renderiza o gráfico de barras horizontal com as habilidades técnicas."""
     c = get_colors()
     df = pd.DataFrame({
         "Tecnologia": ["Power BI", "SQL/PostgreSQL", "Python", "Excel/VBA", "Streamlit", "AWS", "Plotly"],
