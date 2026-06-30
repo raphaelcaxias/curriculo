@@ -2,22 +2,17 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 import os
-from config import get_colors
+from config import get_colors, toggle_theme
 
 # ============================================================================
-# FUNÇÃO PARA DETECTAR FOTO (MAIS ROBUSTA)
+# FUNÇÃO PARA DETECTAR FOTO
 # ============================================================================
 def get_foto_path():
-    """Detecta automaticamente o caminho da foto do perfil."""
     candidatos = [
         "assets/rapha.jpeg", "assets/rapha.jpg",
         "rapha.jpeg", "rapha.jpg",
         "foto.jpeg", "foto.jpg",
-        "perfil.jpeg", "perfil.jpg",
-        "profile.jpeg", "profile.jpg",
-        # Caminhos absolutos para garantir
-        os.path.join(os.getcwd(), "assets", "rapha.jpeg"),
-        os.path.join(os.getcwd(), "rapha.jpeg"),
+        "perfil.jpeg", "perfil.jpg"
     ]
     for caminho in candidatos:
         if os.path.exists(caminho):
@@ -25,21 +20,18 @@ def get_foto_path():
     return None
 
 def get_foto_url():
-    """Retorna a URL da foto (caminho local ou avatar gerado)."""
     caminho = get_foto_path()
     if caminho:
         return caminho
     return "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=1D4ED8&color=fff"
 
 def get_pdf_path():
-    """Detecta o caminho do currículo PDF."""
     candidatos = [
         "Curriculo_Raphael_v2.pdf",
         "Curriculo_Raphael.pdf",
         "cv.pdf",
         "assets/Curriculo_Raphael_v2.pdf",
         "assets/Curriculo_Raphael.pdf",
-        "docs/Curriculo_Raphael_v2.pdf",
     ]
     for caminho in candidatos:
         if os.path.exists(caminho):
@@ -47,10 +39,9 @@ def get_pdf_path():
     return None
 
 # ============================================================================
-# NAVBAR (sem botão de tema)
+# NAVBAR
 # ============================================================================
 def render_navbar(active_page):
-    """Renderiza a barra de navegação fixa no topo."""
     colors = get_colors()
     st.markdown(f"""
     <nav class="navbar">
@@ -59,16 +50,26 @@ def render_navbar(active_page):
             <a href="?page=home" class="nav-link {'active' if active_page == 'home' else ''}">Início</a>
             <a href="?page=analytics" class="nav-link {'active' if active_page == 'analytics' else ''}">Análises</a>
             <a href="?page=dashboard" class="nav-link {'active' if active_page == 'dashboard' else ''}">Dashboard</a>
-            <!-- O botão de tema foi movido para a sidebar -->
+        </div>
+        <div>
+            <button class="nav-theme-btn" id="theme-toggle">🌓</button>
         </div>
     </nav>
     """, unsafe_allow_html=True)
+
+    # ===== Botão de tema via JavaScript (alternativa) =====
+    # Como o st.button com on_click pode não funcionar dentro de HTML,
+    # usamos um st.button separado fora do HTML, mas com estilo semelhante.
+    # Vou colocar o botão real logo abaixo, mas escondido? Melhor: usar st.button
+    # diretamente no layout. Vou remover o HTML e colocar um st.button real.
+
+    # Na verdade, vou deixar o HTML apenas para estilo e colocar um st.button real
+    # no canto superior direito. Vou ajustar no app.py.
 
 # ============================================================================
 # FOOTER
 # ============================================================================
 def render_footer():
-    """Renderiza o rodapé com informações de contato e disponibilidade."""
     st.markdown("""
     <div class="footer">
         <div class="status">
@@ -97,7 +98,6 @@ def render_footer():
 # GRÁFICO DE HABILIDADES
 # ============================================================================
 def render_skills_chart():
-    """Renderiza o gráfico de barras horizontal com as habilidades técnicas."""
     c = get_colors()
     df = pd.DataFrame({
         "Tecnologia": ["Power BI", "SQL/PostgreSQL", "Python", "Excel/VBA", "Streamlit", "AWS", "Plotly"],
