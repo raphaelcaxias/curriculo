@@ -5,6 +5,7 @@ def init_theme():
         st.session_state.theme = "dark"
 
 def toggle_theme():
+    """Alterna entre os temas claro e escuro."""
     st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
 
 def get_colors():
