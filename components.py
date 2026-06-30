@@ -4,7 +4,6 @@ import pandas as pd
 import os
 from config import get_colors
 
-# ===== DETECÇÃO DE FOTO =====
 def get_foto_path():
     candidatos = [
         "assets/rapha.jpeg", "assets/rapha.jpg",
@@ -23,7 +22,6 @@ def get_foto_url():
         return caminho
     return "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=1D4ED8&color=fff"
 
-# ===== DETECÇÃO DE PDF =====
 def get_pdf_path():
     candidatos = [
         "Curriculo_Raphael_v2.pdf",
@@ -37,7 +35,6 @@ def get_pdf_path():
             return caminho
     return None
 
-# ===== RODAPÉ =====
 def render_footer():
     st.markdown("""
     <div class="footer">
@@ -63,7 +60,6 @@ def render_footer():
     </div>
     """, unsafe_allow_html=True)
 
-# ===== GRÁFICO DE HABILIDADES =====
 def render_skills_chart():
     c = get_colors()
     df = pd.DataFrame({
