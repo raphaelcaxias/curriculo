@@ -5,55 +5,47 @@ import os
 from config import get_colors
 
 # ============================================================================
-# FUNÇÃO PARA DETECTAR FOTO (MAIS ROBUSTA)
+# FUNÇÃO PARA DETECTAR FOTO
 # ============================================================================
 def get_foto_path():
-    """
-    Detecta automaticamente o caminho da foto do perfil.
-    Tenta várias combinações de pastas e extensões.
-    Retorna o caminho relativo ou None.
-    """
-    # Lista de possíveis caminhos (relativos à raiz do projeto)
+    """Detecta a foto em múltiplos caminhos."""
     candidatos = [
-        # Nomes comuns na raiz
+        "assets/rapha.jpeg", "assets/rapha.jpg",
         "rapha.jpeg", "rapha.jpg",
         "foto.jpeg", "foto.jpg",
-        "perfil.jpeg", "perfil.jpg",
-        "profile.jpeg", "profile.jpg",
-        # Dentro da pasta assets
-        "assets/rapha.jpeg", "assets/rapha.jpg",
-        "assets/foto.jpeg", "assets/foto.jpg",
-        "assets/perfil.jpeg", "assets/perfil.jpg",
-        # Dentro da pasta images
-        "images/rapha.jpeg", "images/rapha.jpg",
-        "images/foto.jpeg", "images/foto.jpg",
-        # Com caminho absoluto (se necessário)
-        os.path.join("assets", "rapha.jpeg"),
-        os.path.join("assets", "rapha.jpg"),
+        "perfil.jpeg", "perfil.jpg"
     ]
-    
     for caminho in candidatos:
         if os.path.exists(caminho):
             return caminho
-    
-    # Se não encontrou, retorna None
     return None
 
 def get_foto_url():
-    """
-    Retorna a URL da foto (caminho local ou avatar gerado).
-    """
     caminho = get_foto_path()
     if caminho:
         return caminho
-    # Fallback: avatar gerado
     return "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=1D4ED8&color=fff"
 
 # ============================================================================
-# NAVBAR (fixa com glassmorphism)
+# FUNÇÃO PARA DETECTAR PDF
+# ============================================================================
+def get_pdf_path():
+    candidatos = [
+        "Curriculo_Raphael_v2.pdf",
+        "Curriculo_Raphael.pdf",
+        "cv.pdf",
+        "assets/Curriculo_Raphael_v2.pdf",
+    ]
+    for caminho in candidatos:
+        if os.path.exists(caminho):
+            return caminho
+    return None
+
+# ============================================================================
+# NAVBAR
 # ============================================================================
 def render_navbar(active_page):
-    """Renderiza a barra de navegação fixa no topo."""
+    """Renderiza a barra de navegação fixa com botão de tema."""
     colors = get_colors()
     st.markdown(f"""
     <nav class="navbar">
@@ -71,7 +63,6 @@ def render_navbar(active_page):
 # FOOTER
 # ============================================================================
 def render_footer():
-    """Renderiza o rodapé com informações de contato e disponibilidade."""
     st.markdown("""
     <div class="footer">
         <div class="status">
@@ -97,10 +88,9 @@ def render_footer():
     """, unsafe_allow_html=True)
 
 # ============================================================================
-# GRÁFICO DE HABILIDADES (competências)
+# SKILLS CHART
 # ============================================================================
 def render_skills_chart():
-    """Renderiza o gráfico de barras horizontal com as habilidades técnicas."""
     c = get_colors()
     df = pd.DataFrame({
         "Tecnologia": ["Power BI", "SQL/PostgreSQL", "Python", "Excel/VBA", "Streamlit", "AWS", "Plotly"],
@@ -129,21 +119,3 @@ def render_skills_chart():
     )
     fig.update_traces(textposition="outside", textfont=dict(color=c["text"], size=11))
     st.plotly_chart(fig, use_container_width=True)
-
-# ============================================================================
-# FUNÇÃO PARA DETECTAR PDF
-# ============================================================================
-def get_pdf_path():
-    """Detecta o caminho do currículo PDF."""
-    candidatos = [
-        "Curriculo_Raphael_v2.pdf",
-        "Curriculo_Raphael.pdf",
-        "cv.pdf",
-        "assets/Curriculo_Raphael_v2.pdf",
-        "assets/Curriculo_Raphael.pdf",
-        "docs/Curriculo_Raphael_v2.pdf",
-    ]
-    for caminho in candidatos:
-        if os.path.exists(caminho):
-            return caminho
-    return None
