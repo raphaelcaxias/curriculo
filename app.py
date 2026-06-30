@@ -1,6 +1,6 @@
 import streamlit as st
 from config import init_theme, toggle_theme, get_colors
-from components import render_navbar, render_footer, get_foto_url, get_pdf_path
+from components import render_footer, get_foto_url, get_pdf_path
 
 st.set_page_config(
     page_title="Raphael Pires · Analista de Dados & BI",
@@ -54,21 +54,19 @@ def load_css():
             background: {colors['primary']}; color: white;
             box-shadow: 0 4px 12px rgba(59,130,246,0.3);
         }}
-        .nav-theme-btn {{
-            background: {colors['card_bg']}; border: 1px solid {colors['border']};
-            border-radius: 999px; padding: 0.3rem 0.8rem; font-size: 1rem;
-            cursor: pointer; transition: 0.2s; color: {colors['text']};
-            margin-left: 0.5rem;
+        .theme-btn-container {{
+            display: flex;
+            align-items: center;
+            margin-left: 1rem;
         }}
-        .nav-theme-btn:hover {{ background: {colors['nav_hover']}; }}
 
         /* Hero – espaçamento reduzido */
         .hero-full {{
-            min-height: 70vh; /* antes era 100vh */
+            min-height: 70vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 4rem 2rem 2rem; /* antes era 6rem 2rem 4rem */
+            padding: 4rem 2rem 2rem;
             background: {colors['hero_bg']};
             position: relative;
             overflow: hidden;
@@ -230,26 +228,15 @@ def load_css():
 
 load_css()
 
-# ===== BOTÃO DE TEMA (fora da navbar HTML) =====
-# Colocar o botão no canto superior direito, usando st.button
+# ===== BOTÃO DE TEMA =====
+# Coloca o botão no canto superior direito usando columns
 col1, col2, col3 = st.columns([10, 1, 1])
 with col3:
     theme_label = "☀️" if st.session_state.theme == "dark" else "🌙"
     st.button(theme_label, on_click=toggle_theme, key="theme_btn", use_container_width=True)
 
-# ===== NAVBAR (sem o botão de tema, que já foi colocado) =====
-# A navbar agora não precisa do botão, então removemos da função ou ajustamos.
-# Vamos usar a função render_navbar sem o botão.
-# Precisamos modificar a função para não renderizar o botão.
-
-# Vou redefinir a navbar localmente para não incluir o botão.
-# Como a função render_navbar está em components, vou ignorar e criar uma versão local.
-# Na verdade, vou modificar o render_navbar em components para remover o botão.
-
-# ===== NAVEGAÇÃO =====
+# ===== NAVBAR =====
 page = st.query_params.get("page", "home")
-
-# ===== RENDER NAVBAR (sem botão) =====
 st.markdown(f"""
 <nav class="navbar">
     <a href="/" class="navbar-brand">Raphael <span>Pires</span></a>
