@@ -1,89 +1,21 @@
 import streamlit as st
 import os
 from config import get_colors
-from components import render_skills_chart, get_pdf_path
+from components import render_skills_chart, get_foto_url, get_pdf_path
 
 def render_home():
     c = get_colors()
 
-    # ===== DIAGNÓSTICO: lista arquivos na raiz e em assets =====
-    # (você pode remover esta parte depois que a foto aparecer)
-    if "mostrar_diagnostico" not in st.session_state:
-        st.session_state.mostrar_diagnostico = True
-
-    if st.session_state.mostrar_diagnostico:
-        with st.expander("🔍 Diagnóstico de arquivos (clique para expandir)"):
-            st.write("**Arquivos na raiz do projeto:**")
-            try:
-                raiz = os.listdir(".")
-                st.code("\n".join(raiz))
-            except Exception as e:
-                st.error(f"Erro ao listar raiz: {e}")
-
-            st.write("**Arquivos em 'assets/':**")
-            try:
-                if os.path.exists("assets"):
-                    assets = os.listdir("assets")
-                    st.code("\n".join(assets))
-                else:
-                    st.warning("Pasta 'assets' não encontrada!")
-            except Exception as e:
-                st.error(f"Erro ao listar assets: {e}")
-
-    # ===== DETECÇÃO DA FOTO (com múltiplas tentativas) =====
-    foto_path = None
-    caminhos_tentados = []
-
-    # Lista de possíveis caminhos (absolutos e relativos)
-    candidatos = [
-        "assets/rapha.jpeg",
-        "assets/rapha.jpg",
-        "rapha.jpeg",
-        "rapha.jpg",
-        "foto.jpeg",
-        "foto.jpg",
-        "perfil.jpeg",
-        "perfil.jpg",
-        # Caminhos absolutos (para garantir)
-        os.path.join(os.getcwd(), "assets", "rapha.jpeg"),
-        os.path.join(os.getcwd(), "assets", "rapha.jpg"),
-        os.path.join(os.getcwd(), "rapha.jpeg"),
-        os.path.join(os.getcwd(), "rapha.jpg"),
-    ]
-
-    for caminho in candidatos:
-        caminhos_tentados.append(caminho)
-        if os.path.exists(caminho):
-            foto_path = caminho
-            break
-
-    # Se encontrou, mostra o caminho no diagnóstico
-    if foto_path and st.session_state.mostrar_diagnostico:
-        st.success(f"✅ Foto encontrada em: `{foto_path}`")
-
-    # Fallback para avatar
-    if not foto_path:
-        if st.session_state.mostrar_diagnostico:
-            st.error("❌ Nenhuma foto encontrada! Verifique se o arquivo está em 'assets/rapha.jpeg'.")
-        foto_url = "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=1D4ED8&color=fff"
-    else:
-        foto_url = foto_path
-
-    # ===== PDF =====
+    # ===== FOTO E PDF =====
+    foto_url = get_foto_url()
     pdf_path = get_pdf_path()
-    if pdf_path and st.session_state.mostrar_diagnostico:
-        st.success(f"✅ PDF encontrado em: `{pdf_path}`")
 
-    # ===== HERO (usando st.image) =====
+    # ===== HERO =====
     st.markdown('<section class="hero-full">', unsafe_allow_html=True)
-
     col1, col2 = st.columns([1, 2])
 
     with col1:
-        if foto_path:
-            st.image(foto_path, width=220)
-        else:
-            st.image(foto_url, width=220)  # fallback avatar
+        st.image(foto_url, width=220)
 
     with col2:
         st.markdown(f"""
@@ -107,7 +39,7 @@ def render_home():
 
     st.markdown('</section>', unsafe_allow_html=True)
 
-    # ===== KPIs =====
+    # ===== KPIS =====
     st.markdown("""
     <div class="section-glass">
         <div class="container">
