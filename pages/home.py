@@ -1,13 +1,19 @@
 import streamlit as st
 import os
 from config import get_colors
-from components import render_skills_chart, get_foto_url, get_pdf_path
+from components import render_skills_chart, get_pdf_path, get_foto_path
 
 def render_home():
     c = get_colors()
 
-    # ===== FOTO E PDF =====
-    foto_url = get_foto_url()
+    # ===== FOTO =====
+    foto_path = get_foto_path()
+    if foto_path:
+        foto_url = foto_path
+    else:
+        foto_url = "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=1D4ED8&color=fff"
+
+    # ===== PDF =====
     pdf_path = get_pdf_path()
 
     # ===== HERO =====
@@ -39,7 +45,7 @@ def render_home():
 
     st.markdown('</section>', unsafe_allow_html=True)
 
-    # ===== KPIS =====
+    # ===== KPIs =====
     st.markdown("""
     <div class="section-glass">
         <div class="container">
