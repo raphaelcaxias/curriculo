@@ -247,7 +247,7 @@ LINKS = {
 }
 
 # ============================================================================
-# CSS PREMIUM COM ANIMAÇÕES OTIMIZADAS
+# CSS COM VARIÁVEIS CSS PERSONALIZADAS
 # ============================================================================
 def get_css():
     theme = st.session_state.theme
@@ -272,7 +272,22 @@ def get_css():
     
     return f"""
     <style>
+    /* Importando fontes */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
+    /* Definindo variáveis CSS globais */
+    :root {{
+        --bg: {bg};
+        --text: {text};
+        --text-muted: {text_muted};
+        --text-muted-light: {text_muted_light};
+        --card-bg: {card_bg};
+        --border: {border};
+        --shadow: {shadow};
+        --hover-bg: {hover_bg};
+        --primary: #3B82F6;
+        --secondary: #0EA5E9;
+    }}
     
     * {{
         font-family: 'Inter', sans-serif;
@@ -286,8 +301,8 @@ def get_css():
     }}
     
     .stApp {{
-        background: {bg};
-        color: {text};
+        background: var(--bg);
+        color: var(--text);
     }}
     
     .block-container {{
@@ -306,7 +321,7 @@ def get_css():
         background: {'rgba(11,15,26,0.92)' if theme == 'dark' else 'rgba(248,250,252,0.92)'};
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border-bottom: 1px solid {border};
+        border-bottom: 1px solid var(--border);
         padding: 0.75rem 2rem;
         display: flex;
         align-items: center;
@@ -318,7 +333,7 @@ def get_css():
     .navbar-brand {{
         font-weight: 800;
         font-size: 1.2rem;
-        color: {text};
+        color: var(--text);
         text-decoration: none;
         display: flex;
         align-items: center;
@@ -329,8 +344,8 @@ def get_css():
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
-        box-shadow: 0 0 12px #3B82F6;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        box-shadow: 0 0 12px var(--primary);
         animation: pulse 2s infinite;
         flex-shrink: 0;
     }}
@@ -341,7 +356,7 @@ def get_css():
     }}
     
     .navbar-brand .gradient-text {{
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }}
@@ -360,7 +375,7 @@ def get_css():
         font-weight: 600;
         border: none;
         background: transparent;
-        color: {text_muted};
+        color: var(--text-muted);
         cursor: pointer;
         transition: all 0.25s ease;
         text-decoration: none;
@@ -371,13 +386,13 @@ def get_css():
     }}
     
     .nav-btn:hover {{
-        background: {hover_bg};
-        color: {text};
+        background: var(--hover-bg);
+        color: var(--text);
         transform: translateY(-1px);
     }}
     
     .nav-btn.active {{
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         color: white !important;
         box-shadow: 0 2px 12px rgba(59,130,246,0.3);
     }}
@@ -386,8 +401,8 @@ def get_css():
         width: 38px;
         height: 38px;
         border-radius: 50%;
-        background: {card_bg};
-        border: 1px solid {border};
+        background: var(--card-bg);
+        border: 1px solid var(--border);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -395,12 +410,12 @@ def get_css():
         transition: all 0.3s ease;
         font-size: 1.1rem;
         flex-shrink: 0;
-        color: {text};
+        color: var(--text);
     }}
     
     .theme-btn:hover {{
         transform: rotate(360deg);
-        border-color: #3B82F6;
+        border-color: var(--primary);
         box-shadow: 0 0 20px rgba(59,130,246,0.15);
     }}
     
@@ -434,7 +449,7 @@ def get_css():
             margin-left: auto !important;
             margin-right: auto !important;
             padding-left: 1rem !important;
-            border-left: 3px solid #3B82F6 !important;
+            border-left: 3px solid var(--primary) !important;
             text-align: left !important;
             max-width: 400px !important;
         }}
@@ -465,7 +480,7 @@ def get_css():
         position: absolute;
         inset: -12px;
         border-radius: 50%;
-        background: conic-gradient(#3B82F6, #0EA5E9, #8B5CF6, #3B82F6);
+        background: conic-gradient(var(--primary), var(--secondary), #8B5CF6, var(--primary));
         animation: rotate 8s linear infinite;
         opacity: 0.5;
     }}
@@ -475,7 +490,7 @@ def get_css():
         position: absolute;
         inset: 4px;
         border-radius: 50%;
-        background: {bg};
+        background: var(--bg);
     }}
     
     @keyframes rotate {{
@@ -489,14 +504,14 @@ def get_css():
         height: 100%;
         border-radius: 50%;
         object-fit: cover;
-        border: 4px solid {bg};
-        box-shadow: 0 25px 80px {shadow};
+        border: 4px solid var(--bg);
+        box-shadow: 0 25px 80px var(--shadow);
     }}
     
     .hero-title {{
         font-size: 3.5rem;
         font-weight: 900;
-        color: {text};
+        color: var(--text);
         margin-bottom: 0.5rem;
         line-height: 1.1;
     }}
@@ -508,14 +523,14 @@ def get_css():
     }}
     
     .hero-title .gradient {{
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }}
     
     .hero-subtitle {{
         font-size: 1.05rem;
-        color: {text_muted};
+        color: var(--text-muted);
         line-height: 1.7;
         margin: 0.5rem 0 1rem;
         max-width: 600px;
@@ -523,11 +538,11 @@ def get_css():
     
     .hero-quote {{
         font-style: italic;
-        color: {text_muted_light};
+        color: var(--text-muted-light);
         font-size: 0.95rem;
         margin: 1.2rem 0 1.5rem;
         padding-left: 1.5rem;
-        border-left: 3px solid #3B82F6;
+        border-left: 3px solid var(--primary);
         max-width: 500px;
         line-height: 1.6;
     }}
@@ -540,20 +555,20 @@ def get_css():
     }}
     
     .badge {{
-        background: {card_bg};
-        border: 1px solid {border};
+        background: var(--card-bg);
+        border: 1px solid var(--border);
         padding: 0.35rem 0.9rem;
         border-radius: 10px;
         font-size: 0.75rem;
         font-weight: 500;
-        color: {text_muted};
+        color: var(--text-muted);
         display: inline-block;
         transition: all 0.2s ease;
         white-space: nowrap;
     }}
     
     .badge:hover {{
-        border-color: #3B82F6;
+        border-color: var(--primary);
         transform: translateY(-2px);
     }}
     
@@ -566,7 +581,7 @@ def get_css():
     
     /* ===== BOTÕES ===== */
     .btn-primary {{
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         color: white !important;
         padding: 0.65rem 1.5rem;
         border-radius: 12px;
@@ -589,13 +604,13 @@ def get_css():
     }}
     
     .btn-secondary {{
-        background: {card_bg};
-        border: 1px solid {border};
+        background: var(--card-bg);
+        border: 1px solid var(--border);
         padding: 0.65rem 1.5rem;
         border-radius: 12px;
         font-weight: 600;
         font-size: 0.9rem;
-        color: {text} !important;
+        color: var(--text) !important;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
@@ -605,19 +620,19 @@ def get_css():
     }}
     
     .btn-secondary:hover {{
-        border-color: #3B82F6;
+        border-color: var(--primary);
         transform: translateY(-2px);
     }}
     
     /* ===== SEÇÕES ===== */
     .section {{
         padding: 4rem 2rem;
-        background: {bg};
-        border-top: 1px solid {border};
+        background: var(--bg);
+        border-top: 1px solid var(--border);
     }}
     
     .section-alt {{
-        background: {card_bg};
+        background: var(--card-bg);
     }}
     
     .container {{
@@ -642,19 +657,19 @@ def get_css():
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        color: #3B82F6;
+        color: var(--primary);
         margin-bottom: 0.75rem;
     }}
     
     .section-title {{
         font-size: 2.5rem;
         font-weight: 800;
-        color: {text};
+        color: var(--text);
         margin-top: 0.25rem;
     }}
     
     .section-subtitle {{
-        color: {text_muted};
+        color: var(--text-muted);
         max-width: 600px;
         margin: 0.75rem auto 0;
         font-size: 1rem;
@@ -672,10 +687,10 @@ def get_css():
     
     /* ===== SOBRE MIM ===== */
     .sobre-section {{
-        background: {card_bg};
+        background: var(--card-bg);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border: 1px solid {border};
+        border: 1px solid var(--border);
         border-radius: 24px;
         padding: 2.5rem;
         margin: 1.5rem 0;
@@ -684,63 +699,9 @@ def get_css():
     .sobre-text {{
         font-size: 1.05rem;
         line-height: 1.8;
-        color: {text_muted};
+        color: var(--text-muted);
         white-space: pre-line;
-        margin-bottom: 1.5rem;
-    }}
-    
-    /* ===== VALORES ===== */
-    .valores-grid {{
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1rem;
-        margin-top: 1.5rem;
-    }}
-    
-    @media (max-width: 1024px) {{
-        .valores-grid {{
-            grid-template-columns: repeat(2, 1fr);
-        }}
-    }}
-    
-    @media (max-width: 480px) {{
-        .valores-grid {{
-            grid-template-columns: 1fr;
-        }}
-    }}
-    
-    .valor-card {{
-        background: {bg};
-        border: 1px solid {border};
-        border-radius: 16px;
-        padding: 1.25rem;
-        text-align: center;
-        transition: all 0.3s ease;
-        height: 100%;
-    }}
-    
-    .valor-card:hover {{
-        transform: translateY(-4px);
-        border-color: #3B82F6;
-        box-shadow: 0 8px 24px {shadow};
-    }}
-    
-    .valor-icon {{
-        font-size: 2.2rem;
-        margin-bottom: 0.5rem;
-    }}
-    
-    .valor-title {{
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: {text};
-        margin-bottom: 0.25rem;
-    }}
-    
-    .valor-desc {{
-        font-size: 0.8rem;
-        color: {text_muted};
-        line-height: 1.5;
+        margin-bottom: 0;
     }}
     
     /* ===== KPIs ===== */
@@ -763,10 +724,10 @@ def get_css():
     }}
     
     .kpi-card {{
-        background: {card_bg};
+        background: var(--card-bg);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border: 1px solid {border};
+        border: 1px solid var(--border);
         border-radius: 20px;
         padding: 1.5rem;
         text-align: center;
@@ -783,15 +744,15 @@ def get_css():
         left: 0;
         right: 0;
         height: 3px;
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         opacity: 0;
         transition: opacity 0.3s ease;
     }}
     
     .kpi-card:hover {{
         transform: translateY(-6px);
-        border-color: #3B82F6;
-        box-shadow: 0 12px 40px {shadow};
+        border-color: var(--primary);
+        box-shadow: 0 12px 40px var(--shadow);
     }}
     
     .kpi-card:hover::before {{
@@ -806,7 +767,7 @@ def get_css():
     .kpi-value {{
         font-size: 2rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.25rem;
@@ -814,13 +775,13 @@ def get_css():
     
     .kpi-label {{
         font-size: 0.85rem;
-        color: {text_muted};
+        color: var(--text-muted);
         font-weight: 500;
     }}
     
     .kpi-context {{
         font-size: 0.72rem;
-        color: {text_muted_light};
+        color: var(--text-muted-light);
         margin-top: 0.15rem;
         opacity: 0.7;
     }}
@@ -833,10 +794,10 @@ def get_css():
     }}
     
     .tech-card {{
-        background: {card_bg};
+        background: var(--card-bg);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border: 1px solid {border};
+        border: 1px solid var(--border);
         border-radius: 20px;
         padding: 1.5rem;
         transition: all 0.3s ease;
@@ -845,8 +806,8 @@ def get_css():
     
     .tech-card:hover {{
         transform: translateY(-4px);
-        border-color: #3B82F6;
-        box-shadow: 0 8px 24px {shadow};
+        border-color: var(--primary);
+        box-shadow: 0 8px 24px var(--shadow);
     }}
     
     .tech-header {{
@@ -864,7 +825,7 @@ def get_css():
     .tech-name {{
         font-size: 1rem;
         font-weight: 700;
-        color: {text};
+        color: var(--text);
     }}
     
     .tech-level {{
@@ -882,7 +843,7 @@ def get_css():
     
     .tech-level.avancado {{
         background: rgba(59,130,246,0.15);
-        color: #3B82F6;
+        color: var(--primary);
     }}
     
     .tech-level.intermediario {{
@@ -902,7 +863,7 @@ def get_css():
         border: 1px solid rgba(59,130,246,0.2);
         padding: 0.15rem 0.6rem;
         border-radius: 8px;
-        color: #3B82F6;
+        color: var(--primary);
         font-weight: 500;
     }}
     
@@ -916,7 +877,7 @@ def get_css():
         position: relative;
         padding-left: 2rem;
         margin-bottom: 1.5rem;
-        border-left: 2px solid #3B82F6;
+        border-left: 2px solid var(--primary);
         animation: slideIn 0.5s ease backwards;
     }}
     
@@ -938,25 +899,25 @@ def get_css():
         width: 14px;
         height: 14px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
-        border: 3px solid {bg};
-        box-shadow: 0 0 0 3px #3B82F6;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border: 3px solid var(--bg);
+        box-shadow: 0 0 0 3px var(--primary);
     }}
     
     .timeline-card {{
-        background: {card_bg};
+        background: var(--card-bg);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border: 1px solid {border};
+        border: 1px solid var(--border);
         border-radius: 16px;
         padding: 1.25rem;
         transition: all 0.3s ease;
     }}
     
     .timeline-card:hover {{
-        border-color: #3B82F6;
+        border-color: var(--primary);
         transform: translateX(6px);
-        box-shadow: 0 8px 24px {shadow};
+        box-shadow: 0 8px 24px var(--shadow);
     }}
     
     .timeline-date {{
@@ -964,13 +925,13 @@ def get_css():
         font-size: 0.7rem;
         font-weight: 700;
         background: rgba(59,130,246,0.12);
-        color: #3B82F6;
+        color: var(--primary);
         padding: 0.15rem 0.8rem;
         border-radius: 999px;
     }}
     
     .timeline-badge {{
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         color: white;
         font-size: 0.6rem;
         font-weight: 700;
@@ -982,19 +943,19 @@ def get_css():
     .timeline-role {{
         font-size: 1.1rem;
         font-weight: 700;
-        color: {text};
+        color: var(--text);
         margin: 0.4rem 0 0.1rem;
     }}
     
     .timeline-company {{
-        color: #0EA5E9;
+        color: var(--secondary);
         font-weight: 600;
         font-size: 0.9rem;
         margin-bottom: 0.5rem;
     }}
     
     .timeline-desc {{
-        color: {text_muted};
+        color: var(--text-muted);
         line-height: 1.6;
         font-size: 0.92rem;
         margin-bottom: 0.5rem;
@@ -1008,7 +969,7 @@ def get_css():
         border-radius: 8px;
         display: inline-block;
         margin: 0.15rem;
-        color: #3B82F6;
+        color: var(--primary);
         font-weight: 500;
     }}
     
@@ -1020,10 +981,10 @@ def get_css():
     }}
     
     .project-card {{
-        background: {card_bg};
+        background: var(--card-bg);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border: 1px solid {border};
+        border: 1px solid var(--border);
         border-radius: 24px;
         padding: 1.75rem;
         transition: all 0.3s ease;
@@ -1039,7 +1000,7 @@ def get_css():
         left: 0;
         right: 0;
         height: 3px;
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         transform: scaleX(0);
         transform-origin: left;
         transition: transform 0.4s ease;
@@ -1047,8 +1008,8 @@ def get_css():
     
     .project-card:hover {{
         transform: translateY(-8px);
-        border-color: #3B82F6;
-        box-shadow: 0 12px 40px {shadow};
+        border-color: var(--primary);
+        box-shadow: 0 12px 40px var(--shadow);
     }}
     
     .project-card:hover::before {{
@@ -1063,19 +1024,19 @@ def get_css():
     .project-card h3 {{
         font-size: 1.15rem;
         font-weight: 700;
-        color: {text};
+        color: var(--text);
         margin-bottom: 0.15rem;
     }}
     
     .project-subtitle {{
         font-size: 0.85rem;
-        color: {text_muted};
+        color: var(--text-muted);
         margin-bottom: 0.5rem;
         font-style: italic;
     }}
     
     .project-card p {{
-        color: {text_muted};
+        color: var(--text-muted);
         line-height: 1.6;
         font-size: 0.88rem;
         margin-bottom: 0.5rem;
@@ -1083,11 +1044,11 @@ def get_css():
     
     .project-context {{
         font-size: 0.8rem;
-        color: #3B82F6;
+        color: var(--primary);
         font-style: italic;
         margin-bottom: 0.75rem;
         padding-left: 0.75rem;
-        border-left: 2px solid #3B82F6;
+        border-left: 2px solid var(--primary);
     }}
     
     .project-tag {{
@@ -1096,7 +1057,7 @@ def get_css():
         border: 1px solid rgba(59,130,246,0.2);
         padding: 0.15rem 0.5rem;
         border-radius: 6px;
-        color: #3B82F6;
+        color: var(--primary);
         font-weight: 500;
         display: inline-block;
         margin: 0.15rem;
@@ -1110,10 +1071,10 @@ def get_css():
     }}
     
     .cert-card {{
-        background: {card_bg};
+        background: var(--card-bg);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border: 1px solid {border};
+        border: 1px solid var(--border);
         border-radius: 20px;
         padding: 1.5rem;
         transition: all 0.3s ease;
@@ -1121,9 +1082,9 @@ def get_css():
     }}
     
     .cert-card:hover {{
-        border-color: #3B82F6;
+        border-color: var(--primary);
         transform: translateY(-4px);
-        box-shadow: 0 8px 24px {shadow};
+        box-shadow: 0 8px 24px var(--shadow);
     }}
     
     .cert-header {{
@@ -1141,12 +1102,12 @@ def get_css():
     .cert-inst {{
         font-weight: 700;
         font-size: 1rem;
-        color: {text};
+        color: var(--text);
     }}
     
     .cert-status {{
         font-size: 0.75rem;
-        color: {text_muted};
+        color: var(--text-muted);
         margin-bottom: 0.5rem;
     }}
     
@@ -1162,7 +1123,7 @@ def get_css():
         border: 1px solid rgba(59,130,246,0.2);
         padding: 0.15rem 0.6rem;
         border-radius: 8px;
-        color: #3B82F6;
+        color: var(--primary);
         font-weight: 500;
         display: inline-block;
     }}
@@ -1170,7 +1131,7 @@ def get_css():
     .progress-bar {{
         width: 100%;
         height: 6px;
-        background: {border};
+        background: var(--border);
         border-radius: 999px;
         overflow: hidden;
         margin-top: 0.75rem;
@@ -1178,7 +1139,7 @@ def get_css():
     
     .progress-fill {{
         height: 100%;
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         border-radius: 999px;
         transition: width 0.8s ease;
         box-shadow: 0 0 12px rgba(59,130,246,0.3);
@@ -1188,8 +1149,8 @@ def get_css():
     .footer {{
         padding: 3rem 2rem 2rem;
         text-align: center;
-        border-top: 1px solid {border};
-        background: {card_bg};
+        border-top: 1px solid var(--border);
+        background: var(--card-bg);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
     }}
@@ -1197,7 +1158,7 @@ def get_css():
     .footer h3 {{
         font-size: 1.8rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.5rem;
@@ -1212,11 +1173,11 @@ def get_css():
     }}
     
     .footer-link {{
-        background: {card_bg};
-        border: 1px solid {border};
+        background: var(--card-bg);
+        border: 1px solid var(--border);
         padding: 0.5rem 1.1rem;
         border-radius: 12px;
-        color: {text} !important;
+        color: var(--text) !important;
         text-decoration: none;
         font-size: 0.82rem;
         font-weight: 500;
@@ -1227,7 +1188,7 @@ def get_css():
     }}
     
     .footer-link:hover {{
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         color: white !important;
         border-color: transparent;
         transform: translateY(-2px);
@@ -1235,7 +1196,7 @@ def get_css():
     }}
     
     .footer-copy {{
-        color: {text_muted_light};
+        color: var(--text-muted-light);
         font-size: 0.75rem;
         margin-top: 1rem;
     }}
@@ -1247,7 +1208,7 @@ def get_css():
         width: 44px;
         height: 44px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #3B82F6, #0EA5E9);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         color: white;
         display: flex;
         align-items: center;
@@ -1266,7 +1227,6 @@ def get_css():
         box-shadow: 0 12px 32px rgba(59,130,246,0.5);
     }}
     
-    /* ===== RESPONSIVIDADE ===== */
     @media (max-width: 768px) {{
         .navbar {{
             padding: 0.5rem 1rem;
@@ -1351,9 +1311,6 @@ def get_css():
             font-size: 0.8rem;
             padding: 0.5rem 1rem;
         }}
-        .project-grid {{
-            grid-template-columns: 1fr;
-        }}
     }}
     </style>
     """
@@ -1436,21 +1393,45 @@ def render_sobre():
     </div>
     """, unsafe_allow_html=True)
     
+    # Texto da seção "Sobre Mim"
     st.markdown(f"""
     <div class="sobre-section">
         <p class="sobre-text">{SOBRE_MIM['texto']}</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Renderiza os cards de valores usando colunas do Streamlit
+    # Título dos valores
+    st.markdown("""
+    <div style="margin-top: 2rem; text-align: center;">
+        <h3 style="color: var(--text); font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem;">💎 Meus Valores</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">O que me move e como trabalho</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # === CARDS DE VALORES USANDO APENAS STREAMLIT ===
     cols = st.columns(4)
+    
     for i, valor in enumerate(SOBRE_MIM['valores']):
         with cols[i]:
             st.markdown(f"""
-            <div class="valor-card">
-                <div class="valor-icon">{valor['icone']}</div>
-                <div class="valor-title">{valor['titulo']}</div>
-                <div class="valor-desc">{valor['desc']}</div>
+            <div style="
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                padding: 1.5rem 1rem;
+                text-align: center;
+                transition: all 0.3s ease;
+                height: 100%;
+                min-height: 160px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                cursor: default;
+            ">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">{valor['icone']}</div>
+                <div style="font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 0.25rem;">{valor['titulo']}</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">{valor['desc']}</div>
             </div>
             """, unsafe_allow_html=True)
 
