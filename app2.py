@@ -704,6 +704,66 @@ def get_css():
         margin-bottom: 0;
     }}
     
+    /* ===== VALORES ===== */
+    .valores-grid {{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }}
+    
+    @media (max-width: 1024px) {{
+        .valores-grid {{
+            grid-template-columns: repeat(2, 1fr);
+        }}
+    }}
+    
+    @media (max-width: 480px) {{
+        .valores-grid {{
+            grid-template-columns: 1fr;
+        }}
+    }}
+    
+    .valor-card {{
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        height: 100%;
+        min-height: 160px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: default;
+    }}
+    
+    .valor-card:hover {{
+        transform: translateY(-4px);
+        border-color: var(--primary);
+        box-shadow: 0 8px 24px var(--shadow);
+    }}
+    
+    .valor-icon {{
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }}
+    
+    .valor-title {{
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--text);
+        margin-bottom: 0.25rem;
+    }}
+    
+    .valor-desc {{
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.4;
+    }}
+    
     /* ===== KPIs ===== */
     .kpi-grid {{
         display: grid;
@@ -1311,6 +1371,9 @@ def get_css():
             font-size: 0.8rem;
             padding: 0.5rem 1rem;
         }}
+        .project-grid {{
+            grid-template-columns: 1fr;
+        }}
     }}
     </style>
     """
@@ -1408,32 +1471,22 @@ def render_sobre():
     </div>
     """, unsafe_allow_html=True)
     
-    # === CARDS DE VALORES USANDO APENAS STREAMLIT ===
-    cols = st.columns(4)
+    # Cards de valores usando HTML com classes CSS
+    valores_html = ""
+    for valor in SOBRE_MIM['valores']:
+        valores_html += f"""
+        <div class="valor-card">
+            <div class="valor-icon">{valor['icone']}</div>
+            <div class="valor-title">{valor['titulo']}</div>
+            <div class="valor-desc">{valor['desc']}</div>
+        </div>
+        """
     
-    for i, valor in enumerate(SOBRE_MIM['valores']):
-        with cols[i]:
-            st.markdown(f"""
-            <div style="
-                background: var(--card-bg);
-                border: 1px solid var(--border);
-                border-radius: 16px;
-                padding: 1.5rem 1rem;
-                text-align: center;
-                transition: all 0.3s ease;
-                height: 100%;
-                min-height: 160px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                cursor: default;
-            ">
-                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">{valor['icone']}</div>
-                <div style="font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 0.25rem;">{valor['titulo']}</div>
-                <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">{valor['desc']}</div>
-            </div>
-            """, unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="valores-grid">
+        {valores_html}
+    </div>
+    """, unsafe_allow_html=True)
 
 def render_kpis():
     st.markdown("""
