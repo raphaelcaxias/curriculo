@@ -1,6 +1,6 @@
 """
 app.py - Portfólio Raphael Pires - Streamlit Premium
-Versão Refatorada com Design Moderno e Animações Otimizadas
+Versão com Estilos Inline para Garantir Funcionamento
 """
 import streamlit as st
 import pandas as pd
@@ -700,68 +700,6 @@ def get_css():
         color: var(--text-muted);
         white-space: pre-line;
         margin-bottom: 0;
-    }}
-    
-    /* ===== VALORES ===== */
-    .valores-grid {{
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1rem;
-        margin-top: 1.5rem;
-    }}
-    
-    @media (max-width: 1024px) {{
-        .valores-grid {{
-            grid-template-columns: repeat(2, 1fr);
-        }}
-    }}
-    
-    @media (max-width: 480px) {{
-        .valores-grid {{
-            grid-template-columns: 1fr;
-        }}
-    }}
-    
-    .valor-card {{
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 1.5rem 1rem;
-        text-align: center;
-        transition: all 0.3s ease;
-        height: 100%;
-        min-height: 160px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        cursor: default;
-    }}
-    
-    .valor-card:hover {{
-        transform: translateY(-6px);
-        border-color: var(--primary);
-        box-shadow: 0 12px 30px var(--shadow);
-    }}
-    
-    .valor-icon {{
-        font-size: 2.8rem;
-        margin-bottom: 0.75rem;
-        display: block;
-    }}
-    
-    .valor-title {{
-        font-weight: 700;
-        font-size: 1.05rem;
-        color: var(--text);
-        margin-bottom: 0.35rem;
-    }}
-    
-    .valor-desc {{
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        line-height: 1.5;
-        max-width: 200px;
     }}
     
     /* ===== KPIs ===== */
@@ -1469,21 +1407,32 @@ def render_sobre():
     </div>
     """, unsafe_allow_html=True)
     
-    valores_html = ""
-    for valor in SOBRE_MIM['valores']:
-        valores_html += f"""
-        <div class="valor-card">
-            <div class="valor-icon">{valor['icone']}</div>
-            <div class="valor-title">{valor['titulo']}</div>
-            <div class="valor-desc">{valor['desc']}</div>
-        </div>
-        """
+    # USANDO ESTILOS INLINE - GARANTIDO QUE FUNCIONA!
+    cols = st.columns(4)
     
-    st.markdown(f"""
-    <div class="valores-grid">
-        {valores_html}
-    </div>
-    """, unsafe_allow_html=True)
+    for i, valor in enumerate(SOBRE_MIM['valores']):
+        with cols[i]:
+            st.markdown(f"""
+            <div style="
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                padding: 1.5rem 1rem;
+                text-align: center;
+                transition: all 0.3s ease;
+                height: 100%;
+                min-height: 160px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                cursor: default;
+            ">
+                <div style="font-size: 2.8rem; margin-bottom: 0.75rem;">{valor['icone']}</div>
+                <div style="font-weight: 700; font-size: 1.05rem; color: var(--text); margin-bottom: 0.35rem;">{valor['titulo']}</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; max-width: 200px;">{valor['desc']}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
 def render_kpis():
     st.markdown("""
