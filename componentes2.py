@@ -3,36 +3,28 @@ componentes2.py - Todos os componentes visuais e funções de renderização
 """
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
 import os
 import base64
+from datetime import datetime, timedelta
 from config2 import (
     FOTO_CANDIDATOS, PDF_CANDIDATOS, FOTO_FALLBACK,
     DADOS_PESSOAIS, PERFIL_PROFISSIONAL, KPIS, TECH_STACK,
     CERTIFICACOES, FORMACAO, IDIOMAS, PROJETOS, EXPERIENCIAS,
-    LINKS_SOCIAIS, MODOS_VISUALIZACAO, TEMA_DARK, TEMA_LIGHT,
-    get_css, PLOTLY_LAYOUT
+    LINKS_SOCIAIS, MODOS_VISUALIZACAO, get_colors
 )
 
 # ============================================================================
 # FUNÇÕES AUXILIARES
 # ============================================================================
-def get_colors():
-    """Retorna as cores do tema atual"""
-    if st.session_state.get("theme", "dark") == "dark":
-        return TEMA_DARK
-    return TEMA_LIGHT
-
 def get_foto_path():
-    """Busca o caminho da foto"""
     for caminho in FOTO_CANDIDATOS:
         if os.path.exists(caminho):
             return caminho
     return None
 
 def get_foto_base64(foto_path):
-    """Converte foto para base64"""
     if foto_path and os.path.exists(foto_path):
         with open(foto_path, "rb") as f:
             data = f.read()
@@ -43,14 +35,12 @@ def get_foto_base64(foto_path):
     return None
 
 def get_pdf_path():
-    """Busca o caminho do PDF"""
     for caminho in PDF_CANDIDATOS:
         if os.path.exists(caminho):
             return caminho
     return None
 
 def get_pdf_base64(pdf_path):
-    """Converte PDF para base64"""
     if pdf_path and os.path.exists(pdf_path):
         with open(pdf_path, "rb") as f:
             data = f.read()
@@ -58,22 +48,20 @@ def get_pdf_base64(pdf_path):
             return f"data:application/pdf;base64,{encoded}"
     return None
 
-def toggle_theme():
-    """Alterna entre dark e light mode"""
-    st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
-
 # ============================================================================
 # NAVBAR
 # ============================================================================
 def render_navbar(page_atual):
-    """Renderiza a navbar fixa"""
     theme_label = "☀️" if st.session_state.theme == "dark" else "🌙"
+    nome_parts = DADOS_PESSOAIS['nome'].split()
+    primeiro = nome_parts[0]
+    ultimo = nome_parts[-1]
     
     st.markdown(f"""
     <nav class="navbar">
         <a href="/?page=home" class="navbar-brand">
             <span class="brand-dot"></span>
-            {DADOS_PESSOAIS['nome'].split()[0]} <span>{DADOS_PESSOAIS['nome'].split()[-1]}</span>
+            {primeiro} <span>{ultimo}</span>
         </a>
         <div class="navbar-links">
             <a href="/?page=home" class="nav-link {'active' if page_atual == 'home' else ''}">Início</a>
@@ -89,22 +77,26 @@ def render_navbar(page_atual):
     """, unsafe_allow_html=True)
 
 # ============================================================================
-# MODE SELECTOR (4 MODOS DE VISUALIZAÇÃO)
+# MODE SELECTOR
 # ============================================================================
 def render_mode_selector():
-    """Renderiza seletor dos 4 modos de visualização"""
     if "modo" not in st.session_state:
         st.session_state.modo = "Dados & BI"
     
-    modos = list(MODOS_VISUALIZACAO.keys())
+    st.markdown("""
+    <div style="padding:3rem 2rem 0;text-align:center;">
+        <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--primary);margin-bottom:1rem;">
+            🎯 Modo de Visualização
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
+    modos = list(MODOS_VISUALIZACAO.keys())
     cols = st.columns(len(modos))
+    
     for i, modo in enumerate(modos):
         with cols[i]:
             ativo = st.session_state.modo == modo
-            cor = MODOS_VISUALIZACAO[modo]["cor_destaque"]
-            classe = "mode-btn active" if ativo else "mode-btn"
-            
             if st.button(
                 modo,
                 key=f"modo_{i}",
@@ -113,12 +105,18 @@ def render_mode_selector():
             ):
                 st.session_state.modo = modo
                 st.rerun()
+    
+    modo_atual = st.session_state.modo
+    st.markdown(f"""
+    <div style="text-align:center;margin-top:1rem;color:var(--text-muted);font-size:0.9rem;">
+        {MODOS_VISUALIZACAO[modo_atual]['descricao']}
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================================
-# HERO SECTION
+# HERO
 # ============================================================================
 def render_hero():
-    """Renderiza a seção hero principal"""
     foto_path = get_foto_path()
     foto_b64 = get_foto_base64(foto_path)
     foto_url = foto_b64 if foto_b64 else FOTO_FALLBACK
@@ -127,6 +125,14 @@ def render_hero():
     
     modo_atual = st.session_state.get("modo", "Dados & BI")
     cor_destaque = MODOS_VISUALIZACAO[modo_atual]["cor_destaque"]
+    
+    nome_parts = DADOS_PESSOAIS['nome'].split()
+    primeiro = nome_parts[0]
+    ultimo = nome_parts[-1]
+    
+    botao_cv = ""
+    if pdf_b64:
+        botao_cv = f'<a href="{pdf_b64}" download="Curriculo_Raphael.pdf" class="btn-secondary">📄 Baixar CV</a>'
     
     st.markdown(f"""
     <section class="hero-full" id="topo">
@@ -142,18 +148,19 @@ def render_hero():
                     <span style="width:6px;height:6px;border-radius:50%;background:{cor_destaque};"></span>
                     {DADOS_PESSOAIS['titulo']}
                 </div>
-                <h1>{DADOS_PESSOAIS['nome'].split()[0]} <span class="gradient-name">{DADOS_PESSOAIS['nome'].split()[-1]}</span></h1>
-                <p class="subtitle">
-                    {PERFIL_PROFISSIONAL}
-                </p>
-                <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin:1rem 0;">
+                <h1>{primeiro} <span class="gradient-name">{ultimo}</span></h1>
+                <p class="subtitle">{PERFIL_PROFISSIONAL}</p>
+                <div class="badge-group">
                     <span class="badge">📍 {DADOS_PESSOAIS['localizacao']}</span>
                     <span class="badge">🏠 {DADOS_PESSOAIS['modalidades'][0]}</span>
                     <span class="badge">✈️ {DADOS_PESSOAIS['modalidades'][1]}</span>
                 </div>
+                <div class="hero-quote">
+                    "Dados sem contexto são apenas números. Meu trabalho é transformá-los em histórias que orientam decisões."
+                </div>
                 <div class="cta-group">
                     <a href="#experiencia" class="btn-primary">💼 Ver Experiência</a>
-                    {'<a href="' + pdf_b64 + '" download="Curriculo_Raphael.pdf" class="btn-secondary">📄 Baixar CV</a>' if pdf_b64 else ''}
+                    {botao_cv}
                     <a href="{LINKS_SOCIAIS['linkedin']}" target="_blank" class="btn-secondary">💼 LinkedIn</a>
                 </div>
             </div>
@@ -165,15 +172,13 @@ def render_hero():
 # KPIs
 # ============================================================================
 def render_kpis():
-    """Renderiza os KPIs principais"""
-    icones = ["⚡", "⏱️", "📊", "🏆"]
-    
     st.markdown("""
     <div class="section-glass">
         <div class="container">
             <div class="section-header">
                 <span class="label">📈 Impacto Mensurável</span>
                 <h2>Números que contam histórias</h2>
+                <p>Resultados concretos de mais de uma década transformando dados em valor</p>
             </div>
             <div class="kpi-grid">
     """, unsafe_allow_html=True)
@@ -183,7 +188,7 @@ def render_kpis():
         with cols[i]:
             st.markdown(f"""
             <div class="kpi-card">
-                <div class="kpi-icon">{icones[i]}</div>
+                <div class="kpi-icon">{kpi['icone']}</div>
                 <div class="kpi-value">{kpi['valor']}</div>
                 <div class="kpi-label">{kpi['label']}</div>
                 <div class="kpi-context">{kpi['contexto']}</div>
@@ -196,7 +201,6 @@ def render_kpis():
 # TECH STACK
 # ============================================================================
 def render_tech_stack():
-    """Renderiza o grid de tecnologias"""
     modo_atual = st.session_state.get("modo", "Dados & BI")
     destaques = MODOS_VISUALIZACAO[modo_atual]["destaques"]
     
@@ -211,7 +215,6 @@ def render_tech_stack():
             <div class="tech-grid">
     """, unsafe_allow_html=True)
     
-    # Ordena: destaques primeiro
     techs_ordenadas = []
     for destaque in destaques:
         if destaque in TECH_STACK:
@@ -220,34 +223,30 @@ def render_tech_stack():
         if tech not in destaques:
             techs_ordenadas.append((tech, dados))
     
-    cols = st.columns(3)
-    for i, (tech, dados) in enumerate(techs_ordenadas):
-        with cols[i % 3]:
-            nivel_class = dados['nivel'].lower().replace('í', 'i')
-            itens_html = "".join([f'<span class="tech-item">{item}</span>' for item in dados['itens']])
-            
-            destaque_badge = "⭐ " if tech in destaques else ""
-            
-            st.markdown(f"""
-            <div class="tech-card">
-                <div class="tech-card-header">
-                    <div class="tech-icon">{dados['icone']}</div>
-                    <div>
-                        <div class="tech-name">{destaque_badge}{tech}</div>
-                        <span class="tech-level {nivel_class}">{dados['nivel']}</span>
-                    </div>
+    for tech, dados in techs_ordenadas:
+        nivel_class = dados['nivel'].lower().replace('í', 'i').replace('á', 'a')
+        itens_html = "".join([f'<span class="tech-item">{item}</span>' for item in dados['itens']])
+        destaque_badge = "⭐ " if tech in destaques else ""
+        
+        st.markdown(f"""
+        <div class="tech-card">
+            <div class="tech-card-header">
+                <div class="tech-icon">{dados['icone']}</div>
+                <div>
+                    <div class="tech-name">{destaque_badge}{tech}</div>
+                    <span class="tech-level {nivel_class}">{dados['nivel']}</span>
                 </div>
-                <div class="tech-items">{itens_html}</div>
             </div>
-            """, unsafe_allow_html=True)
+            <div class="tech-items">{itens_html}</div>
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("</div></div></div>", unsafe_allow_html=True)
 
 # ============================================================================
-# SKILLS CHART (PLOTLY)
+# SKILLS CHART
 # ============================================================================
 def render_skills_chart():
-    """Renderiza gráfico de habilidades"""
     colors = get_colors()
     
     df = pd.DataFrame({
@@ -257,26 +256,18 @@ def render_skills_chart():
     })
     
     fig = px.bar(
-        df,
-        x="Proficiência",
-        y="Tecnologia",
-        color="Nível",
-        orientation="h",
-        color_discrete_sequence=colors["chart_colors"],
-        template=colors["plotly_template"],
-        text="Proficiência"
+        df, x="Proficiência", y="Tecnologia", color="Nível",
+        orientation="h", color_discrete_sequence=colors["chart_colors"],
+        template=colors["plotly_template"], text="Proficiência"
     )
     
     fig.update_layout(
-        height=420,
-        margin=dict(l=20, r=60, t=20, b=40),
+        height=420, margin=dict(l=20, r=60, t=20, b=40),
         xaxis=dict(range=[0, 110], showgrid=True, gridcolor="rgba(148,163,184,0.12)", zeroline=False),
         yaxis=dict(showgrid=False, categoryorder='total ascending'),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         font=dict(family="Inter", color=colors["text"], size=12),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        showlegend=True
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", showlegend=True
     )
     fig.update_traces(
         textposition="outside",
@@ -287,10 +278,9 @@ def render_skills_chart():
     st.plotly_chart(fig, use_container_width=True)
 
 # ============================================================================
-# EXPERIÊNCIA PROFISSIONAL
+# EXPERIÊNCIAS
 # ============================================================================
 def render_experiencias():
-    """Renderiza timeline de experiências"""
     modo_atual = st.session_state.get("modo", "Dados & BI")
     ordem = MODOS_VISUALIZACAO[modo_atual]["ordem_experiencias"]
     
@@ -307,11 +297,7 @@ def render_experiencias():
     
     for idx in ordem:
         exp = EXPERIENCIAS[idx]
-        
-        badge_html = ""
-        if exp.get("status"):
-            badge_html = f'<span class="timeline-badge">{exp["status"]}</span>'
-        
+        badge_html = f'<span class="timeline-badge">{exp["status"]}</span>' if exp.get("status") else ""
         desc_html = "<br>".join([f"• {d}" for d in exp["descricao"]])
         tags_html = "".join([f'<span class="timeline-tag">{t}</span>' for t in exp["tags"]])
         
@@ -334,7 +320,6 @@ def render_experiencias():
 # PROJETOS
 # ============================================================================
 def render_projetos():
-    """Renderiza grid de projetos"""
     st.markdown("""
     <div class="section-glass alt">
         <div class="container">
@@ -346,27 +331,24 @@ def render_projetos():
             <div class="project-grid">
     """, unsafe_allow_html=True)
     
-    cols = st.columns(len(PROJETOS))
-    for i, projeto in enumerate(PROJETOS):
-        with cols[i]:
-            desc_html = "<br>".join([f"• {d}" for d in projeto["descricao"]])
-            techs_html = "".join([f'<span class="project-tag">{t}</span>' for t in projeto["tecnologias"]])
-            
-            link_btn = ""
-            if projeto.get("url"):
-                link_btn = f'<a href="https://{projeto["url"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">🔗 Ver App</a>'
-            else:
-                link_btn = f'<a href="{LINKS_SOCIAIS["github"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">💻 Ver no GitHub</a>'
-            
-            st.markdown(f"""
-            <div class="project-card">
-                <div class="project-icon">{projeto['icone']}</div>
-                <h3>{projeto['nome']}</h3>
-                <p>{desc_html}</p>
-                <div class="project-tech">{techs_html}</div>
-                {link_btn}
-            </div>
-            """, unsafe_allow_html=True)
+    for projeto in PROJETOS:
+        desc_html = "<br>".join([f"• {d}" for d in projeto["descricao"]])
+        techs_html = "".join([f'<span class="project-tag">{t}</span>' for t in projeto["tecnologias"]])
+        
+        if projeto.get("url"):
+            link_btn = f'<a href="{projeto["url"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">🔗 Ver App</a>'
+        else:
+            link_btn = f'<a href="{LINKS_SOCIAIS["github"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">💻 Ver no GitHub</a>'
+        
+        st.markdown(f"""
+        <div class="project-card">
+            <div class="project-icon">{projeto['icone']}</div>
+            <h3>{projeto['nome']}</h3>
+            <p>{desc_html}</p>
+            <div class="project-tech">{techs_html}</div>
+            {link_btn}
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("</div></div></div>", unsafe_allow_html=True)
 
@@ -374,7 +356,6 @@ def render_projetos():
 # CERTIFICAÇÕES
 # ============================================================================
 def render_certificacoes():
-    """Renderiza seção de certificações"""
     colors = get_colors()
     
     st.markdown("""
@@ -387,35 +368,32 @@ def render_certificacoes():
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
     """, unsafe_allow_html=True)
     
-    cols = st.columns(2)
-    for i, cert in enumerate(CERTIFICACOES):
-        with cols[i]:
-            cursos_html = " · ".join(cert["cursos"])
-            
-            if "Em andamento" in cert["status"]:
-                status_badge = f'<div style="display:inline-block;background:{colors["warning"]};color:white;padding:0.25rem 0.9rem;border-radius:999px;font-size:0.75rem;font-weight:700;">🔄 {cert["status"]}</div>'
-                if "modulos_concluidos" in cert:
-                    status_badge += f'<div class="progress-bar" style="margin-top:1rem;"><div class="progress-fill" style="width:40%;"></div></div>'
-                    status_badge += f'<div style="font-size:0.78rem;color:{colors["text_muted"]};margin-top:0.5rem;font-weight:600;">{cert["modulos_concluidos"]} módulos concluídos</div>'
-            else:
-                status_badge = f'<div style="display:inline-block;background:{colors["success"]};color:white;padding:0.25rem 0.9rem;border-radius:999px;font-size:0.75rem;font-weight:700;">✓ {cert["status"]}</div>'
-            
-            st.markdown(f"""
-            <div class="glass-card" style="text-align:center;">
-                <div style="font-size:3rem;margin-bottom:1rem;">{cert['icone']}</div>
-                <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:0.75rem;">{cert['instituicao']}</h3>
-                <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;margin-bottom:1rem;">{cursos_html}</p>
-                {status_badge}
-            </div>
-            """, unsafe_allow_html=True)
+    for cert in CERTIFICACOES:
+        cursos_html = " · ".join(cert["cursos"])
+        
+        if "Em andamento" in cert["status"]:
+            status_badge = f'<div style="display:inline-block;background:{colors["warning"]};color:white;padding:0.25rem 0.9rem;border-radius:999px;font-size:0.75rem;font-weight:700;">🔄 {cert["status"]}</div>'
+            if "modulos_concluidos" in cert:
+                status_badge += f'<div class="progress-bar"><div class="progress-fill" style="width:40%;"></div></div>'
+                status_badge += f'<div style="font-size:0.78rem;color:{colors["text_muted"]};margin-top:0.5rem;font-weight:600;">{cert["modulos_concluidos"]} módulos concluídos</div>'
+        else:
+            status_badge = f'<div style="display:inline-block;background:{colors["success"]};color:white;padding:0.25rem 0.9rem;border-radius:999px;font-size:0.75rem;font-weight:700;">✓ {cert["status"]}</div>'
+        
+        st.markdown(f"""
+        <div class="glass-card" style="text-align:center;">
+            <div style="font-size:3rem;margin-bottom:1rem;">{cert['icone']}</div>
+            <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:0.75rem;">{cert['instituicao']}</h3>
+            <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;margin-bottom:1rem;">{cursos_html}</p>
+            {status_badge}
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("</div></div></div>", unsafe_allow_html=True)
 
 # ============================================================================
-# FORMAÇÃO ACADÊMICA
+# FORMAÇÃO
 # ============================================================================
 def render_formacao():
-    """Renderiza formação acadêmica"""
     st.markdown("""
     <div class="section-glass alt">
         <div class="container">
@@ -426,21 +404,19 @@ def render_formacao():
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
     """, unsafe_allow_html=True)
     
-    cols = st.columns(2)
-    for i, form in enumerate(FORMACAO):
-        with cols[i]:
-            st.markdown(f"""
-            <div class="glass-card">
-                <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
-                    <div style="width:56px;height:56px;border-radius:16px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:1.8rem;">🎓</div>
-                    <div>
-                        <h4 style="font-size:1.1rem;font-weight:700;margin:0;">{form['curso']}</h4>
-                        <div style="color:var(--text-muted);font-size:0.9rem;">{form['instituicao']}</div>
-                    </div>
+    for form in FORMACAO:
+        st.markdown(f"""
+        <div class="glass-card">
+            <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+                <div style="width:56px;height:56px;border-radius:16px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:1.8rem;">🎓</div>
+                <div>
+                    <h4 style="font-size:1.1rem;font-weight:700;margin:0;">{form['curso']}</h4>
+                    <div style="color:var(--text-muted);font-size:0.9rem;">{form['instituicao']}</div>
                 </div>
-                <div style="display:inline-block;background:var(--primary-light);border:1px solid var(--tag-border);padding:0.25rem 0.9rem;border-radius:999px;font-size:0.78rem;font-weight:600;color:var(--primary);">Concluído em {form['ano']}</div>
             </div>
-            """, unsafe_allow_html=True)
+            <div style="display:inline-block;background:var(--primary-light);border:1px solid var(--tag-border);padding:0.25rem 0.9rem;border-radius:999px;font-size:0.78rem;font-weight:600;color:var(--primary);">Concluído em {form['ano']}</div>
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("</div></div></div>", unsafe_allow_html=True)
 
@@ -448,7 +424,6 @@ def render_formacao():
 # IDIOMAS
 # ============================================================================
 def render_idiomas():
-    """Renderiza seção de idiomas"""
     st.markdown("""
     <div class="section-glass">
         <div class="container">
@@ -459,16 +434,15 @@ def render_idiomas():
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:600px;margin:0 auto;">
     """, unsafe_allow_html=True)
     
-    cols = st.columns(2)
-    for i, idioma in enumerate(IDIOMAS):
-        with cols[i]:
-            st.markdown(f"""
-            <div class="glass-card" style="text-align:center;">
-                <div style="font-size:2.5rem;margin-bottom:0.5rem;">{'🇧🇷' if 'Português' in idioma['idioma'] else '🇺🇸'}</div>
-                <h4 style="font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">{idioma['idioma']}</h4>
-                <div style="display:inline-block;background:var(--primary-light);border:1px solid var(--tag-border);padding:0.25rem 0.9rem;border-radius:999px;font-size:0.78rem;font-weight:600;color:var(--primary);">{idioma['nivel']}</div>
-            </div>
-            """, unsafe_allow_html=True)
+    for idioma in IDIOMAS:
+        bandeira = '🇧🇷' if 'Português' in idioma['idioma'] else '🇺🇸'
+        st.markdown(f"""
+        <div class="glass-card" style="text-align:center;">
+            <div style="font-size:2.5rem;margin-bottom:0.5rem;">{bandeira}</div>
+            <h4 style="font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">{idioma['idioma']}</h4>
+            <div style="display:inline-block;background:var(--primary-light);border:1px solid var(--tag-border);padding:0.25rem 0.9rem;border-radius:999px;font-size:0.78rem;font-weight:600;color:var(--primary);">{idioma['nivel']}</div>
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("</div></div></div>", unsafe_allow_html=True)
 
@@ -476,7 +450,8 @@ def render_idiomas():
 # FOOTER
 # ============================================================================
 def render_footer():
-    """Renderiza o footer"""
+    tel_limpo = DADOS_PESSOAIS['telefone1'].replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+    
     st.markdown(f"""
     <div class="footer" id="contato">
         <div style="display:inline-flex;align-items:center;gap:0.6rem;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);padding:0.4rem 1.2rem;border-radius:999px;font-size:0.82rem;font-weight:600;color:var(--success);margin-bottom:1.5rem;">
@@ -497,26 +472,49 @@ def render_footer():
             <a href="{LINKS_SOCIAIS['github']}" target="_blank" class="footer-link">💻 GitHub</a>
             <a href="{LINKS_SOCIAIS['email']}" class="footer-link">✉️ E-mail</a>
             <a href="{LINKS_SOCIAIS['whatsapp']}" target="_blank" class="footer-link">📱 WhatsApp</a>
-            <a href="tel:{DADOS_PESSOAIS['telefone1'].replace(' ', '').replace('-', '').replace('(', '').replace(')', '')}" class="footer-link">📞 {DADOS_PESSOAIS['telefone1']}</a>
+            <a href="tel:{tel_limpo}" class="footer-link">📞 {DADOS_PESSOAIS['telefone1']}</a>
         </div>
         
         <p class="footer-copy">© 2026 {DADOS_PESSOAIS['nome']} · Construído com ❤️ usando Streamlit</p>
     </div>
-    <a href="#topo" style="position:fixed;bottom:2rem;right:2rem;width:48px;height:48px;border-radius:50%;background:var(--gradient-primary);color:white;display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;box-shadow:0 8px 24px rgba(59,130,246,0.35);text-decoration:none;z-index:999;">↑</a>
+    <a href="#topo" class="scroll-top" title="Voltar ao topo">↑</a>
     """, unsafe_allow_html=True)
 
 # ============================================================================
-# PÁGINA CURRÍCULO COMPLETO
+# PÁGINAS
 # ============================================================================
+def render_pagina_home():
+    render_hero()
+    render_mode_selector()
+    render_kpis()
+    render_tech_stack()
+    render_experiencias()
+    render_projetos()
+    
+    st.markdown("""
+    <div class="section-glass">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">📊 Competências Visuais</span>
+                <h2>Domínio tecnológico em gráficos</h2>
+            </div>
+    """, unsafe_allow_html=True)
+    render_skills_chart()
+    st.markdown("</div></div>", unsafe_allow_html=True)
+    
+    render_certificacoes()
+    render_formacao()
+    render_idiomas()
+
 def render_pagina_curriculo():
-    """Renderiza página com currículo completo"""
-    st.markdown(f"""
-    <div style="padding:7rem 2rem 2rem;text-align:center;background:var(--hero-bg);position:relative;overflow:hidden;">
-        <h1 style="font-size:2.5rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.5rem;">Currículo Completo</h1>
-        <p style="color:var(--text-muted);font-size:1.05rem;">Todas as informações do currículo organizadas</p>
+    st.markdown("""
+    <div class="page-header">
+        <h1>📄 Currículo Completo</h1>
+        <p>Todas as informações do currículo organizadas</p>
     </div>
     """, unsafe_allow_html=True)
     
+    render_mode_selector()
     render_kpis()
     render_tech_stack()
     render_experiencias()
@@ -524,21 +522,16 @@ def render_pagina_curriculo():
     render_formacao()
     render_idiomas()
 
-# ============================================================================
-# PÁGINA PROJETOS
-# ============================================================================
 def render_pagina_projetos():
-    """Renderiza página de projetos"""
-    st.markdown(f"""
-    <div style="padding:7rem 2rem 2rem;text-align:center;background:var(--hero-bg);position:relative;overflow:hidden;">
-        <h1 style="font-size:2.5rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.5rem;">🚀 Projetos de Analytics</h1>
-        <p style="color:var(--text-muted);font-size:1.05rem;">Aplicações reais construídas com Python, Streamlit e visualizações interativas</p>
+    st.markdown("""
+    <div class="page-header">
+        <h1>🚀 Projetos de Analytics</h1>
+        <p>Aplicações reais construídas com Python, Streamlit e visualizações interativas</p>
     </div>
     """, unsafe_allow_html=True)
     
     render_projetos()
     
-    # Gráfico de tecnologias dos projetos
     colors = get_colors()
     
     st.markdown("""
@@ -550,7 +543,6 @@ def render_pagina_projetos():
             </div>
     """, unsafe_allow_html=True)
     
-    # Conta tecnologias
     tech_count = {}
     for projeto in PROJETOS:
         for tech in projeto["tecnologias"]:
@@ -562,42 +554,28 @@ def render_pagina_projetos():
     }).sort_values("Projetos", ascending=True)
     
     fig = px.bar(
-        df_tech,
-        x="Projetos",
-        y="Tecnologia",
-        orientation="h",
+        df_tech, x="Projetos", y="Tecnologia", orientation="h",
         color_discrete_sequence=[colors["primary"]],
-        template=colors["plotly_template"],
-        text="Projetos"
+        template=colors["plotly_template"], text="Projetos"
     )
     fig.update_layout(
-        height=350,
-        margin=dict(l=20, r=40, t=20, b=40),
-        xaxis=dict(showgrid=False),
-        yaxis=dict(showgrid=False),
+        height=350, margin=dict(l=20, r=40, t=20, b=40),
+        xaxis=dict(showgrid=False), yaxis=dict(showgrid=False),
         font=dict(family="Inter", color=colors["text"]),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)"
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)"
     )
     fig.update_traces(textposition="outside")
     
     st.plotly_chart(fig, use_container_width=True)
     st.markdown("</div></div>", unsafe_allow_html=True)
 
-# ============================================================================
-# PÁGINA ANALYTICS (DEMO)
-# ============================================================================
 def render_pagina_analytics():
-    """Renderiza página de analytics com dados simulados"""
-    import numpy as np
-    from datetime import datetime, timedelta
-    
     colors = get_colors()
     
-    st.markdown(f"""
-    <div style="padding:7rem 2rem 2rem;text-align:center;background:var(--hero-bg);position:relative;overflow:hidden;">
-        <h1 style="font-size:2.5rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.5rem;">📊 Analytics Interativo</h1>
-        <p style="color:var(--text-muted);font-size:1.05rem;">Demonstrações de dashboards construídos em Streamlit + Plotly</p>
+    st.markdown("""
+    <div class="page-header">
+        <h1>📊 Analytics Interativo</h1>
+        <p>Demonstrações de dashboards construídos em Streamlit + Plotly</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -608,16 +586,16 @@ def render_pagina_analytics():
     with tabs[0]:
         np.random.seed(42)
         regioes = ["Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte"]
-        status = ["Renegociado", "Em Negociação", "Inadimplente"]
+        status_opts = ["Renegociado", "Em Negociação", "Inadimplente"]
         df = pd.DataFrame({
             "Região": np.random.choice(regioes, 400, p=[.45, .28, .15, .07, .05]),
             "Valor": np.random.lognormal(8.5, 1.2, 400),
-            "Status": np.random.choice(status, 400, p=[.65, .25, .10])
+            "Status": np.random.choice(status_opts, 400, p=[.65, .25, .10])
         })
         
         col1, col2 = st.columns(2)
         reg = col1.multiselect("Região", regioes, default=regioes)
-        stat = col2.multiselect("Status", status, default=status)
+        stat = col2.multiselect("Status", status_opts, default=status_opts)
         filtro = df[df["Região"].isin(reg) & df["Status"].isin(stat)]
         
         if filtro.empty:
@@ -686,31 +664,3 @@ def render_pagina_analytics():
         k3.metric("Projetos", "24", "+60%")
     
     st.markdown('</div>', unsafe_allow_html=True)
-
-# ============================================================================
-# PÁGINA HOME
-# ============================================================================
-def render_pagina_home():
-    """Renderiza a página inicial"""
-    render_hero()
-    render_mode_selector()
-    render_kpis()
-    render_tech_stack()
-    render_experiencias()
-    render_projetos()
-    
-    # Skills Chart
-    st.markdown("""
-    <div class="section-glass">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">📊 Competências Visuais</span>
-                <h2>Domínio tecnológico em gráficos</h2>
-            </div>
-    """, unsafe_allow_html=True)
-    render_skills_chart()
-    st.markdown("</div></div>", unsafe_allow_html=True)
-    
-    render_certificacoes()
-    render_formacao()
-    render_idiomas()
