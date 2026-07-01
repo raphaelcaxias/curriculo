@@ -1,6 +1,7 @@
 """
 config2.py - Todas as configurações, cores, CSS e constantes
 """
+import streamlit as st
 
 # ============================================================================
 # CAMINHOS DOS ARQUIVOS
@@ -23,7 +24,7 @@ PDF_CANDIDATOS = [
 FOTO_FALLBACK = "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=1D4ED8&color=fff&bold=true"
 
 # ============================================================================
-# TEXTOS FIXOS DO CURRÍCULO
+# DADOS DO CURRÍCULO
 # ============================================================================
 DADOS_PESSOAIS = {
     "nome": "Raphael Fernando S. Pires",
@@ -40,10 +41,10 @@ DADOS_PESSOAIS = {
 PERFIL_PROFISSIONAL = "Analista de Dados e Business Intelligence (BI) com formação em Sistemas de Informação e experiência prática na construção de soluções analíticas, modelagem de dados, automação de processos e desenvolvimento de dashboards para apoio à tomada de decisão. Atua com Power BI, SQL, Python e Excel em operações reais de negócio."
 
 KPIS = [
-    {"valor": "70%", "label": "Redução tempo operacional", "contexto": "Banco do Brasil"},
-    {"valor": "2h→15min", "label": "Ciclo de análise", "contexto": "Relatórios comerciais"},
-    {"valor": "213 mil+", "label": "Registros analisados", "contexto": "Projeto CNPq"},
-    {"valor": "16 anos", "label": "Experiência", "contexto": "Profissional acumulada"}
+    {"valor": "70%", "label": "Redução tempo operacional", "contexto": "Banco do Brasil", "icone": "⚡"},
+    {"valor": "2h→15min", "label": "Ciclo de análise", "contexto": "Relatórios comerciais", "icone": "⏱️"},
+    {"valor": "213 mil+", "label": "Registros analisados", "contexto": "Projeto CNPq", "icone": "📊"},
+    {"valor": "16 anos", "label": "Experiência", "contexto": "Profissional acumulada", "icone": "🏆"}
 ]
 
 TECH_STACK = {
@@ -65,8 +66,8 @@ CERTIFICACOES = [
     },
     {
         "instituicao": "AWS Educate",
-        "cursos": ["Cloud Computing", "Introdução ao Cloud 101", "Console de Gerenciamento da AWS", 
-                   "Introdução a Armazenamento", "Machine Learning Foundations", "AWS Sustainability", 
+        "cursos": ["Cloud Computing", "Introdução ao Cloud 101", "Console de Gerenciamento da AWS",
+                   "Introdução a Armazenamento", "Machine Learning Foundations", "AWS Sustainability",
                    "Cloud and Sustainability", "Cloud Support Associate Day in the Life"],
         "status": "Em andamento (40%)",
         "icone": "☁️",
@@ -88,9 +89,9 @@ PROJETOS = [
     {
         "nome": "Desenrola Brasil — Painel Analítico Executivo",
         "tecnologias": ["Python", "Pandas", "Scikit-learn", "Statsmodels", "Plotly", "Streamlit"],
-        "url": "desenrolabrasil.streamlit.app",
+        "url": "https://desenrolabrasil.streamlit.app",
         "descricao": [
-            "Processamento de dados oficiais do Banco Central com KPIs, séries temporais e análise de concentração de mercado(HHI).",
+            "Processamento de dados oficiais do Banco Central com KPIs, séries temporais e análise de concentração de mercado (HHI).",
             "Segmentação analítica de perfis de renegociação via clusterização e análise exploratória de dados."
         ],
         "icone": "🇧🇷"
@@ -98,7 +99,7 @@ PROJETOS = [
     {
         "nome": "CNPq Analytics — Investimentos em Pesquisa",
         "tecnologias": ["Python", "Pandas", "Plotly", "Streamlit", "PostgreSQL"],
-        "url": "cnpq-analytics.streamlit.app",
+        "url": "https://cnpq-analytics.streamlit.app",
         "descricao": [
             "ETL e análise de mais de 213 mil bolsas e R$ 1,2 bi em investimentos públicos — evidenciando desigualdades regionais.",
             "Dashboard interativo com filtros dinâmicos e visualizações de distribuição de recursos por região."
@@ -171,7 +172,7 @@ EXPERIENCIAS = [
         "periodo": "Jan 2006 — Dez 2007",
         "status": None,
         "descricao": [
-            "Capacitou jovens em Excel avançado(tabelas dinâmicas, PROCV, automações) e lógica de programação."
+            "Capacitou jovens em Excel avançado (tabelas dinâmicas, PROCV, automações) e lógica de programação."
         ],
         "tags": ["Excel", "Programação", "Ensino"]
     }
@@ -191,7 +192,7 @@ MODOS_VISUALIZACAO = {
     "Dados & BI": {
         "descricao": "Foco em análise de dados, BI, dashboards e modelagem",
         "destaques": ["POWER BI", "SQL", "PYTHON", "ETL", "VISUALIZAÇÃO"],
-        "ordem_experiencias": [0, 1, 2, 3, 4],  # Mantém ordem original
+        "ordem_experiencias": [0, 1, 2, 3, 4],
         "cor_destaque": "#3B82F6"
     },
     "Desenvolvimento": {
@@ -203,13 +204,13 @@ MODOS_VISUALIZACAO = {
     "Indústria & Gestão": {
         "descricao": "Foco em operações, gestão e processos industriais",
         "destaques": ["POWER BI", "SQL", "ETL", "FERRAMENTAS"],
-        "ordem_experiencias": [3, 2, 0, 1, 4],  # NSM primeiro, depois Banco
+        "ordem_experiencias": [3, 2, 0, 1, 4],
         "cor_destaque": "#10B981"
     },
     "Empreendedorismo": {
         "descricao": "Foco em fundação de empresas e gestão de negócios",
         "destaques": ["POWER BI", "SQL", "PYTHON", "FERRAMENTAS"],
-        "ordem_experiencias": [0, 1, 2, 3, 4],  # Jardins primeiro
+        "ordem_experiencias": [0, 1, 2, 3, 4],
         "cor_destaque": "#F59E0B"
     }
 }
@@ -290,6 +291,22 @@ TEMA_LIGHT = {
 }
 
 # ============================================================================
+# FUNÇÕES DE CONFIGURAÇÃO
+# ============================================================================
+def get_colors():
+    """Retorna as cores do tema atual"""
+    if st.session_state.get("theme", "dark") == "dark":
+        return TEMA_DARK
+    return TEMA_LIGHT
+
+def toggle_theme():
+    """Alterna entre dark e light mode"""
+    if st.session_state.theme == "dark":
+        st.session_state.theme = "light"
+    else:
+        st.session_state.theme = "dark"
+
+# ============================================================================
 # CSS COMPLETO
 # ============================================================================
 def get_css(colors):
@@ -305,7 +322,6 @@ def get_css(colors):
             --success: {colors['success']};
             --warning: {colors['warning']};
             --bg: {colors['bg']};
-            --bg-elevated: {colors['bg_elevated']};
             --text: {colors['text']};
             --text-muted: {colors['text_muted']};
             --text-subtle: {colors['text_subtle']};
@@ -325,6 +341,10 @@ def get_css(colors):
             --gradient-primary: {colors['gradient_primary']};
             --gradient-accent: {colors['gradient_accent']};
             --gradient-text: {colors['gradient_text']};
+            --section-bg: {colors['section_bg']};
+            --section-alt-bg: {colors['section_alt_bg']};
+            --hero-bg: {colors['hero_bg']};
+            --hero-glow: {colors['hero_glow']};
         }}
 
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
@@ -339,21 +359,18 @@ def get_css(colors):
         .stApp {{ background: var(--bg); }}
         .block-container {{ padding: 0 !important; max-width: 100%; }}
 
-        /* NAVBAR */
         .navbar {{
             position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
             background: var(--navbar-bg);
             backdrop-filter: blur(20px) saturate(200%);
+            -webkit-backdrop-filter: blur(20px) saturate(200%);
             border-bottom: 1px solid var(--navbar-border);
             padding: 0.875rem 2.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
         }}
         .navbar-brand {{ 
-            font-weight: 800; font-size: 1.3rem; 
-            color: var(--text); text-decoration: none;
-            display: flex; align-items: center; gap: 0.5rem;
+            font-weight: 800; font-size: 1.3rem; color: var(--text); 
+            text-decoration: none; display: flex; align-items: center; gap: 0.5rem;
         }}
         .navbar-brand .brand-dot {{
             width: 10px; height: 10px; border-radius: 50%;
@@ -369,14 +386,15 @@ def get_css(colors):
             background: var(--gradient-text);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }}
-        .navbar-links {{ display: flex; gap: 0.5rem; align-items: center; }}
+        .navbar-links {{ display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }}
         .nav-link {{
             padding: 0.5rem 1.1rem; border-radius: 999px; font-size: 0.875rem;
             font-weight: 500; text-decoration: none; transition: all 0.25s ease;
             color: var(--text-muted); background: transparent; cursor: pointer;
         }}
-        .nav-link:hover {{ background: var(--nav-hover); color: var(--text); }}
+        .nav-link:hover {{ background: var(--nav-hover); color: var(--text); transform: translateY(-1px); }}
         .nav-link.active {{
             background: var(--gradient-primary); color: white !important;
             box-shadow: 0 4px 16px rgba(59,130,246,0.35);
@@ -393,18 +411,14 @@ def get_css(colors):
             transform: rotate(360deg) scale(1.1);
         }}
 
-        /* HERO */
         .hero-full {{
-            min-height: 85vh;
-            display: flex; align-items: center; justify-content: center;
-            padding: 7rem 2rem 3rem;
-            background: var(--hero-bg);
+            min-height: 85vh; display: flex; align-items: center; justify-content: center;
+            padding: 7rem 2rem 3rem; background: var(--hero-bg);
             position: relative; overflow: hidden;
         }}
         .hero-full::before {{
             content: ''; position: absolute; inset: 0;
-            background: var(--hero-glow);
-            opacity: 0.5; pointer-events: none;
+            background: var(--hero-glow); opacity: 0.5; pointer-events: none;
         }}
         .hero-grid-bg {{
             position: absolute; inset: 0;
@@ -413,19 +427,19 @@ def get_css(colors):
                 linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
             background-size: 60px 60px;
             mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
             pointer-events: none;
         }}
         .hero-content {{
             max-width: 1200px; width: 100%;
             display: grid; grid-template-columns: auto 1fr;
-            gap: 4rem; align-items: center;
-            position: relative; z-index: 2;
+            gap: 4rem; align-items: center; position: relative; z-index: 2;
         }}
         @media (max-width: 900px) {{
             .hero-content {{ grid-template-columns: 1fr; text-align: center; gap: 2rem; }}
+            .hero-photo-wrapper {{ margin: 0 auto; }}
         }}
         .hero-photo-wrapper {{ position: relative; width: 260px; height: 260px; }}
-        @media (max-width: 900px) {{ .hero-photo-wrapper {{ margin: 0 auto; }} }}
         .hero-photo-ring {{
             position: absolute; inset: -12px; border-radius: 50%;
             background: conic-gradient(from 0deg, var(--primary), var(--secondary), var(--accent), var(--primary));
@@ -444,8 +458,7 @@ def get_css(colors):
         }}
         .hero-status-badge {{
             position: absolute; bottom: 10px; right: 10px; z-index: 3;
-            background: var(--success);
-            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--success); width: 28px; height: 28px; border-radius: 50%;
             border: 4px solid var(--bg);
             box-shadow: 0 0 0 3px var(--success), 0 0 20px var(--success);
             animation: pulse-status 2s infinite;
@@ -456,13 +469,13 @@ def get_css(colors):
         }}
         .hero-text h1 {{ 
             font-size: 3.5rem; font-weight: 900; 
-            letter-spacing: -0.04em; line-height: 1.05; 
-            margin-bottom: 0.5rem;
+            letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 0.5rem;
         }}
         .hero-text h1 .gradient-name {{ 
             background: var(--gradient-text);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }}
         .hero-text .role-tag {{
             display: inline-flex; align-items: center; gap: 0.5rem;
@@ -479,7 +492,9 @@ def get_css(colors):
             font-style: italic; color: var(--text-subtle);
             font-size: 0.95rem; margin: 1.5rem 0;
             padding-left: 1.5rem; border-left: 3px solid var(--primary);
+            max-width: 500px;
         }}
+        @media (max-width: 900px) {{ .hero-quote {{ margin-left: auto; margin-right: auto; }} }}
         .badge-group {{ display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }}
         @media (max-width: 900px) {{ .badge-group {{ justify-content: center; }} }}
         .badge {{
@@ -500,7 +515,7 @@ def get_css(colors):
             font-weight: 600; text-decoration: none;
             display: inline-flex; align-items: center; gap: 0.5rem;
             box-shadow: 0 4px 16px rgba(59,130,246,0.3);
-            transition: all 0.25s ease;
+            transition: all 0.25s ease; border: none; cursor: pointer;
         }}
         .btn-primary:hover {{ 
             transform: translateY(-2px);
@@ -519,12 +534,9 @@ def get_css(colors):
             transform: translateY(-2px);
         }}
 
-        /* SECTIONS */
         .section-glass {{
-            padding: 5rem 2rem;
-            background: var(--section-bg);
-            backdrop-filter: blur(8px);
-            border-top: 1px solid var(--border);
+            padding: 5rem 2rem; background: var(--section-bg);
+            backdrop-filter: blur(8px); border-top: 1px solid var(--border);
         }}
         .section-glass.alt {{ background: var(--section-alt-bg); }}
         .container {{ max-width: 1200px; margin: 0 auto; }}
@@ -545,11 +557,7 @@ def get_css(colors):
             margin: 1rem auto 0; font-size: 1.05rem; line-height: 1.6;
         }}
 
-        /* KPI GRID */
-        .kpi-grid {{
-            display: grid; grid-template-columns: repeat(4, 1fr);
-            gap: 1.25rem;
-        }}
+        .kpi-grid {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }}
         @media (max-width: 1024px) {{ .kpi-grid {{ grid-template-columns: repeat(2, 1fr); }} }}
         @media (max-width: 640px) {{ .kpi-grid {{ grid-template-columns: 1fr; }} }}
         .kpi-card {{
@@ -579,12 +587,12 @@ def get_css(colors):
             background: var(--gradient-text);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             line-height: 1.1; margin-bottom: 0.35rem;
         }}
         .kpi-label {{ font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }}
         .kpi-context {{ font-size: 0.75rem; color: var(--text-subtle); margin-top: 0.25rem; }}
 
-        /* TECH GRID */
         .tech-grid {{
             display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
@@ -598,10 +606,7 @@ def get_css(colors):
             transform: translateY(-4px); border-color: var(--border-hover);
             box-shadow: var(--shadow-hover);
         }}
-        .tech-card-header {{
-            display: flex; align-items: center; gap: 1rem;
-            margin-bottom: 1rem;
-        }}
+        .tech-card-header {{ display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }}
         .tech-icon {{
             width: 56px; height: 56px; border-radius: 16px;
             background: var(--primary-light);
@@ -617,9 +622,7 @@ def get_css(colors):
         .tech-level.expert {{ background: rgba(34,197,94,0.15); color: var(--success); }}
         .tech-level.avancado {{ background: rgba(59,130,246,0.15); color: var(--primary); }}
         .tech-level.intermediario {{ background: rgba(245,158,11,0.15); color: var(--warning); }}
-        .tech-items {{
-            display: flex; flex-wrap: wrap; gap: 0.4rem;
-        }}
+        .tech-items {{ display: flex; flex-wrap: wrap; gap: 0.4rem; }}
         .tech-item {{
             font-size: 0.78rem; background: var(--tag-bg);
             border: 1px solid var(--tag-border);
@@ -627,7 +630,6 @@ def get_css(colors):
             color: var(--primary); font-weight: 500;
         }}
 
-        /* EXPERIENCE TIMELINE */
         .timeline {{ position: relative; padding: 2rem 0; }}
         .timeline::before {{
             content: ''; position: absolute; left: 28px; top: 0; bottom: 0;
@@ -686,7 +688,6 @@ def get_css(colors):
             color: var(--primary); font-weight: 600;
         }}
 
-        /* PROJECTS */
         .project-grid {{
             display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 1.5rem;
@@ -717,9 +718,7 @@ def get_css(colors):
         }}
         .project-card h3 {{ font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; }}
         .project-card p {{ color: var(--text-muted); line-height: 1.65; font-size: 0.92rem; margin-bottom: 1rem; }}
-        .project-tech {{
-            display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem;
-        }}
+        .project-tech {{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem; }}
         .project-tag {{
             font-size: 0.7rem; background: var(--tag-bg);
             border: 1px solid var(--tag-border);
@@ -727,17 +726,44 @@ def get_css(colors):
             color: var(--primary); font-weight: 600;
         }}
 
-        /* FOOTER */
+        .glass-card {{
+            background: var(--card-bg); backdrop-filter: blur(12px);
+            border: 1px solid var(--border); border-radius: 24px;
+            padding: 2rem; transition: all 0.3s ease;
+        }}
+        .glass-card:hover {{
+            transform: translateY(-6px); border-color: var(--border-hover);
+            box-shadow: var(--shadow-hover);
+        }}
+
+        .progress-bar {{
+            width: 100%; height: 8px;
+            background: var(--border); border-radius: 999px;
+            overflow: hidden; margin-top: 0.75rem;
+        }}
+        .progress-fill {{
+            height: 100%; background: var(--gradient-primary);
+            border-radius: 999px; transition: width 1s ease;
+            box-shadow: 0 0 12px var(--primary);
+        }}
+
         .footer {{
             padding: 4rem 2rem 2.5rem; text-align: center;
             border-top: 1px solid var(--border);
             background: var(--card-bg); backdrop-filter: blur(12px);
+            position: relative;
+        }}
+        .footer::before {{
+            content: ''; position: absolute; top: 0; left: 50%;
+            transform: translateX(-50%); width: 200px; height: 1px;
+            background: var(--gradient-primary);
         }}
         .footer h3 {{
             font-size: 2rem; font-weight: 800;
             background: var(--gradient-text);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 0.5rem;
         }}
         .footer-links {{
@@ -763,27 +789,40 @@ def get_css(colors):
             border-top: 1px solid var(--border);
         }}
 
-        /* MODE SELECTOR */
-        .mode-selector {{
-            display: flex; gap: 0.5rem; justify-content: center;
-            margin-bottom: 3rem; flex-wrap: wrap;
+        .page-header {{
+            padding: 7rem 2rem 2rem; text-align: center;
+            background: var(--hero-bg); position: relative; overflow: hidden;
         }}
-        .mode-btn {{
-            padding: 0.6rem 1.5rem; border-radius: 999px;
-            background: var(--card-bg); border: 1px solid var(--border);
-            font-weight: 600; font-size: 0.88rem;
-            color: var(--text-muted); cursor: pointer;
-            transition: all 0.25s ease;
+        .page-header::before {{
+            content: ''; position: absolute; inset: 0;
+            background: var(--hero-glow); opacity: 0.4; pointer-events: none;
         }}
-        .mode-btn:hover {{
-            background: var(--card-bg-hover); color: var(--text);
-            border-color: var(--primary);
+        .page-header h1 {{
+            font-size: 2.5rem; font-weight: 800;
+            letter-spacing: -0.03em; margin-bottom: 0.5rem;
+            position: relative; z-index: 2;
         }}
-        .mode-btn.active {{
+        .page-header p {{
+            color: var(--text-muted); font-size: 1.05rem;
+            position: relative; z-index: 2;
+        }}
+
+        .scroll-top {{
+            position: fixed; bottom: 2rem; right: 2rem;
+            width: 48px; height: 48px; border-radius: 50%;
             background: var(--gradient-primary); color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 16px rgba(59,130,246,0.35);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; cursor: pointer;
+            box-shadow: 0 8px 24px rgba(59,130,246,0.35);
+            transition: all 0.25s ease; z-index: 999;
+            text-decoration: none;
         }}
+        .scroll-top:hover {{
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(59,130,246,0.5);
+        }}
+
+        @keyframes pulse {{ 0%,100% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} }}
 
         @media (max-width: 768px) {{
             .navbar {{ padding: 0.75rem 1rem; }}
@@ -796,13 +835,3 @@ def get_css(colors):
         }}
     </style>
     """
-
-# ============================================================================
-# CONFIGURAÇÕES DO PLOTLY
-# ============================================================================
-PLOTLY_LAYOUT = {
-    "font": {"family": "Inter"},
-    "paper_bgcolor": "rgba(0,0,0,0)",
-    "plot_bgcolor": "rgba(0,0,0,0)",
-    "margin": {"l": 20, "r": 20, "t": 40, "b": 40}
-}
