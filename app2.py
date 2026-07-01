@@ -1,13 +1,11 @@
 """
 app2.py - Arquivo principal do Streamlit
-Responsável apenas por: iniciar, configurar página, menu, navegação e chamadas
 """
 import streamlit as st
-from config2 import get_css, get_colors
+from config2 import get_css, get_colors, toggle_theme
 from componentes2 import (
     render_navbar, render_pagina_home, render_pagina_curriculo,
-    render_pagina_projetos, render_pagina_analytics, render_footer,
-    toggle_theme
+    render_pagina_projetos, render_pagina_analytics, render_footer
 )
 
 # ============================================================================
@@ -37,7 +35,6 @@ st.markdown(get_css(colors), unsafe_allow_html=True)
 # ============================================================================
 page = st.query_params.get("page", "home")
 
-# Handle theme toggle
 if "theme_toggle" in st.query_params:
     toggle_theme()
     params = dict(st.query_params)
@@ -47,13 +44,10 @@ if "theme_toggle" in st.query_params:
     st.rerun()
 
 # ============================================================================
-# RENDERIZA NAVBAR
+# RENDERIZA CONTEÚDO
 # ============================================================================
 render_navbar(page)
 
-# ============================================================================
-# RENDERIZA CONTEÚDO
-# ============================================================================
 if page == "home":
     render_pagina_home()
 elif page == "curriculo":
@@ -65,7 +59,4 @@ elif page == "analytics":
 else:
     render_pagina_home()
 
-# ============================================================================
-# FOOTER
-# ============================================================================
 render_footer()
