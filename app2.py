@@ -8,7 +8,6 @@ import numpy as np
 import plotly.express as px
 import os
 import base64
-from datetime import datetime
 
 # ============================================================================
 # CONFIGURAÇÃO DA PÁGINA
@@ -113,10 +112,10 @@ Sou curioso por natureza. Quando aprendo algo, quero entender tudo. Gosto de con
 }
 
 KPIS = [
-    {"valor": "70%", "label": "Redução tempo operacional", "contexto": "Banco do Brasil", "icone": "⚡", "cor": "#3B82F6"},
-    {"valor": "2h→15min", "label": "Ciclo de análise", "contexto": "Relatórios comerciais", "icone": "⏱️", "cor": "#0EA5E9"},
-    {"valor": "213 mil+", "label": "Registros analisados", "contexto": "Projeto CNPq", "icone": "📊", "cor": "#8B5CF6"},
-    {"valor": "16 anos", "label": "Experiência profissional", "contexto": "Acumulada", "icone": "🏆", "cor": "#F59E0B"}
+    {"valor": "70%", "label": "Redução tempo operacional", "contexto": "Banco do Brasil", "icone": "⚡"},
+    {"valor": "2h→15min", "label": "Ciclo de análise", "contexto": "Relatórios comerciais", "icone": "⏱️"},
+    {"valor": "213 mil+", "label": "Registros analisados", "contexto": "Projeto CNPq", "icone": "📊"},
+    {"valor": "16 anos", "label": "Experiência profissional", "contexto": "Acumulada", "icone": "🏆"}
 ]
 
 TECH_STACK = {
@@ -291,7 +290,6 @@ def get_css():
         color: {text};
     }}
     
-    /* Bloqueia scroll horizontal */
     .block-container {{
         padding: 0 !important;
         max-width: 100% !important;
@@ -313,6 +311,8 @@ def get_css():
         display: flex;
         align-items: center;
         justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }}
     
     .navbar-brand {{
@@ -353,7 +353,6 @@ def get_css():
         flex-wrap: wrap;
     }}
     
-    /* ===== BOTÕES DE NAVEGAÇÃO ===== */
     .nav-btn {{
         padding: 0.4rem 0.9rem;
         border-radius: 999px;
@@ -381,11 +380,6 @@ def get_css():
         background: linear-gradient(135deg, #3B82F6, #0EA5E9);
         color: white !important;
         box-shadow: 0 2px 12px rgba(59,130,246,0.3);
-    }}
-    
-    .nav-btn.active:hover {{
-        transform: translateY(-1px);
-        box-shadow: 0 4px 20px rgba(59,130,246,0.4);
     }}
     
     .theme-btn {{
@@ -457,6 +451,7 @@ def get_css():
         width: 260px;
         height: 260px;
         flex-shrink: 0;
+        margin: 0 auto;
     }}
     
     @media (max-width: 480px) {{
@@ -675,6 +670,79 @@ def get_css():
         }}
     }}
     
+    /* ===== SOBRE MIM ===== */
+    .sobre-section {{
+        background: {card_bg};
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid {border};
+        border-radius: 24px;
+        padding: 2.5rem;
+        margin: 1.5rem 0;
+    }}
+    
+    .sobre-text {{
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: {text_muted};
+        white-space: pre-line;
+        margin-bottom: 1.5rem;
+    }}
+    
+    /* ===== VALORES ===== */
+    .valores-grid {{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }}
+    
+    @media (max-width: 1024px) {{
+        .valores-grid {{
+            grid-template-columns: repeat(2, 1fr);
+        }}
+    }}
+    
+    @media (max-width: 480px) {{
+        .valores-grid {{
+            grid-template-columns: 1fr;
+        }}
+    }}
+    
+    .valor-card {{
+        background: {bg};
+        border: 1px solid {border};
+        border-radius: 16px;
+        padding: 1.25rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        height: 100%;
+    }}
+    
+    .valor-card:hover {{
+        transform: translateY(-4px);
+        border-color: #3B82F6;
+        box-shadow: 0 8px 24px {shadow};
+    }}
+    
+    .valor-icon {{
+        font-size: 2.2rem;
+        margin-bottom: 0.5rem;
+    }}
+    
+    .valor-title {{
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: {text};
+        margin-bottom: 0.25rem;
+    }}
+    
+    .valor-desc {{
+        font-size: 0.8rem;
+        color: {text_muted};
+        line-height: 1.5;
+    }}
+    
     /* ===== KPIs ===== */
     .kpi-grid {{
         display: grid;
@@ -755,65 +823,6 @@ def get_css():
         color: {text_muted_light};
         margin-top: 0.15rem;
         opacity: 0.7;
-    }}
-    
-    /* ===== SOBRE ===== */
-    .sobre-section {{
-        background: {card_bg};
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid {border};
-        border-radius: 24px;
-        padding: 2.5rem;
-        margin: 1.5rem 0;
-    }}
-    
-    .sobre-text {{
-        font-size: 1.05rem;
-        line-height: 1.8;
-        color: {text_muted};
-        white-space: pre-line;
-        margin-bottom: 1.5rem;
-    }}
-    
-    .valores-grid {{
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-top: 1.5rem;
-    }}
-    
-    .valor-card {{
-        background: {bg};
-        border: 1px solid {border};
-        border-radius: 16px;
-        padding: 1.25rem;
-        text-align: center;
-        transition: all 0.3s ease;
-    }}
-    
-    .valor-card:hover {{
-        transform: translateY(-4px);
-        border-color: #3B82F6;
-        box-shadow: 0 8px 24px {shadow};
-    }}
-    
-    .valor-icon {{
-        font-size: 2.2rem;
-        margin-bottom: 0.5rem;
-    }}
-    
-    .valor-title {{
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: {text};
-        margin-bottom: 0.25rem;
-    }}
-    
-    .valor-desc {{
-        font-size: 0.8rem;
-        color: {text_muted};
-        line-height: 1.5;
     }}
     
     /* ===== TECH STACK ===== */
@@ -1257,7 +1266,7 @@ def get_css():
         box-shadow: 0 12px 32px rgba(59,130,246,0.5);
     }}
     
-    /* ===== RESPONSIVIDADE GERAL ===== */
+    /* ===== RESPONSIVIDADE ===== */
     @media (max-width: 768px) {{
         .navbar {{
             padding: 0.5rem 1rem;
@@ -1302,9 +1311,6 @@ def get_css():
         .sobre-text {{
             font-size: 0.95rem;
         }}
-        .valores-grid {{
-            grid-template-columns: repeat(2, 1fr);
-        }}
         .footer {{
             padding: 2rem 1rem 1.5rem;
         }}
@@ -1334,9 +1340,6 @@ def get_css():
         .kpi-value {{
             font-size: 1.5rem;
         }}
-        .valores-grid {{
-            grid-template-columns: 1fr;
-        }}
         .nav-btn {{
             font-size: 0.6rem;
             padding: 0.2rem 0.5rem;
@@ -1348,27 +1351,9 @@ def get_css():
             font-size: 0.8rem;
             padding: 0.5rem 1rem;
         }}
-    }}
-    
-    /* ===== UTILITÁRIOS ===== */
-    .text-center {{
-        text-align: center;
-    }}
-    .mt-1 {{ margin-top: 0.5rem; }}
-    .mt-2 {{ margin-top: 1rem; }}
-    .mt-3 {{ margin-top: 1.5rem; }}
-    .mb-1 {{ margin-bottom: 0.5rem; }}
-    .mb-2 {{ margin-bottom: 1rem; }}
-    .mb-3 {{ margin-bottom: 1.5rem; }}
-    .gap-1 {{ gap: 0.5rem; }}
-    .gap-2 {{ gap: 1rem; }}
-    .flex-center {{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }}
-    .flex-wrap {{
-        flex-wrap: wrap;
+        .project-grid {{
+            grid-template-columns: 1fr;
+        }}
     }}
     </style>
     """
@@ -1381,7 +1366,6 @@ def render_navbar():
     theme_icon = "☀️" if st.session_state.theme == "dark" else "🌙"
     page = st.session_state.page
     
-    # Navbar com HTML + CSS puro (sem botões Streamlit para melhor performance)
     nav_html = f"""
     <nav class="navbar" role="navigation" aria-label="Navegação principal">
         <a href="#" class="navbar-brand" onclick="window.location.href='?page=home'" style="cursor:pointer;">
@@ -1398,8 +1382,6 @@ def render_navbar():
     </nav>
     """
     st.markdown(nav_html, unsafe_allow_html=True)
-    
-    # Espaçamento para compensar a navbar fixa
     st.markdown('<div style="height: 70px;"></div>', unsafe_allow_html=True)
 
 def render_hero():
@@ -1428,24 +1410,20 @@ def render_hero():
     
     with col2:
         st.markdown(f"""
-        <div class="hero">
-            <div class="hero-content" style="padding: 0;">
-                <div>
-                    <div class="section-label">📊 {DADOS['titulo']}</div>
-                    <h1 class="hero-title">Raphael <span class="gradient">Pires</span></h1>
-                    <p class="hero-subtitle">{PERFIL}</p>
-                    <div class="hero-quote">"{CITACAO}"</div>
-                    <div class="hero-badges">
-                        <span class="badge">📍 {DADOS['localizacao']}</span>
-                        <span class="badge">🏠 {DADOS['modalidades'][0]}</span>
-                        <span class="badge">✈️ {DADOS['modalidades'][1]}</span>
-                    </div>
-                    <div class="hero-actions">
-                        <a href="#experiencia" class="btn-primary">💼 Ver Experiência</a>
-                        {cv_button}
-                        <a href="{LINKS['linkedin']}" target="_blank" rel="noopener noreferrer" class="btn-secondary">💼 LinkedIn</a>
-                    </div>
-                </div>
+        <div>
+            <div class="section-label">📊 {DADOS['titulo']}</div>
+            <h1 class="hero-title">Raphael <span class="gradient">Pires</span></h1>
+            <p class="hero-subtitle">{PERFIL}</p>
+            <div class="hero-quote">"{CITACAO}"</div>
+            <div class="hero-badges">
+                <span class="badge">📍 {DADOS['localizacao']}</span>
+                <span class="badge">🏠 {DADOS['modalidades'][0]}</span>
+                <span class="badge">✈️ {DADOS['modalidades'][1]}</span>
+            </div>
+            <div class="hero-actions">
+                <a href="#experiencia" class="btn-primary">💼 Ver Experiência</a>
+                {cv_button}
+                <a href="{LINKS['linkedin']}" target="_blank" rel="noopener noreferrer" class="btn-secondary">💼 LinkedIn</a>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -1458,22 +1436,23 @@ def render_sobre():
     </div>
     """, unsafe_allow_html=True)
     
-    valores_html = ""
-    for v in SOBRE_MIM['valores']:
-        valores_html += f"""
-        <div class="valor-card">
-            <div class="valor-icon">{v['icone']}</div>
-            <div class="valor-title">{v['titulo']}</div>
-            <div class="valor-desc">{v['desc']}</div>
-        </div>
-        """
-    
     st.markdown(f"""
     <div class="sobre-section">
         <p class="sobre-text">{SOBRE_MIM['texto']}</p>
-        <div class="valores-grid">{valores_html}</div>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Renderiza os cards de valores usando colunas do Streamlit
+    cols = st.columns(4)
+    for i, valor in enumerate(SOBRE_MIM['valores']):
+        with cols[i]:
+            st.markdown(f"""
+            <div class="valor-card">
+                <div class="valor-icon">{valor['icone']}</div>
+                <div class="valor-title">{valor['titulo']}</div>
+                <div class="valor-desc">{valor['desc']}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
 def render_kpis():
     st.markdown("""
@@ -1560,7 +1539,6 @@ def render_skills_chart():
         plot_bgcolor="rgba(0,0,0,0)",
     )
     
-    # Cor da fonte baseada no tema
     font_color = "#F1F5F9" if st.session_state.theme == "dark" else "#0F172A"
     fig.update_layout(font=dict(color=font_color))
     fig.update_traces(textposition="outside")
@@ -1702,11 +1680,10 @@ def render_footer():
             Disponível para oportunidades
         </div>
         <h2 style="font-size:2rem;font-weight:800;background:linear-gradient(135deg, #3B82F6, #0EA5E9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.5rem;">Vamos conversar?</h2>
-        <p style="color:var(--text-muted);font-size:1.05rem;margin-bottom:1.5rem;">Se busca alguém que entende de negócio E de dados, vamos tomar um café.</p>
+        <p style="color:#94A3B8;font-size:1.05rem;margin-bottom:1.5rem;">Se busca alguém que entende de negócio E de dados, vamos tomar um café.</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Links do rodapé em colunas para melhor responsividade
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
         st.markdown(f'<a href="{LINKS["linkedin"]}" target="_blank" rel="noopener noreferrer" class="footer-link">💼 LinkedIn</a>', unsafe_allow_html=True)
@@ -1719,7 +1696,6 @@ def render_footer():
     with col5:
         st.markdown(f'<a href="tel:{tel}" class="footer-link">📞 {DADOS["contato"]["telefone1"]}</a>', unsafe_allow_html=True)
     
-    # Download do CV adicional no rodapé
     pdf_path = get_pdf_path()
     if pdf_path:
         pdf_b64 = ler_pdf_base64(pdf_path)
@@ -1789,10 +1765,8 @@ def render_analytics():
 # MAIN
 # ============================================================================
 def main():
-    # Aplica CSS
     st.markdown(get_css(), unsafe_allow_html=True)
     
-    # Processa toggle de tema via query params
     if "theme_toggle" in st.query_params:
         toggle_theme()
         page = st.query_params.get("page", "home")
@@ -1800,19 +1774,14 @@ def main():
         st.query_params["page"] = page
         st.rerun()
     
-    # Atualiza página via query params
     if "page" in st.query_params:
         st.session_state.page = st.query_params["page"]
     
-    # Renderiza navbar
     render_navbar()
-    
-    # Âncora para topo
     st.markdown('<div id="topo"></div>', unsafe_allow_html=True)
     
     page = st.session_state.page
     
-    # Conteúdo da página
     if page == "home":
         render_hero()
         st.markdown("---")
@@ -1857,7 +1826,6 @@ def main():
     elif page == "analytics":
         render_analytics()
     
-    # Rodapé
     render_footer()
 
 if __name__ == "__main__":
