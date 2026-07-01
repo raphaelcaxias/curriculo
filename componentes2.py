@@ -57,7 +57,7 @@ def render_navbar(page_atual):
     primeiro = nome_parts[0]
     ultimo = nome_parts[-1]
     
-    st.markdown(f"""
+    navbar_html = f"""
     <nav class="navbar">
         <a href="/?page=home" class="navbar-brand">
             <span class="brand-dot"></span>
@@ -74,7 +74,8 @@ def render_navbar(page_atual):
             </div>
         </div>
     </nav>
-    """, unsafe_allow_html=True)
+    """
+    st.markdown(navbar_html, unsafe_allow_html=True)
 
 # ============================================================================
 # MODE SELECTOR
@@ -134,7 +135,7 @@ def render_hero():
     if pdf_b64:
         botao_cv = f'<a href="{pdf_b64}" download="Curriculo_Raphael.pdf" class="btn-secondary">📄 Baixar CV</a>'
     
-    st.markdown(f"""
+    hero_html = f"""
     <section class="hero-full" id="topo">
         <div class="hero-grid-bg"></div>
         <div class="hero-content">
@@ -164,13 +165,24 @@ def render_hero():
             </div>
         </div>
     </section>
-    """, unsafe_allow_html=True)
+    """
+    st.markdown(hero_html, unsafe_allow_html=True)
 
 # ============================================================================
 # SOBRE MIM
 # ============================================================================
 def render_sobre_mim():
-    st.markdown(f"""
+    valores_html = ""
+    for valor in SOBRE_MIM['valores']:
+        valores_html += f"""
+                <div class="valor-card">
+                    <div class="valor-icon">{valor['icone']}</div>
+                    <div class="valor-title">{valor['titulo']}</div>
+                    <div class="valor-desc">{valor['desc']}</div>
+                </div>
+        """
+    
+    sobre_html = f"""
     <div class="section-glass alt">
         <div class="container">
             <div class="section-header">
@@ -180,29 +192,30 @@ def render_sobre_mim():
             <div class="sobre-section">
                 <p class="sobre-text">{SOBRE_MIM['texto'].strip()}</p>
                 <div class="valores-grid">
-    """, unsafe_allow_html=True)
-    
-    for valor in SOBRE_MIM['valores']:
-        st.markdown(f"""
-                <div class="valor-card">
-                    <div class="valor-icon">{valor['icone']}</div>
-                    <div class="valor-title">{valor['titulo']}</div>
-                    <div class="valor-desc">{valor['desc']}</div>
-                </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown("""
+                    {valores_html}
                 </div>
             </div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    st.markdown(sobre_html, unsafe_allow_html=True)
 
 # ============================================================================
 # KPIs
 # ============================================================================
 def render_kpis():
-    st.markdown("""
+    kpis_html = ""
+    for kpi in KPIS:
+        kpis_html += f"""
+            <div class="kpi-card">
+                <div class="kpi-icon">{kpi['icone']}</div>
+                <div class="kpi-value">{kpi['valor']}</div>
+                <div class="kpi-label">{kpi['label']}</div>
+                <div class="kpi-context">{kpi['contexto']}</div>
+            </div>
+        """
+    
+    st.markdown(f"""
     <div class="section-glass">
         <div class="container">
             <div class="section-header">
@@ -211,21 +224,11 @@ def render_kpis():
                 <p>Cada número aqui representa um problema que resolvi</p>
             </div>
             <div class="kpi-grid">
-    """, unsafe_allow_html=True)
-    
-    cols = st.columns(len(KPIS))
-    for i, kpi in enumerate(KPIS):
-        with cols[i]:
-            st.markdown(f"""
-            <div class="kpi-card">
-                <div class="kpi-icon">{kpi['icone']}</div>
-                <div class="kpi-value">{kpi['valor']}</div>
-                <div class="kpi-label">{kpi['label']}</div>
-                <div class="kpi-context">{kpi['contexto']}</div>
+                {kpis_html}
             </div>
-            """, unsafe_allow_html=True)
-    
-    st.markdown("</div></div></div>", unsafe_allow_html=True)
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================================
 # TECH STACK
@@ -233,17 +236,6 @@ def render_kpis():
 def render_tech_stack():
     modo_atual = st.session_state.get("modo", "Dados & BI")
     destaques = MODOS_VISUALIZACAO[modo_atual]["destaques"]
-    
-    st.markdown("""
-    <div class="section-glass alt">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">⚡ Ferramentas que uso</span>
-                <h2>Stack tecnológica</h2>
-                <p>Tecnologias que domino no dia a dia</p>
-            </div>
-            <div class="tech-grid">
-    """, unsafe_allow_html=True)
     
     techs_ordenadas = []
     for destaque in destaques:
@@ -253,12 +245,13 @@ def render_tech_stack():
         if tech not in destaques:
             techs_ordenadas.append((tech, dados))
     
+    tech_cards_html = ""
     for tech, dados in techs_ordenadas:
         nivel_class = dados['nivel'].lower().replace('í', 'i').replace('á', 'a')
         itens_html = "".join([f'<span class="tech-item">{item}</span>' for item in dados['itens']])
         destaque_badge = "⭐ " if tech in destaques else ""
         
-        st.markdown(f"""
+        tech_cards_html += f"""
         <div class="tech-card">
             <div class="tech-card-header">
                 <div class="tech-icon">{dados['icone']}</div>
@@ -269,9 +262,22 @@ def render_tech_stack():
             </div>
             <div class="tech-items">{itens_html}</div>
         </div>
-        """, unsafe_allow_html=True)
+        """
     
-    st.markdown("</div></div></div>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="section-glass alt">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">⚡ Ferramentas que uso</span>
+                <h2>Stack tecnológica</h2>
+                <p>Tecnologias que domino no dia a dia</p>
+            </div>
+            <div class="tech-grid">
+                {tech_cards_html}
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================================
 # SKILLS CHART
@@ -314,23 +320,13 @@ def render_experiencias():
     modo_atual = st.session_state.get("modo", "Dados & BI")
     ordem = MODOS_VISUALIZACAO[modo_atual]["ordem_experiencias"]
     
-    st.markdown("""
-    <div class="section-glass" id="experiencia">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">💼 Minha trajetória</span>
-                <h2>Experiência profissional</h2>
-                <p>Cada experiência me trouxe algo único</p>
-            </div>
-            <div class="timeline">
-    """, unsafe_allow_html=True)
-    
+    timeline_items_html = ""
     for idx in ordem:
         exp = EXPERIENCIAS[idx]
         badge_html = f'<span class="timeline-badge">{exp["status"]}</span>' if exp.get("status") else ""
         tags_html = "".join([f'<span class="timeline-tag">{t}</span>' for t in exp["tags"]])
         
-        st.markdown(f"""
+        timeline_items_html += f"""
         <div class="timeline-item">
             <div class="timeline-dot"></div>
             <div class="timeline-card">
@@ -341,25 +337,28 @@ def render_experiencias():
                 <div>{tags_html}</div>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """
     
-    st.markdown("</div></div></div>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="section-glass" id="experiencia">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">💼 Minha trajetória</span>
+                <h2>Experiência profissional</h2>
+                <p>Cada experiência me trouxe algo único</p>
+            </div>
+            <div class="timeline">
+                {timeline_items_html}
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================================
 # PROJETOS
 # ============================================================================
 def render_projetos():
-    st.markdown("""
-    <div class="section-glass alt">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">🚀 Projetos que construí</span>
-                <h2>Analytics na prática</h2>
-                <p>Projetos reais com dados reais</p>
-            </div>
-            <div class="project-grid">
-    """, unsafe_allow_html=True)
-    
+    project_cards_html = ""
     for projeto in PROJETOS:
         desc_html = "<br>".join([f"• {d}" for d in projeto["descricao"]])
         techs_html = "".join([f'<span class="project-tag">{t}</span>' for t in projeto["tecnologias"]])
@@ -369,7 +368,7 @@ def render_projetos():
         else:
             link_btn = f'<a href="{LINKS_SOCIAIS["github"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">💻 Ver no GitHub</a>'
         
-        st.markdown(f"""
+        project_cards_html += f"""
         <div class="project-card">
             <div class="project-icon">{projeto['icone']}</div>
             <h3>{projeto['nome']}</h3>
@@ -379,9 +378,22 @@ def render_projetos():
             <div class="project-tech">{techs_html}</div>
             {link_btn}
         </div>
-        """, unsafe_allow_html=True)
+        """
     
-    st.markdown("</div></div></div>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="section-glass alt">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">🚀 Projetos que construí</span>
+                <h2>Analytics na prática</h2>
+                <p>Projetos reais com dados reais</p>
+            </div>
+            <div class="project-grid">
+                {project_cards_html}
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================================
 # CERTIFICAÇÕES
@@ -389,17 +401,7 @@ def render_projetos():
 def render_certificacoes():
     colors = get_colors()
     
-    st.markdown("""
-    <div class="section-glass">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">🎓 Aprendizado contínuo</span>
-                <h2>Certificações</h2>
-                <p>Nunca parei de estudar</p>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
-    """, unsafe_allow_html=True)
-    
+    cert_cards_html = ""
     for cert in CERTIFICACOES:
         cursos_html = " · ".join(cert["cursos"])
         
@@ -411,33 +413,37 @@ def render_certificacoes():
         else:
             status_badge = f'<div style="display:inline-block;background:{colors["success"]};color:white;padding:0.25rem 0.9rem;border-radius:999px;font-size:0.75rem;font-weight:700;">✓ {cert["status"]}</div>'
         
-        st.markdown(f"""
+        cert_cards_html += f"""
         <div class="glass-card" style="text-align:center;">
             <div style="font-size:3rem;margin-bottom:1rem;">{cert['icone']}</div>
             <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:0.75rem;">{cert['instituicao']}</h3>
             <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;margin-bottom:1rem;">{cursos_html}</p>
             {status_badge}
         </div>
-        """, unsafe_allow_html=True)
+        """
     
-    st.markdown("</div></div></div>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="section-glass">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">🎓 Aprendizado contínuo</span>
+                <h2>Certificações</h2>
+                <p>Nunca parei de estudar</p>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+                {cert_cards_html}
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================================
 # FORMAÇÃO
 # ============================================================================
 def render_formacao():
-    st.markdown("""
-    <div class="section-glass alt">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">🎓 Base acadêmica</span>
-                <h2>Formação</h2>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
-    """, unsafe_allow_html=True)
-    
+    formacao_html = ""
     for form in FORMACAO:
-        st.markdown(f"""
+        formacao_html += f"""
         <div class="glass-card">
             <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
                 <div style="width:56px;height:56px;border-radius:16px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:1.8rem;">🎓</div>
@@ -448,15 +454,38 @@ def render_formacao():
             </div>
             <div style="display:inline-block;background:var(--primary-light);border:1px solid var(--tag-border);padding:0.25rem 0.9rem;border-radius:999px;font-size:0.78rem;font-weight:600;color:var(--primary);">Concluído em {form['ano']}</div>
         </div>
-        """, unsafe_allow_html=True)
+        """
     
-    st.markdown("</div></div></div>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="section-glass alt">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">🎓 Base acadêmica</span>
+                <h2>Formação</h2>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+                {formacao_html}
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================================
 # IDIOMAS
 # ============================================================================
 def render_idiomas():
-    st.markdown("""
+    idiomas_html = ""
+    for idioma in IDIOMAS:
+        bandeira = '🇧🇷' if 'Português' in idioma['idioma'] else '🇺🇸'
+        idiomas_html += f"""
+        <div class="glass-card" style="text-align:center;">
+            <div style="font-size:2.5rem;margin-bottom:0.5rem;">{bandeira}</div>
+            <h4 style="font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">{idioma['idioma']}</h4>
+            <div style="display:inline-block;background:var(--primary-light);border:1px solid var(--tag-border);padding:0.25rem 0.9rem;border-radius:999px;font-size:0.78rem;font-weight:600;color:var(--primary);">{idioma['nivel']}</div>
+        </div>
+        """
+    
+    st.markdown(f"""
     <div class="section-glass">
         <div class="container">
             <div class="section-header">
@@ -464,19 +493,11 @@ def render_idiomas():
                 <h2>Competências linguísticas</h2>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:600px;margin:0 auto;">
-    """, unsafe_allow_html=True)
-    
-    for idioma in IDIOMAS:
-        bandeira = '🇷' if 'Português' in idioma['idioma'] else '🇺'
-        st.markdown(f"""
-        <div class="glass-card" style="text-align:center;">
-            <div style="font-size:2.5rem;margin-bottom:0.5rem;">{bandeira}</div>
-            <h4 style="font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">{idioma['idioma']}</h4>
-            <div style="display:inline-block;background:var(--primary-light);border:1px solid var(--tag-border);padding:0.25rem 0.9rem;border-radius:999px;font-size:0.78rem;font-weight:600;color:var(--primary);">{idioma['nivel']}</div>
+                {idiomas_html}
+            </div>
         </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown("</div></div></div>", unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================================
 # FOOTER
@@ -561,7 +582,7 @@ def render_pagina_curriculo():
 def render_pagina_projetos():
     st.markdown("""
     <div class="page-header">
-        <h1> Projetos de Analytics</h1>
+        <h1>🚀 Projetos de Analytics</h1>
         <p>Construídos com Python, Streamlit e dados reais</p>
     </div>
     """, unsafe_allow_html=True)
