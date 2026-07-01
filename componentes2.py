@@ -10,9 +10,9 @@ import base64
 from datetime import datetime, timedelta
 from config2 import (
     FOTO_CANDIDATOS, PDF_CANDIDATOS, FOTO_FALLBACK,
-    DADOS_PESSOAIS, PERFIL_PROFISSIONAL, KPIS, TECH_STACK,
+    DADOS_PESSOAIS, PERFIL_PROFISSIONAL, CITACAO_PESSOAL, KPIS, TECH_STACK,
     CERTIFICACOES, FORMACAO, IDIOMAS, PROJETOS, EXPERIENCIAS,
-    LINKS_SOCIAIS, MODOS_VISUALIZACAO, get_colors
+    LINKS_SOCIAIS, MODOS_VISUALIZACAO, SOBRE_MIM, get_colors
 )
 
 # ============================================================================
@@ -86,7 +86,7 @@ def render_mode_selector():
     st.markdown("""
     <div style="padding:3rem 2rem 0;text-align:center;">
         <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--primary);margin-bottom:1rem;">
-            🎯 Modo de Visualização
+            🎯 Como você quer me conhecer?
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -149,23 +149,53 @@ def render_hero():
                     {DADOS_PESSOAIS['titulo']}
                 </div>
                 <h1>{primeiro} <span class="gradient-name">{ultimo}</span></h1>
-                <p class="subtitle">{PERFIL_PROFISSIONAL}</p>
+                <p class="subtitle">{PERFIL_PROFISSIONAL.strip()}</p>
+                <div class="hero-quote">{CITACAO_PESSOAL.strip()}</div>
                 <div class="badge-group">
                     <span class="badge">📍 {DADOS_PESSOAIS['localizacao']}</span>
                     <span class="badge">🏠 {DADOS_PESSOAIS['modalidades'][0]}</span>
                     <span class="badge">✈️ {DADOS_PESSOAIS['modalidades'][1]}</span>
                 </div>
-                <div class="hero-quote">
-                    "Dados sem contexto são apenas números. Meu trabalho é transformá-los em histórias que orientam decisões."
-                </div>
                 <div class="cta-group">
-                    <a href="#experiencia" class="btn-primary">💼 Ver Experiência</a>
+                    <a href="#experiencia" class="btn-primary">💼 Conhecer minha trajetória</a>
                     {botao_cv}
                     <a href="{LINKS_SOCIAIS['linkedin']}" target="_blank" class="btn-secondary">💼 LinkedIn</a>
                 </div>
             </div>
         </div>
     </section>
+    """, unsafe_allow_html=True)
+
+# ============================================================================
+# SOBRE MIM
+# ============================================================================
+def render_sobre_mim():
+    st.markdown(f"""
+    <div class="section-glass alt">
+        <div class="container">
+            <div class="section-header">
+                <span class="label">👤 Quem sou eu</span>
+                <h2>{SOBRE_MIM['titulo']}</h2>
+            </div>
+            <div class="sobre-section">
+                <p class="sobre-text">{SOBRE_MIM['texto'].strip()}</p>
+                <div class="valores-grid">
+    """, unsafe_allow_html=True)
+    
+    for valor in SOBRE_MIM['valores']:
+        st.markdown(f"""
+                <div class="valor-card">
+                    <div class="valor-icon">{valor['icone']}</div>
+                    <div class="valor-title">{valor['titulo']}</div>
+                    <div class="valor-desc">{valor['desc']}</div>
+                </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("""
+                </div>
+            </div>
+        </div>
+    </div>
     """, unsafe_allow_html=True)
 
 # ============================================================================
@@ -176,9 +206,9 @@ def render_kpis():
     <div class="section-glass">
         <div class="container">
             <div class="section-header">
-                <span class="label">📈 Impacto Mensurável</span>
-                <h2>Números que contam histórias</h2>
-                <p>Resultados concretos de mais de uma década transformando dados em valor</p>
+                <span class="label">📈 Números que contam histórias</span>
+                <h2>Impacto real, não apenas métricas</h2>
+                <p>Cada número aqui representa um problema que resolvi</p>
             </div>
             <div class="kpi-grid">
     """, unsafe_allow_html=True)
@@ -208,9 +238,9 @@ def render_tech_stack():
     <div class="section-glass alt">
         <div class="container">
             <div class="section-header">
-                <span class="label">⚡ Stack Tecnológica</span>
-                <h2>Domínio tecnológico</h2>
-                <p>Competências organizadas por nível de proficiência</p>
+                <span class="label">⚡ Ferramentas que uso</span>
+                <h2>Stack tecnológica</h2>
+                <p>Tecnologias que domino no dia a dia</p>
             </div>
             <div class="tech-grid">
     """, unsafe_allow_html=True)
@@ -288,9 +318,9 @@ def render_experiencias():
     <div class="section-glass" id="experiencia">
         <div class="container">
             <div class="section-header">
-                <span class="label">💼 Trajetória</span>
+                <span class="label">💼 Minha trajetória</span>
                 <h2>Experiência profissional</h2>
-                <p>Jornada de evolução contínua em dados, BI e automação</p>
+                <p>Cada experiência me trouxe algo único</p>
             </div>
             <div class="timeline">
     """, unsafe_allow_html=True)
@@ -298,7 +328,6 @@ def render_experiencias():
     for idx in ordem:
         exp = EXPERIENCIAS[idx]
         badge_html = f'<span class="timeline-badge">{exp["status"]}</span>' if exp.get("status") else ""
-        desc_html = "<br>".join([f"• {d}" for d in exp["descricao"]])
         tags_html = "".join([f'<span class="timeline-tag">{t}</span>' for t in exp["tags"]])
         
         st.markdown(f"""
@@ -308,7 +337,7 @@ def render_experiencias():
                 <span class="timeline-date">{exp['periodo']}</span> {badge_html}
                 <div class="timeline-role">{exp['cargo']}</div>
                 <div class="timeline-company">{exp['empresa']} · {exp['tipo']}</div>
-                <div class="timeline-desc">{desc_html}</div>
+                <div class="timeline-historia">{exp['historia']}</div>
                 <div>{tags_html}</div>
             </div>
         </div>
@@ -324,9 +353,9 @@ def render_projetos():
     <div class="section-glass alt">
         <div class="container">
             <div class="section-header">
-                <span class="label">🚀 Portfólio</span>
-                <h2>Projetos de Analytics</h2>
-                <p>Aplicações reais construídas com Python, Streamlit e visualizações interativas</p>
+                <span class="label">🚀 Projetos que construí</span>
+                <h2>Analytics na prática</h2>
+                <p>Projetos reais com dados reais</p>
             </div>
             <div class="project-grid">
     """, unsafe_allow_html=True)
@@ -336,7 +365,7 @@ def render_projetos():
         techs_html = "".join([f'<span class="project-tag">{t}</span>' for t in projeto["tecnologias"]])
         
         if projeto.get("url"):
-            link_btn = f'<a href="{projeto["url"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">🔗 Ver App</a>'
+            link_btn = f'<a href="{projeto["url"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">🔗 Ver projeto</a>'
         else:
             link_btn = f'<a href="{LINKS_SOCIAIS["github"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">💻 Ver no GitHub</a>'
         
@@ -344,7 +373,9 @@ def render_projetos():
         <div class="project-card">
             <div class="project-icon">{projeto['icone']}</div>
             <h3>{projeto['nome']}</h3>
+            <div class="project-subtitle">{projeto['subtitulo']}</div>
             <p>{desc_html}</p>
+            <div class="project-context">💡 {projeto['contexto']}</div>
             <div class="project-tech">{techs_html}</div>
             {link_btn}
         </div>
@@ -362,8 +393,9 @@ def render_certificacoes():
     <div class="section-glass">
         <div class="container">
             <div class="section-header">
-                <span class="label">🎓 Certificações</span>
-                <h2>Formação contínua</h2>
+                <span class="label">🎓 Aprendizado contínuo</span>
+                <h2>Certificações</h2>
+                <p>Nunca parei de estudar</p>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
     """, unsafe_allow_html=True)
@@ -398,8 +430,8 @@ def render_formacao():
     <div class="section-glass alt">
         <div class="container">
             <div class="section-header">
-                <span class="label">🎓 Formação</span>
-                <h2>Formação acadêmica</h2>
+                <span class="label">🎓 Base acadêmica</span>
+                <h2>Formação</h2>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
     """, unsafe_allow_html=True)
@@ -435,7 +467,7 @@ def render_idiomas():
     """, unsafe_allow_html=True)
     
     for idioma in IDIOMAS:
-        bandeira = '🇧🇷' if 'Português' in idioma['idioma'] else '🇺🇸'
+        bandeira = '🇷' if 'Português' in idioma['idioma'] else '🇺'
         st.markdown(f"""
         <div class="glass-card" style="text-align:center;">
             <div style="font-size:2.5rem;margin-bottom:0.5rem;">{bandeira}</div>
@@ -452,14 +484,14 @@ def render_idiomas():
 def render_footer():
     tel_limpo = DADOS_PESSOAIS['telefone1'].replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
     
-    st.markdown(f"""
+    footer_html = f"""
     <div class="footer" id="contato">
         <div style="display:inline-flex;align-items:center;gap:0.6rem;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);padding:0.4rem 1.2rem;border-radius:999px;font-size:0.82rem;font-weight:600;color:var(--success);margin-bottom:1.5rem;">
             <span style="width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 12px var(--success);animation:pulse 2s infinite;"></span>
             Disponível para novas oportunidades
         </div>
-        <h3>Vamos conversar sobre dados?</h3>
-        <p style="color:var(--text-muted);font-size:1.05rem;margin-bottom:2rem;">Aberto a projetos em Dados, BI e Cloud Computing</p>
+        <h3>Vamos conversar?</h3>
+        <p style="color:var(--text-muted);font-size:1.05rem;margin-bottom:2rem;">Se você busca alguém que entende de negócio E de dados, vamos tomar um café.</p>
         
         <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:2rem;">
             <span style="background:var(--tag-bg);border:1px solid var(--tag-border);padding:0.4rem 1rem;border-radius:999px;font-size:0.82rem;font-weight:500;">📍 {DADOS_PESSOAIS['localizacao']}</span>
@@ -475,16 +507,19 @@ def render_footer():
             <a href="tel:{tel_limpo}" class="footer-link">📞 {DADOS_PESSOAIS['telefone1']}</a>
         </div>
         
-        <p class="footer-copy">© 2026 {DADOS_PESSOAIS['nome']} · Construído com ❤️ usando Streamlit</p>
+        <p class="footer-copy">© 2026 {DADOS_PESSOAIS['nome']} · Feito com ❤️ e muito café ☕</p>
     </div>
     <a href="#topo" class="scroll-top" title="Voltar ao topo">↑</a>
-    """, unsafe_allow_html=True)
+    """
+    
+    st.markdown(footer_html, unsafe_allow_html=True)
 
 # ============================================================================
 # PÁGINAS
 # ============================================================================
 def render_pagina_home():
     render_hero()
+    render_sobre_mim()
     render_mode_selector()
     render_kpis()
     render_tech_stack()
@@ -495,8 +530,8 @@ def render_pagina_home():
     <div class="section-glass">
         <div class="container">
             <div class="section-header">
-                <span class="label">📊 Competências Visuais</span>
-                <h2>Domínio tecnológico em gráficos</h2>
+                <span class="label">📊 Visualização de skills</span>
+                <h2>Nível de domínio</h2>
             </div>
     """, unsafe_allow_html=True)
     render_skills_chart()
@@ -510,10 +545,11 @@ def render_pagina_curriculo():
     st.markdown("""
     <div class="page-header">
         <h1>📄 Currículo Completo</h1>
-        <p>Todas as informações do currículo organizadas</p>
+        <p>Toda minha trajetória organizada</p>
     </div>
     """, unsafe_allow_html=True)
     
+    render_sobre_mim()
     render_mode_selector()
     render_kpis()
     render_tech_stack()
@@ -525,8 +561,8 @@ def render_pagina_curriculo():
 def render_pagina_projetos():
     st.markdown("""
     <div class="page-header">
-        <h1>🚀 Projetos de Analytics</h1>
-        <p>Aplicações reais construídas com Python, Streamlit e visualizações interativas</p>
+        <h1> Projetos de Analytics</h1>
+        <p>Construídos com Python, Streamlit e dados reais</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -538,8 +574,8 @@ def render_pagina_projetos():
     <div class="section-glass">
         <div class="container">
             <div class="section-header">
-                <span class="label">📊 Tecnologias nos Projetos</span>
-                <h2>Stack utilizada</h2>
+                <span class="label">📊 Tecnologias mais usadas</span>
+                <h2>Stack dos projetos</h2>
             </div>
     """, unsafe_allow_html=True)
     
@@ -575,7 +611,7 @@ def render_pagina_analytics():
     st.markdown("""
     <div class="page-header">
         <h1>📊 Analytics Interativo</h1>
-        <p>Demonstrações de dashboards construídos em Streamlit + Plotly</p>
+        <p>Dashboards construídos em Streamlit + Plotly</p>
     </div>
     """, unsafe_allow_html=True)
     
