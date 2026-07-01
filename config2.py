@@ -28,7 +28,7 @@ FOTO_FALLBACK = "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&backgro
 # ============================================================================
 DADOS_PESSOAIS = {
     "nome": "Raphael Fernando S. Pires",
-    "titulo": "Analista de Dados & Business Intelligence (BI)",
+    "titulo": "Analista de Dados & Business Intelligence",
     "localizacao": "Volta Redonda — RJ",
     "modalidades": ["Remoto", "Disponível para viagens"],
     "telefone1": "(24) 3018-1303",
@@ -38,13 +38,23 @@ DADOS_PESSOAIS = {
     "github": "github.com/raphaelcaxias"
 }
 
-PERFIL_PROFISSIONAL = "Analista de Dados e Business Intelligence (BI) com formação em Sistemas de Informação e experiência prática na construção de soluções analíticas, modelagem de dados, automação de processos e desenvolvimento de dashboards para apoio à tomada de decisão. Atua com Power BI, SQL, Python e Excel em operações reais de negócio."
+# PERFIL HUMANIZADO - Em primeira pessoa, mais pessoal
+PERFIL_PROFISSIONAL = """
+Não cheguei aos dados por acaso. Cheguei porque vivi o negócio por anos — estoque, vendas, margem, fluxo de caixa, operação. Quando aprendi Power BI, Python e SQL, não foi para seguir tendência. Foi porque finalmente tinha as ferramentas para resolver os problemas que eu já conhecia de perto.
+
+Sou Analista de Dados e BI com formação em Sistemas de Informação, mas minha verdadeira escola foi o chão de loja, o balcão do banco, a gestão de empresas próprias. Hoje transformo essa experiência em dashboards, automações e indicadores que fazem diferença real.
+"""
+
+# CITAÇÃO PESSOAL - Mais autêntica
+CITACAO_PESSOAL = """
+"Não estou entrando em tecnologia. Estou mostrando que, durante anos, já resolvi problemas com dados — mesmo quando meu cargo não tinha 'Analista' no nome."
+"""
 
 KPIS = [
-    {"valor": "70%", "label": "Redução tempo operacional", "contexto": "Banco do Brasil", "icone": "⚡"},
+    {"valor": "70%", "label": "Redução no tempo operacional", "contexto": "Banco do Brasil", "icone": "⚡"},
     {"valor": "2h→15min", "label": "Ciclo de análise", "contexto": "Relatórios comerciais", "icone": "⏱️"},
     {"valor": "213 mil+", "label": "Registros analisados", "contexto": "Projeto CNPq", "icone": "📊"},
-    {"valor": "16 anos", "label": "Experiência", "contexto": "Profissional acumulada", "icone": "🏆"}
+    {"valor": "16 anos", "label": "De experiência real", "contexto": "Vivendo o negócio", "icone": "🏆"}
 ]
 
 TECH_STACK = {
@@ -62,7 +72,7 @@ CERTIFICACOES = [
         "instituicao": "Hashtag Treinamentos",
         "cursos": ["SQL Avançado", "Power BI", "Python para Análise de Dados", "Algoritmos e IA Aplicada"],
         "status": "Concluído",
-        "icone": "📘"
+        "icone": ""
     },
     {
         "instituicao": "AWS Educate",
@@ -87,36 +97,44 @@ IDIOMAS = [
 
 PROJETOS = [
     {
-        "nome": "Desenrola Brasil — Painel Analítico Executivo",
+        "nome": "Desenrola Brasil",
+        "subtitulo": "Painel Analítico Executivo",
         "tecnologias": ["Python", "Pandas", "Scikit-learn", "Statsmodels", "Plotly", "Streamlit"],
         "url": "https://desenrolabrasil.streamlit.app",
         "descricao": [
-            "Processamento de dados oficiais do Banco Central com KPIs, séries temporais e análise de concentração de mercado (HHI).",
-            "Segmentação analítica de perfis de renegociação via clusterização e análise exploratória de dados."
+            "Dados oficiais do Banco Central transformados em insights reais: KPIs, séries temporais e análise de concentração de mercado (HHI).",
+            "Segmentação de perfis de renegociação via clusterização — porque números sem contexto não ajudam ninguém."
         ],
-        "icone": "🇧🇷"
+        "icone": "🇧",
+        "contexto": "Entender o impacto real do programa no Brasil"
     },
     {
-        "nome": "CNPq Analytics — Investimentos em Pesquisa",
+        "nome": "CNPq Analytics",
+        "subtitulo": "Investimentos em Pesquisa",
         "tecnologias": ["Python", "Pandas", "Plotly", "Streamlit", "PostgreSQL"],
         "url": "https://cnpq-analytics.streamlit.app",
         "descricao": [
-            "ETL e análise de mais de 213 mil bolsas e R$ 1,2 bi em investimentos públicos — evidenciando desigualdades regionais.",
-            "Dashboard interativo com filtros dinâmicos e visualizações de distribuição de recursos por região."
+            "213 mil bolsas e R$ 1,2 bilhão em investimentos públicos analisados. Um dos projetos que mais me orgulho.",
+            "Dashboard interativo que evidencia desigualdades regionais na distribuição de recursos."
         ],
-        "icone": "🔬"
+        "icone": "🔬",
+        "contexto": "Mostrar para onde vai o dinheiro da pesquisa no Brasil"
     },
     {
-        "nome": "Análise de Preços de Combustíveis — ANP",
+        "nome": "Dashboard ANP",
+        "subtitulo": "Preços de Combustíveis",
         "tecnologias": ["Python", "Pandas", "Plotly", "Streamlit"],
         "url": None,
         "descricao": [
-            "Dashboard interativo com filtros temporais e regionais utilizando dados oficiais da Agência Nacional do Petróleo."
+            "Dados oficiais da Agência Nacional do Petróleo com filtros temporais e regionais.",
+            "Porque todo cidadão merece entender o que paga no posto."
         ],
-        "icone": "⛽"
+        "icone": "⛽",
+        "contexto": "Transparência em dados públicos"
     }
 ]
 
+# EXPERIÊNCIAS HUMANIZADAS - Contando histórias, não apenas listando tarefas
 EXPERIENCIAS = [
     {
         "cargo": "Fundador & Analista de Dados",
@@ -124,10 +142,7 @@ EXPERIENCIAS = [
         "tipo": "Empresa Própria",
         "periodo": "2009 — Atual",
         "status": "Consultiva",
-        "descricao": [
-            "Estruturação da base de dados, modelagem, limpeza, integração e desenvolvimento de dashboards gerenciais com SQL, Python, Power BI e Looker Studio — reduzindo ciclo de análise de 2h para 15 min.",
-            "Utilização de IA Generativa como apoio na exploração, documentação e automação de processos analíticos, aumentando frequência analítica sem custo adicional."
-        ],
+        "historia": "Muita gente vê 'dono de loja'. Mas o que eu fiz foi muito além. Estruturei a base de dados do zero, criei dashboards gerenciais, automatizei processos. Reduzi análises que levavam 2 horas para 15 minutos. Foi aqui que desenvolvi meu pensamento de BI de verdade — usando SQL, Python, Power BI, Looker Studio e IA Generativa no dia a dia.",
         "tags": ["SQL", "Python", "Power BI", "Looker Studio", "IA Generativa", "Empreendedorismo"]
     },
     {
@@ -136,10 +151,7 @@ EXPERIENCIAS = [
         "tipo": "Empresa Própria",
         "periodo": "2014 — maio 2026",
         "status": "Encerrado",
-        "descricao": [
-            "Monitoramento de KPIs de vendas, margem e rentabilidade com relatórios automatizados, substituindo intuição por evidência em cada decisão gerencial.",
-            "Análise de viabilidade econômica — projeções, cenários e tendências — que fundamentou encerramento estratégico planejado em maio/2026, evitando prejuízo."
-        ],
+        "historia": "Outra empresa própria, outra escola. Trabalhei com indicadores, KPIs, viabilidade econômica, planejamento financeiro. O encerramento do negócio em maio/2026 não foi por impulso — foi baseado em análise de dados, projeções e cenários. Maturidade de quem decide com evidência, não com emoção.",
         "tags": ["KPIs", "Dashboards", "Análise Econômica", "Empreendedorismo"]
     },
     {
@@ -148,11 +160,8 @@ EXPERIENCIAS = [
         "tipo": "Estágio",
         "periodo": "2008 — 2010",
         "status": None,
-        "descricao": [
-            "Desenvolveu macros VBA em 20 agências, reduzindo 70% do tempo operacional.",
-            "Saneou e padronizou bases de dados gerenciais internas."
-        ],
-        "tags": ["VBA", "Automação", "SQL"]
+        "historia": "Uma das experiências mais fortes da minha carreira. Desenvolvi macros VBA que chegaram a 20 agências, reduzindo 70% do tempo operacional. Saneei e padronizei bases de dados gerenciais. Aqui aprendi o que é automação de verdade em ambiente corporativo.",
+        "tags": ["VBA", "Automação", "SQL", "Ambiente Corporativo"]
     },
     {
         "cargo": "Auxiliar de Dados & Operações",
@@ -160,10 +169,8 @@ EXPERIENCIAS = [
         "tipo": "CLT",
         "periodo": "2002 — 2009",
         "status": None,
-        "descricao": [
-            "Centralizou registros de estoque de 7 unidades, eliminando inconsistências de inventário."
-        ],
-        "tags": ["Operações", "Estoque", "Dados"]
+        "historia": "Meu primeiro contato sério com tecnologia aplicada ao negócio. Centralizei registros de estoque de 7 unidades, eliminando inconsistências de inventário. Aqui desenvolvi minha visão operacional que carrego até hoje.",
+        "tags": ["Operações", "Estoque", "Dados", "Visão Operacional"]
     },
     {
         "cargo": "Instrutor de Informática",
@@ -171,10 +178,8 @@ EXPERIENCIAS = [
         "tipo": "Projeto",
         "periodo": "Jan 2006 — Dez 2007",
         "status": None,
-        "descricao": [
-            "Capacitou jovens em Excel avançado (tabelas dinâmicas, PROCV, automações) e lógica de programação."
-        ],
-        "tags": ["Excel", "Programação", "Ensino"]
+        "historia": "Ensinar é uma das melhores formas de aprender. Capacitei jovens em Excel avançado (tabelas dinâmicas, PROCV, automações) e lógica de programação. Descobri aqui que tenho facilidade para transmitir conhecimento — algo que uso até hoje.",
+        "tags": ["Excel", "Programação", "Ensino", "Comunicação"]
     }
 ]
 
@@ -183,6 +188,28 @@ LINKS_SOCIAIS = {
     "github": "https://github.com/raphaelcaxias",
     "email": "mailto:raphael_caxias@hotmail.com",
     "whatsapp": "https://wa.me/5524992789637"
+}
+
+# SOBRE MIM - Seção pessoal
+SOBRE_MIM = {
+    "titulo": "Minha História",
+    "texto": """
+Sou de Volta Redonda, RJ. Casado com Daiane, pai da Melina (nossa Mel). 
+
+Minha trajetória não é linear — e isso é minha maior força. Comecei na operação, passei pelo banco, empreendi, ensinei, e agora estou reorganizando tudo isso sob a ótica de Dados e BI.
+
+Não sou aquele profissional que fez curso e saiu procurando emprego. Sou alguém que viveu o negócio por anos e agora tem as ferramentas para transformar essa experiência em valor.
+
+Sou curioso por natureza. Quando aprendo algo, quero entender tudo. Não gosto apenas de consumir conhecimento — gosto de construir, publicar, melhorar. Meu currículo passou por dezenas de revisões. Meu portfólio também. Busco excelência, às vezes até demais.
+
+Hoje meu foco é claro: Analista de Dados, Business Intelligence, Planejamento, Indicadores, Power BI. Abandonei a imagem de "empresário" para mostrar minha experiência através da ótica de dados — e essa foi a melhor decisão que tomei.
+    """,
+    "valores": [
+        {"icone": "🎯", "titulo": "Resolução de Problemas", "desc": "Quando aprendo uma tecnologia, penso: como isso resolve um problema real?"},
+        {"icone": "🔍", "titulo": "Curiosidade", "desc": "Quero entender tudo. Não aceito a primeira versão."},
+        {"icone": "🛠️", "titulo": "Construção", "desc": "Não consumo conhecimento passivamente. Construo, publico, melhoro."},
+        {"icone": "📊", "titulo": "Decisão por Dados", "desc": "Encerrei um negócio baseado em análise, não em impulso."}
+    ]
 }
 
 # ============================================================================
@@ -294,13 +321,11 @@ TEMA_LIGHT = {
 # FUNÇÕES DE CONFIGURAÇÃO
 # ============================================================================
 def get_colors():
-    """Retorna as cores do tema atual"""
     if st.session_state.get("theme", "dark") == "dark":
         return TEMA_DARK
     return TEMA_LIGHT
 
 def toggle_theme():
-    """Alterna entre dark e light mode"""
     if st.session_state.theme == "dark":
         st.session_state.theme = "light"
     else:
@@ -485,14 +510,16 @@ def get_css(colors):
             margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em;
         }}
         .hero-text .subtitle {{ 
-            font-size: 1.15rem; color: var(--text-muted); 
-            margin: 0.5rem 0 1.5rem; line-height: 1.7; max-width: 540px;
+            font-size: 1.1rem; color: var(--text-muted); 
+            margin: 0.5rem 0 1.5rem; line-height: 1.7; max-width: 600px;
+            white-space: pre-line;
         }}
         .hero-quote {{
             font-style: italic; color: var(--text-subtle);
             font-size: 0.95rem; margin: 1.5rem 0;
             padding-left: 1.5rem; border-left: 3px solid var(--primary);
-            max-width: 500px;
+            max-width: 500px; line-height: 1.6;
+            white-space: pre-line;
         }}
         @media (max-width: 900px) {{ .hero-quote {{ margin-left: auto; margin-right: auto; }} }}
         .badge-group {{ display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }}
@@ -676,8 +703,8 @@ def get_css(colors):
             color: var(--secondary); font-weight: 600; font-size: 0.95rem;
             margin-bottom: 0.75rem;
         }}
-        .timeline-desc {{ 
-            color: var(--text-muted); line-height: 1.7; font-size: 0.92rem;
+        .timeline-historia {{ 
+            color: var(--text-muted); line-height: 1.7; font-size: 0.95rem;
             margin-bottom: 0.75rem;
         }}
         .timeline-tag {{
@@ -716,8 +743,17 @@ def get_css(colors):
             font-size: 1.8rem; margin-bottom: 1.25rem;
             box-shadow: 0 8px 24px rgba(59,130,246,0.25);
         }}
-        .project-card h3 {{ font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; }}
-        .project-card p {{ color: var(--text-muted); line-height: 1.65; font-size: 0.92rem; margin-bottom: 1rem; }}
+        .project-card h3 {{ font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; }}
+        .project-card .project-subtitle {{ 
+            font-size: 0.9rem; color: var(--text-subtle); 
+            margin-bottom: 0.75rem; font-style: italic;
+        }}
+        .project-card p {{ color: var(--text-muted); line-height: 1.65; font-size: 0.92rem; margin-bottom: 0.5rem; }}
+        .project-card .project-context {{
+            font-size: 0.85rem; color: var(--primary);
+            font-style: italic; margin-bottom: 1rem;
+            padding-left: 1rem; border-left: 2px solid var(--primary);
+        }}
         .project-tech {{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem; }}
         .project-tag {{
             font-size: 0.7rem; background: var(--tag-bg);
@@ -745,6 +781,57 @@ def get_css(colors):
             height: 100%; background: var(--gradient-primary);
             border-radius: 999px; transition: width 1s ease;
             box-shadow: 0 0 12px var(--primary);
+        }}
+
+        /* SOBRE MIM */
+        .sobre-section {{
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+        }}
+        .sobre-text {{
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+            white-space: pre-line;
+            margin-bottom: 2rem;
+        }}
+        .valores-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }}
+        .valor-card {{
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }}
+        .valor-card:hover {{
+            transform: translateY(-4px);
+            border-color: var(--border-hover);
+            box-shadow: var(--shadow-hover);
+        }}
+        .valor-icon {{
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }}
+        .valor-title {{
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }}
+        .valor-desc {{
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
         }}
 
         .footer {{
