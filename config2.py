@@ -38,14 +38,12 @@ DADOS_PESSOAIS = {
     "github": "github.com/raphaelcaxias"
 }
 
-# PERFIL HUMANIZADO - Em primeira pessoa, mais pessoal
 PERFIL_PROFISSIONAL = """
 Não cheguei aos dados por acaso. Cheguei porque vivi o negócio por anos — estoque, vendas, margem, fluxo de caixa, operação. Quando aprendi Power BI, Python e SQL, não foi para seguir tendência. Foi porque finalmente tinha as ferramentas para resolver os problemas que eu já conhecia de perto.
 
 Sou Analista de Dados e BI com formação em Sistemas de Informação, mas minha verdadeira escola foi o chão de loja, o balcão do banco, a gestão de empresas próprias. Hoje transformo essa experiência em dashboards, automações e indicadores que fazem diferença real.
 """
 
-# CITAÇÃO PESSOAL - Mais autêntica
 CITACAO_PESSOAL = """
 "Não estou entrando em tecnologia. Estou mostrando que, durante anos, já resolvi problemas com dados — mesmo quando meu cargo não tinha 'Analista' no nome."
 """
@@ -72,7 +70,7 @@ CERTIFICACOES = [
         "instituicao": "Hashtag Treinamentos",
         "cursos": ["SQL Avançado", "Power BI", "Python para Análise de Dados", "Algoritmos e IA Aplicada"],
         "status": "Concluído",
-        "icone": ""
+        "icone": "📘"
     },
     {
         "instituicao": "AWS Educate",
@@ -105,7 +103,7 @@ PROJETOS = [
             "Dados oficiais do Banco Central transformados em insights reais: KPIs, séries temporais e análise de concentração de mercado (HHI).",
             "Segmentação de perfis de renegociação via clusterização — porque números sem contexto não ajudam ninguém."
         ],
-        "icone": "🇧",
+        "icone": "🇧🇷",
         "contexto": "Entender o impacto real do programa no Brasil"
     },
     {
@@ -134,7 +132,6 @@ PROJETOS = [
     }
 ]
 
-# EXPERIÊNCIAS HUMANIZADAS - Contando histórias, não apenas listando tarefas
 EXPERIENCIAS = [
     {
         "cargo": "Fundador & Analista de Dados",
@@ -190,7 +187,6 @@ LINKS_SOCIAIS = {
     "whatsapp": "https://wa.me/5524992789637"
 }
 
-# SOBRE MIM - Seção pessoal
 SOBRE_MIM = {
     "titulo": "Minha História",
     "texto": """
@@ -212,9 +208,6 @@ Hoje meu foco é claro: Analista de Dados, Business Intelligence, Planejamento, 
     ]
 }
 
-# ============================================================================
-# MODOS DE VISUALIZAÇÃO
-# ============================================================================
 MODOS_VISUALIZACAO = {
     "Dados & BI": {
         "descricao": "Foco em análise de dados, BI, dashboards e modelagem",
@@ -242,37 +235,21 @@ MODOS_VISUALIZACAO = {
     }
 }
 
-# ============================================================================
-# CORES E TEMAS
-# ============================================================================
 TEMA_DARK = {
-    "primary": "#3B82F6",
-    "primary_hover": "#2563EB",
-    "secondary": "#0EA5E9",
-    "accent": "#8B5CF6",
-    "success": "#22C55E",
-    "warning": "#F59E0B",
-    "bg": "#0B0F1A",
-    "bg_elevated": "#111827",
-    "text": "#F1F5F9",
-    "text_muted": "#94A3B8",
-    "text_subtle": "#64748B",
-    "card_bg": "rgba(255,255,255,0.04)",
-    "card_bg_hover": "rgba(255,255,255,0.07)",
-    "border": "rgba(255,255,255,0.08)",
-    "border_hover": "rgba(59,130,246,0.4)",
-    "tag_bg": "rgba(59,130,246,0.12)",
-    "tag_border": "rgba(59,130,246,0.25)",
+    "primary": "#3B82F6", "primary_hover": "#2563EB", "secondary": "#0EA5E9",
+    "accent": "#8B5CF6", "success": "#22C55E", "warning": "#F59E0B",
+    "bg": "#0B0F1A", "bg_elevated": "#111827",
+    "text": "#F1F5F9", "text_muted": "#94A3B8", "text_subtle": "#64748B",
+    "card_bg": "rgba(255,255,255,0.04)", "card_bg_hover": "rgba(255,255,255,0.07)",
+    "border": "rgba(255,255,255,0.08)", "border_hover": "rgba(59,130,246,0.4)",
+    "tag_bg": "rgba(59,130,246,0.12)", "tag_border": "rgba(59,130,246,0.25)",
     "primary_light": "rgba(59,130,246,0.15)",
-    "navbar_bg": "rgba(11,15,26,0.85)",
-    "navbar_border": "rgba(255,255,255,0.06)",
+    "navbar_bg": "rgba(11,15,26,0.85)", "navbar_border": "rgba(255,255,255,0.06)",
     "nav_hover": "rgba(255,255,255,0.06)",
     "hero_bg": "radial-gradient(ellipse at 50% 30%, rgba(59,130,246,0.1) 0%, transparent 70%)",
     "hero_glow": "radial-gradient(ellipse at 70% 20%, rgba(59,130,246,0.18) 0%, transparent 60%)",
-    "section_bg": "rgba(11,15,26,0.6)",
-    "section_alt_bg": "rgba(255,255,255,0.02)",
-    "shadow": "0 8px 32px rgba(0,0,0,0.4)",
-    "shadow_hover": "0 16px 48px rgba(59,130,246,0.25)",
+    "section_bg": "rgba(11,15,26,0.6)", "section_alt_bg": "rgba(255,255,255,0.02)",
+    "shadow": "0 8px 32px rgba(0,0,0,0.4)", "shadow_hover": "0 16px 48px rgba(59,130,246,0.25)",
     "shadow_glow": "0 0 40px rgba(59,130,246,0.15)",
     "plotly_template": "plotly_dark",
     "chart_colors": ["#3B82F6", "#0EA5E9", "#8B5CF6", "#22C55E", "#F59E0B"],
@@ -282,33 +259,20 @@ TEMA_DARK = {
 }
 
 TEMA_LIGHT = {
-    "primary": "#1D4ED8",
-    "primary_hover": "#1E40AF",
-    "secondary": "#0EA5E9",
-    "accent": "#7C3AED",
-    "success": "#16A34A",
-    "warning": "#D97706",
-    "bg": "#F8FAFC",
-    "bg_elevated": "#FFFFFF",
-    "text": "#0F172A",
-    "text_muted": "#475569",
-    "text_subtle": "#94A3B8",
-    "card_bg": "rgba(255,255,255,0.8)",
-    "card_bg_hover": "rgba(255,255,255,0.95)",
-    "border": "rgba(0,0,0,0.06)",
-    "border_hover": "rgba(29,78,216,0.3)",
-    "tag_bg": "#DBEAFE",
-    "tag_border": "#93C5FD",
+    "primary": "#1D4ED8", "primary_hover": "#1E40AF", "secondary": "#0EA5E9",
+    "accent": "#7C3AED", "success": "#16A34A", "warning": "#D97706",
+    "bg": "#F8FAFC", "bg_elevated": "#FFFFFF",
+    "text": "#0F172A", "text_muted": "#475569", "text_subtle": "#94A3B8",
+    "card_bg": "rgba(255,255,255,0.8)", "card_bg_hover": "rgba(255,255,255,0.95)",
+    "border": "rgba(0,0,0,0.06)", "border_hover": "rgba(29,78,216,0.3)",
+    "tag_bg": "#DBEAFE", "tag_border": "#93C5FD",
     "primary_light": "#DBEAFE",
-    "navbar_bg": "rgba(248,250,252,0.9)",
-    "navbar_border": "rgba(0,0,0,0.06)",
+    "navbar_bg": "rgba(248,250,252,0.9)", "navbar_border": "rgba(0,0,0,0.06)",
     "nav_hover": "rgba(0,0,0,0.04)",
     "hero_bg": "radial-gradient(ellipse at 50% 30%, rgba(29,78,216,0.06) 0%, transparent 70%)",
     "hero_glow": "radial-gradient(ellipse at 70% 20%, rgba(29,78,216,0.1) 0%, transparent 60%)",
-    "section_bg": "rgba(255,255,255,0.6)",
-    "section_alt_bg": "rgba(0,0,0,0.01)",
-    "shadow": "0 8px 32px rgba(0,0,0,0.08)",
-    "shadow_hover": "0 16px 48px rgba(29,78,216,0.12)",
+    "section_bg": "rgba(255,255,255,0.6)", "section_alt_bg": "rgba(0,0,0,0.01)",
+    "shadow": "0 8px 32px rgba(0,0,0,0.08)", "shadow_hover": "0 16px 48px rgba(29,78,216,0.12)",
     "shadow_glow": "0 0 40px rgba(29,78,216,0.08)",
     "plotly_template": "plotly_white",
     "chart_colors": ["#1D4ED8", "#0EA5E9", "#7C3AED", "#16A34A", "#D97706"],
@@ -317,9 +281,6 @@ TEMA_LIGHT = {
     "gradient_text": "linear-gradient(135deg, #1D4ED8 0%, #0EA5E9 50%, #7C3AED 100%)"
 }
 
-# ============================================================================
-# FUNÇÕES DE CONFIGURAÇÃO
-# ============================================================================
 def get_colors():
     if st.session_state.get("theme", "dark") == "dark":
         return TEMA_DARK
@@ -331,9 +292,6 @@ def toggle_theme():
     else:
         st.session_state.theme = "dark"
 
-# ============================================================================
-# CSS COMPLETO
-# ============================================================================
 def get_css(colors):
     return f"""
     <style>
@@ -783,7 +741,6 @@ def get_css(colors):
             box-shadow: 0 0 12px var(--primary);
         }}
 
-        /* SOBRE MIM */
         .sobre-section {{
             background: var(--card-bg);
             backdrop-filter: blur(12px);
