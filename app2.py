@@ -8,7 +8,6 @@ import numpy as np
 import plotly.express as px
 import os
 import base64
-from datetime import datetime, timedelta
 
 # ============================================================================
 # CONFIGURAÇÃO DA PÁGINA
@@ -119,8 +118,7 @@ CERTIFICACOES = [
         "instituicao": "AWS Educate",
         "cursos": ["Cloud Computing", "Cloud 101", "AWS Console", "Storage", "ML Foundations", "Sustainability", "Cloud Support"],
         "status": "Em andamento (40%)",
-        "icone": "☁️",
-        "modulos": 8
+        "icone": "☁️"
     }
 ]
 
@@ -801,18 +799,22 @@ def render_footer():
     
     html = f"""
     <div class="footer" id="contato">
+        <!-- Badge de disponibilidade -->
         <div style="display:inline-flex;align-items:center;gap:0.6rem;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);padding:0.4rem 1.2rem;border-radius:999px;font-size:0.82rem;font-weight:600;color:#22C55E;margin-bottom:1.5rem;">
-            <span style="width:8px;height:8px;border-radius:50%;background:#22C55E;animation:pulse 2s infinite;"></span>
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22C55E;animation:pulse 2s infinite;"></span>
             Disponível para oportunidades
         </div>
+        
         <h3>Vamos conversar?</h3>
         <p style="color:var(--text-sec);font-size:1.05rem;margin-bottom:2rem;">Se busca alguém que entende de negócio E de dados, vamos tomar um café.</p>
         
+        <!-- Localização e modalidades -->
         <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:2rem;">
-            <span style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);padding:0.4rem 1rem;border-radius:999px;font-size:0.82rem;">📍 {DADOS['localizacao']}</span>
-            <span style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);padding:0.4rem 1rem;border-radius:999px;font-size:0.82rem;">🏠 {DADOS['modalidades'][0]}</span>
+            <span style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);padding:0.4rem 1rem;border-radius:999px;font-size:0.82rem;color:var(--text-sec);">📍 {DADOS['localizacao']}</span>
+            <span style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);padding:0.4rem 1rem;border-radius:999px;font-size:0.82rem;color:var(--text-sec);">🏠 {DADOS['modalidades'][0]}</span>
         </div>
         
+        <!-- Links -->
         <div class="footer-links">
             <a href="{LINKS['linkedin']}" target="_blank" class="footer-link">💼 LinkedIn</a>
             <a href="{LINKS['github']}" target="_blank" class="footer-link">💻 GitHub</a>
