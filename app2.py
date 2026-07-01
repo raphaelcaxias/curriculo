@@ -272,10 +272,8 @@ def get_css():
     
     return f"""
     <style>
-    /* Importando fontes */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
-    /* Definindo variáveis CSS globais */
     :root {{
         --bg: {bg};
         --text: {text};
@@ -741,27 +739,29 @@ def get_css():
     }}
     
     .valor-card:hover {{
-        transform: translateY(-4px);
+        transform: translateY(-6px);
         border-color: var(--primary);
-        box-shadow: 0 8px 24px var(--shadow);
+        box-shadow: 0 12px 30px var(--shadow);
     }}
     
     .valor-icon {{
-        font-size: 2.5rem;
-        margin-bottom: 0.5rem;
+        font-size: 2.8rem;
+        margin-bottom: 0.75rem;
+        display: block;
     }}
     
     .valor-title {{
         font-weight: 700;
-        font-size: 1rem;
+        font-size: 1.05rem;
         color: var(--text);
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.35rem;
     }}
     
     .valor-desc {{
         font-size: 0.85rem;
         color: var(--text-muted);
-        line-height: 1.4;
+        line-height: 1.5;
+        max-width: 200px;
     }}
     
     /* ===== KPIs ===== */
@@ -1456,14 +1456,12 @@ def render_sobre():
     </div>
     """, unsafe_allow_html=True)
     
-    # Texto da seção "Sobre Mim"
     st.markdown(f"""
     <div class="sobre-section">
         <p class="sobre-text">{SOBRE_MIM['texto']}</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Título dos valores
     st.markdown("""
     <div style="margin-top: 2rem; text-align: center;">
         <h3 style="color: var(--text); font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem;">💎 Meus Valores</h3>
@@ -1471,7 +1469,6 @@ def render_sobre():
     </div>
     """, unsafe_allow_html=True)
     
-    # Cards de valores usando HTML com classes CSS
     valores_html = ""
     for valor in SOBRE_MIM['valores']:
         valores_html += f"""
