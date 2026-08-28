@@ -1,6 +1,6 @@
 """
 app.py - Portfólio Raphael Pires - Streamlit
-Versão com Download Nativo e Links Otimizados
+Navegação com botões nativos + cache + download nativo
 """
 import streamlit as st
 import pandas as pd
@@ -74,7 +74,7 @@ def get_pdf_path() -> Path | None:
         "Curriculo_Raphael.pdf",
         "cv.pdf",
         "assets/Curriculo_Raphael_v2.pdf",
-        "pages/Curriculo_Raphael_v2.pdf",   # importante!
+        "pages/Curriculo_Raphael_v2.pdf",
     ]
     return find_file(candidatos)
 
@@ -252,7 +252,7 @@ LINKS = {
 }
 
 # ============================================================================
-# CSS COMPLETO (com estilos para o download button)
+# CSS (apenas estilos, sem navegação)
 # ============================================================================
 @st.cache_resource
 def get_css():
@@ -312,8 +312,8 @@ def get_css():
     .card-title {{ font-weight: 700; font-size: 1rem; color: var(--text); }}
     .card-desc {{ font-size: 0.85rem; color: var(--text-muted); }}
     
-    /* NAVBAR */
-    .navbar {{
+    /* NAVBAR (agora apenas para posicionamento, mas usamos columns) */
+    .navbar-container {{
         position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
         background: {'rgba(11,15,26,0.92)' if theme == 'dark' else 'rgba(248,250,252,0.92)'};
         backdrop-filter: blur(20px);
@@ -342,28 +342,48 @@ def get_css():
         -webkit-text-fill-color: transparent;
     }}
     
-    .nav-btn {{
-        padding: 0.4rem 0.9rem;
-        border-radius: 999px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        border: none;
-        background: transparent;
-        color: var(--text-muted);
-        cursor: pointer;
-        transition: all 0.25s ease;
+    /* Botões da navbar serão estilizados via CSS do Streamlit */
+    .stButton > button {{
+        background: transparent !important;
+        border: none !important;
+        padding: 0.4rem 0.9rem !important;
+        border-radius: 999px !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        color: var(--text-muted) !important;
+        transition: all 0.25s ease !important;
+        height: auto !important;
+        line-height: normal !important;
     }}
-    .nav-btn:hover {{ background: var(--card-bg); color: var(--text); }}
-    .nav-btn.active {{
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
+    .stButton > button:hover {{
+        background: var(--card-bg) !important;
+        color: var(--text) !important;
+    }}
+    .stButton > button:focus {{
+        box-shadow: none !important;
+    }}
+    .nav-btn-active > button {{
+        background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
         color: white !important;
     }}
-    .theme-btn {{
-        width: 38px; height: 38px; border-radius: 50%;
-        background: var(--card-bg); border: 1px solid var(--border);
-        cursor: pointer; transition: all 0.3s ease; font-size: 1.1rem;
+    
+    /* Tema button */
+    .theme-btn-container .stButton > button {{
+        width: 38px !important;
+        height: 38px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        background: var(--card-bg) !important;
+        border: 1px solid var(--border) !important;
+        font-size: 1.1rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }}
-    .theme-btn:hover {{ transform: rotate(360deg); border-color: var(--primary); }}
+    .theme-btn-container .stButton > button:hover {{
+        transform: rotate(360deg);
+        border-color: var(--primary);
+    }}
     
     /* HERO */
     .hero {{ padding: 6rem 2rem 3rem; }}
@@ -422,7 +442,7 @@ def get_css():
     }}
     .btn-secondary:hover {{ border-color: var(--primary); transform: translateY(-2px); }}
     
-    /* BOTÃO DE DOWNLOAD NATIVO (Streamlit) */
+    /* BOTÃO DE DOWNLOAD NATIVO */
     .stDownloadButton > button {{
         background: var(--card-bg) !important;
         border: 1px solid var(--border) !important;
@@ -535,30 +555,65 @@ def get_css():
     """
 
 # ============================================================================
-# FUNÇÕES DE RENDERIZAÇÃO
+# FUNÇÕES DE NAVEGAÇÃO
 # ============================================================================
+def navigate_to(page_name: str):
+    st.session_state.page = page_name
+    st.query_params["page"] = page_name
+    st.rerun()
 
 def render_navbar():
-    theme_icon = "☀️" if st.session_state.theme == "dark" else "🌙"
-    page = st.session_state.page
+    """Navbar usando st.columns e st.button (100% funcional)."""
+    # Container fixo com CSS para posicionamento
+    st.markdown('<div class="navbar-container">', unsafe_allow_html=True)
     
-    st.markdown(f"""
-    <nav class="navbar">
+    # Marca à esquerda
+    col_marca, col_botoes = st.columns([1, 4], gap="small")
+    with col_marca:
+        st.markdown("""
         <span class="navbar-brand">
             <span class="dot"></span>
             Raphael <span class="gradient">Pires</span>
         </span>
-        <div>
-            <button class="nav-btn {'active' if page == 'home' else ''}" onclick="window.location.href='?page=home'">🏠 Início</button>
-            <button class="nav-btn {'active' if page == 'curriculo' else ''}" onclick="window.location.href='?page=curriculo'">📄 Currículo</button>
-            <button class="nav-btn {'active' if page == 'projetos' else ''}" onclick="window.location.href='?page=projetos'">🚀 Projetos</button>
-            <button class="nav-btn {'active' if page == 'analytics' else ''}" onclick="window.location.href='?page=analytics'">📊 Analytics</button>
-            <button class="theme-btn" onclick="window.location.href='?theme_toggle=1&page={page}'">{theme_icon}</button>
-        </div>
-    </nav>
-    <div style="height: 70px;"></div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+    
+    # Botões de navegação + tema
+    with col_botoes:
+        cols = st.columns([1, 1, 1, 1, 0.5], gap="small")
+        
+        pages = {
+            "home": "🏠 Início",
+            "curriculo": "📄 Currículo",
+            "projetos": "🚀 Projetos",
+            "analytics": "📊 Analytics"
+        }
+        
+        for i, (key, label) in enumerate(pages.items()):
+            with cols[i]:
+                # Define classe ativa se for a página atual
+                if st.session_state.page == key:
+                    st.markdown('<div class="nav-btn-active">', unsafe_allow_html=True)
+                    st.button(label, key=f"nav_{key}", use_container_width=True,
+                              on_click=navigate_to, args=(key,))
+                    st.markdown('</div>', unsafe_allow_html=True)
+                else:
+                    st.button(label, key=f"nav_{key}", use_container_width=True,
+                              on_click=navigate_to, args=(key,))
+        
+        # Botão de tema
+        with cols[4]:
+            theme_icon = "☀️" if st.session_state.theme == "dark" else "🌙"
+            st.markdown('<div class="theme-btn-container">', unsafe_allow_html=True)
+            st.button(theme_icon, key="theme_toggle", use_container_width=True,
+                      on_click=toggle_theme)
+            st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div style="height: 70px;"></div>', unsafe_allow_html=True)
 
+# ============================================================================
+# FUNÇÕES DE RENDERIZAÇÃO DE CONTEÚDO (mesmo código anterior)
+# ============================================================================
 def render_hero():
     foto_path = get_foto_path()
     foto_b64 = get_foto_base64(foto_path)
@@ -589,7 +644,7 @@ def render_hero():
         </div>
         """, unsafe_allow_html=True)
         
-        # Botões usando colunas internas para alinhamento
+        # Botões usando colunas internas
         btn_cols = st.columns(3)
         with btn_cols[0]:
             st.markdown('<a href="#experiencia" class="btn-primary">💼 Ver Experiência</a>', unsafe_allow_html=True)
@@ -966,19 +1021,11 @@ def render_analytics():
 def main():
     st.markdown(get_css(), unsafe_allow_html=True)
     
-    # Gerencia alternância de tema
-    if "theme_toggle" in st.query_params:
-        toggle_theme()
-        page = st.query_params.get("page", "home")
-        new_params = {k: v for k, v in st.query_params.items() if k != "theme_toggle"}
-        st.query_params.clear()
-        for k, v in new_params.items():
-            st.query_params[k] = v
-        st.rerun()
-    
+    # Sincroniza página a partir da URL (se houver)
     if "page" in st.query_params:
         st.session_state.page = st.query_params["page"]
     
+    # Renderiza a navbar (que já trata os cliques)
     render_navbar()
     st.markdown('<div id="topo"></div>', unsafe_allow_html=True)
     
