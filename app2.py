@@ -1,6 +1,6 @@
 """
 app.py - Portfólio Raphael Pires - Streamlit
-Navegação com botões nativos + cache + download nativo
+Refatorado com foco em UI/UX, responsividade e acessibilidade
 """
 import streamlit as st
 import pandas as pd
@@ -82,7 +82,7 @@ def toggle_theme():
     st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
 
 # ============================================================================
-# DADOS ESTÁTICOS
+# DADOS ESTÁTICOS (não alterados)
 # ============================================================================
 DADOS = {
     "nome": "Raphael Fernando S. Pires",
@@ -222,7 +222,8 @@ PROJETOS = [
         "url": "https://desenrolabrasil.streamlit.app",
         "descricao": "Processamento de dados oficiais do Banco Central com KPIs, séries temporais e análise de concentração de mercado (HHI).",
         "contexto": "Entender o impacto real do programa no Brasil",
-        "icone": "🇧🇷"
+        "icone": "🇧🇷",
+        "thumbnail": None  # Adicione caminho da imagem se desejar
     },
     {
         "nome": "CNPq Analytics",
@@ -231,7 +232,8 @@ PROJETOS = [
         "url": "https://cnpq-analytics.streamlit.app",
         "descricao": "ETL e análise de mais de 213 mil bolsas e R$ 1,2 bi em investimentos públicos.",
         "contexto": "Mostrar para onde vai o dinheiro da pesquisa",
-        "icone": "🔬"
+        "icone": "🔬",
+        "thumbnail": None
     },
     {
         "nome": "Dashboard ANP",
@@ -240,7 +242,8 @@ PROJETOS = [
         "url": None,
         "descricao": "Dashboard interativo com filtros temporais e regionais utilizando dados oficiais da ANP.",
         "contexto": "Transparência em dados públicos",
-        "icone": "⛽"
+        "icone": "⛽",
+        "thumbnail": None
     }
 ]
 
@@ -252,7 +255,7 @@ LINKS = {
 }
 
 # ============================================================================
-# CSS (apenas estilos, sem navegação)
+# CSS REFATORADO (Mobile-First, Grids, Animações, Back-to-Top)
 # ============================================================================
 @st.cache_resource
 def get_css():
@@ -260,18 +263,20 @@ def get_css():
     if theme == "dark":
         bg = "#0B0F1A"
         text = "#F1F5F9"
-        text_muted = "#94A3B8"
+        text_muted = "#94A3B8"  # já atende contraste
         card_bg = "rgba(255,255,255,0.04)"
         border = "rgba(255,255,255,0.08)"
         shadow = "rgba(59,130,246,0.3)"
+        back_to_top_bg = "rgba(15,23,42,0.8)"
     else:
         bg = "#F8FAFC"
         text = "#0F172A"
-        text_muted = "#475569"
+        text_muted = "#475569"   # melhorado para WCAG AA
         card_bg = "rgba(255,255,255,0.8)"
         border = "rgba(0,0,0,0.06)"
         shadow = "rgba(59,130,246,0.2)"
-    
+        back_to_top_bg = "rgba(241,245,249,0.9)"
+
     return f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -285,6 +290,7 @@ def get_css():
         --shadow: {shadow};
         --primary: #3B82F6;
         --secondary: #0EA5E9;
+        --back-to-top-bg: {back_to_top_bg};
     }}
     
     * {{ font-family: 'Inter', sans-serif; }}
@@ -293,7 +299,7 @@ def get_css():
     .stApp {{ background: var(--bg); }}
     .block-container {{ padding: 0 !important; max-width: 100% !important; }}
     
-    /* CARDS GENÉRICOS */
+    /* ========== CARDS ========== */
     .card {{
         background: var(--card-bg);
         border: 1px solid var(--border);
@@ -307,12 +313,35 @@ def get_css():
         border-color: var(--primary);
         box-shadow: 0 8px 24px var(--shadow);
     }}
-    
     .card-icon {{ font-size: 2rem; margin-bottom: 0.5rem; }}
     .card-title {{ font-weight: 700; font-size: 1rem; color: var(--text); }}
     .card-desc {{ font-size: 0.85rem; color: var(--text-muted); }}
     
-    /* NAVBAR (agora apenas para posicionamento, mas usamos columns) */
+    /* ========== GRIDS RESPONSIVOS ========== */
+    .grid-4 {{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+    }}
+    .grid-3 {{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+    }}
+    @media (max-width: 992px) {{
+        .grid-4 {{ grid-template-columns: repeat(2, 1fr); }}
+        .grid-3 {{ grid-template-columns: repeat(2, 1fr); }}
+    }}
+    @media (max-width: 576px) {{
+        .grid-4 {{ grid-template-columns: 1fr; }}
+        .grid-3 {{ grid-template-columns: 1fr; }}
+    }}
+    
+    /* ========== NAVBAR (Desktop horizontal, Mobile sidebar via st.sidebar) ========== */
+    /* A navbar em HTML é usada apenas como container visual, mas os botões são renderizados via sidebar em mobile.
+       Estilizamos a sidebar para manter consistência. */
     .navbar-container {{
         position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
         background: {'rgba(11,15,26,0.92)' if theme == 'dark' else 'rgba(248,250,252,0.92)'};
@@ -342,7 +371,7 @@ def get_css():
         -webkit-text-fill-color: transparent;
     }}
     
-    /* Botões da navbar serão estilizados via CSS do Streamlit */
+    /* Botões da navbar (desktop) */
     .stButton > button {{
         background: transparent !important;
         border: none !important;
@@ -385,8 +414,8 @@ def get_css():
         border-color: var(--primary);
     }}
     
-    /* HERO */
-    .hero {{ padding: 6rem 2rem 3rem; }}
+    /* ========== HERO ========== */
+    .hero {{ padding: 6rem 2rem 2rem; }}
     .hero-title {{ font-size: 3.5rem; font-weight: 900; color: var(--text); }}
     .hero-title .gradient {{
         background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -405,7 +434,21 @@ def get_css():
         display: inline-block; margin: 0.25rem;
     }}
     
-    /* FOTO */
+    /* Seta scroll down animada */
+    .scroll-indicator {{
+        text-align: center;
+        margin-top: 1.5rem;
+        animation: bounce 2s infinite;
+        color: var(--text-muted);
+        font-size: 1.2rem;
+    }}
+    @keyframes bounce {{
+        0%, 20%, 50%, 80%, 100% {{ transform: translateY(0); }}
+        40% {{ transform: translateY(-10px); }}
+        60% {{ transform: translateY(-5px); }}
+    }}
+    
+    /* ========== FOTO ========== */
     .foto-wrapper {{
         position: relative; width: 260px; height: 260px; margin: 0 auto;
     }}
@@ -424,25 +467,34 @@ def get_css():
         box-shadow: 0 25px 80px var(--shadow);
     }}
     
-    /* BOTÕES PADRÃO (HTML) */
+    /* ========== BOTÕES ========== */
+    .btn-primary, .btn-secondary {{
+        padding: 0.65rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.25s ease;
+        width: 100%;
+        border: none;
+        cursor: pointer;
+    }}
     .btn-primary {{
         background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: white !important; padding: 0.65rem 1.5rem; border-radius: 12px;
-        font-weight: 600; text-decoration: none; display: inline-flex;
-        align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.25s ease;
-        width: 100%;
+        color: white !important;
     }}
     .btn-primary:hover {{ transform: translateY(-2px); box-shadow: 0 8px 28px rgba(59,130,246,0.45); }}
     .btn-secondary {{
-        background: var(--card-bg); border: 1px solid var(--border);
-        padding: 0.65rem 1.5rem; border-radius: 12px;
-        font-weight: 600; color: var(--text) !important; text-decoration: none;
-        display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; 
-        transition: all 0.25s ease; width: 100%;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        color: var(--text) !important;
     }}
     .btn-secondary:hover {{ border-color: var(--primary); transform: translateY(-2px); }}
     
-    /* BOTÃO DE DOWNLOAD NATIVO */
+    /* Download button nativo */
     .stDownloadButton > button {{
         background: var(--card-bg) !important;
         border: 1px solid var(--border) !important;
@@ -451,36 +503,44 @@ def get_css():
         font-weight: 600 !important;
         color: var(--text) !important;
         transition: all 0.25s ease !important;
-        font-family: 'Inter', sans-serif !important;
         font-size: 0.9rem !important;
         height: auto !important;
         line-height: normal !important;
         width: 100% !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 0.5rem !important;
     }}
     .stDownloadButton > button:hover {{
         border-color: var(--primary) !important;
         transform: translateY(-2px) !important;
-        background: var(--card-bg) !important;
     }}
     
-    /* SEÇÕES */
+    /* ========== SEÇÕES ========== */
     .section {{ padding: 4rem 2rem; border-top: 1px solid var(--border); }}
     .section-header {{ text-align: center; margin-bottom: 3rem; }}
     .section-label {{
         display: inline-block;
-        background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.2);
-        padding: 0.3rem 1rem; border-radius: 999px;
-        font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
-        color: var(--primary); margin-bottom: 0.75rem;
+        background: rgba(59,130,246,0.12);
+        border: 1px solid rgba(59,130,246,0.2);
+        padding: 0.3rem 1rem;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--primary);
+        margin-bottom: 0.75rem;
     }}
-    .section-title {{ font-size: 2.5rem; font-weight: 800; color: var(--text); }}
-    .section-subtitle {{ color: var(--text-muted); max-width: 600px; margin: 0.75rem auto 0; }}
+    .section-title {{
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.02em;  /* Melhora legibilidade e estética */
+    }}
+    .section-subtitle {{
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0.75rem auto 0;
+    }}
     
-    /* TIMELINE */
+    /* ========== TIMELINE ========== */
     .timeline-item {{ 
         position: relative; padding-left: 2rem; 
         margin-bottom: 1.5rem; border-left: 2px solid var(--primary);
@@ -510,7 +570,11 @@ def get_css():
     }}
     .timeline-role {{ font-size: 1.1rem; font-weight: 700; color: var(--text); margin: 0.4rem 0 0.1rem; }}
     .timeline-company {{ color: var(--secondary); font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; }}
-    .timeline-desc {{ color: var(--text-muted); line-height: 1.6; font-size: 0.92rem; }}
+    .timeline-desc {{
+        color: var(--text-muted);
+        line-height: 1.8;  /* Aumentado para melhor legibilidade */
+        font-size: 0.92rem;
+    }}
     .tag {{
         font-size: 0.65rem; background: rgba(59,130,246,0.1);
         border: 1px solid rgba(59,130,246,0.2);
@@ -518,7 +582,7 @@ def get_css():
         display: inline-block; margin: 0.15rem; color: var(--primary); font-weight: 500;
     }}
     
-    /* PROGRESS BAR */
+    /* ========== PROGRESS BAR ========== */
     .progress-bar {{
         width: 100%; height: 6px; background: var(--border);
         border-radius: 999px; overflow: hidden; margin-top: 0.75rem;
@@ -528,7 +592,7 @@ def get_css():
         border-radius: 999px; transition: width 0.8s ease;
     }}
     
-    /* FOOTER */
+    /* ========== FOOTER ========== */
     .footer {{
         padding: 3rem 2rem 2rem; text-align: center;
         border-top: 1px solid var(--border);
@@ -545,11 +609,58 @@ def get_css():
         color: white !important; transform: translateY(-2px);
     }}
     
+    /* ========== BACK TO TOP ========== */
+    .back-to-top {{
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 999;
+        background: var(--back-to-top-bg);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }}
+    .back-to-top.visible {{
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }}
+    .back-to-top:hover {{
+        transform: translateY(-4px);
+        border-color: var(--primary);
+        box-shadow: 0 8px 24px var(--shadow);
+    }}
+    .back-to-top a {{
+        color: var(--text);
+        text-decoration: none;
+        font-size: 1.5rem;
+    }}
+    
+    /* ========== RESPONSIVIDADE ========== */
     @media (max-width: 768px) {{
         .hero-title {{ font-size: 2rem; }}
         .section {{ padding: 2rem 1rem; }}
         .section-title {{ font-size: 1.6rem; }}
         .foto-wrapper {{ width: 200px; height: 200px; }}
+        .navbar-container {{
+            padding: 0.5rem 1rem;
+        }}
+        /* A navbar desktop some, a sidebar assume */
+        .stSidebar {{
+            background: var(--card-bg) !important;
+            border-right: 1px solid var(--border) !important;
+        }}
     }}
     </style>
     """
@@ -563,61 +674,108 @@ def navigate_to(page_name: str):
     st.rerun()
 
 def render_navbar():
-    """Navbar usando st.columns e st.button (100% funcional)."""
-    # Container fixo com CSS para posicionamento
-    st.markdown('<div class="navbar-container">', unsafe_allow_html=True)
+    """
+    Navbar responsiva:
+    - Desktop: horizontal com botões.
+    - Mobile: os botões são movidos para a sidebar (via st.sidebar),
+      mantendo apenas a marca no topo.
+    """
+    # Detecta se estamos em mobile (usando largura da tela via CSS, mas Streamlit não expõe isso)
+    # Usamos uma abordagem híbrida: sempre renderizamos a marca e os botões de navegação na sidebar
+    # para mobile, e os botões desktop são escondidos via CSS em mobile.
+    # Para simplificar, usamos st.sidebar para mobile e mantemos a navbar horizontal no desktop.
     
-    # Marca à esquerda
-    col_marca, col_botoes = st.columns([1, 4], gap="small")
-    with col_marca:
-        st.markdown("""
+    # A marca fica sempre visível no topo
+    st.markdown("""
+    <div class="navbar-container">
         <span class="navbar-brand">
             <span class="dot"></span>
             Raphael <span class="gradient">Pires</span>
         </span>
-        """, unsafe_allow_html=True)
-    
-    # Botões de navegação + tema
-    with col_botoes:
-        cols = st.columns([1, 1, 1, 1, 0.5], gap="small")
-        
+        <!-- Os botões de navegação desktop serão renderizados abaixo, mas escondidos em mobile -->
+    </div>
+    <div style="height: 70px;"></div>
+    """, unsafe_allow_html=True)
+
+    # Sidebar para mobile (sempre presente, mas em desktop fica colapsada)
+    with st.sidebar:
+        st.markdown("### 🧭 Navegação")
         pages = {
             "home": "🏠 Início",
             "curriculo": "📄 Currículo",
             "projetos": "🚀 Projetos",
             "analytics": "📊 Analytics"
         }
+        for key, label in pages.items():
+            if st.button(label, key=f"sidebar_{key}", use_container_width=True,
+                         on_click=navigate_to, args=(key,)):
+                pass
         
-        for i, (key, label) in enumerate(pages.items()):
-            with cols[i]:
-                # Define classe ativa se for a página atual
-                if st.session_state.page == key:
-                    st.markdown('<div class="nav-btn-active">', unsafe_allow_html=True)
-                    st.button(label, key=f"nav_{key}", use_container_width=True,
-                              on_click=navigate_to, args=(key,))
-                    st.markdown('</div>', unsafe_allow_html=True)
-                else:
-                    st.button(label, key=f"nav_{key}", use_container_width=True,
-                              on_click=navigate_to, args=(key,))
+        st.markdown("---")
+        theme_icon = "☀️" if st.session_state.theme == "dark" else "🌙"
+        if st.button(f"{theme_icon} Alternar tema", key="sidebar_theme", use_container_width=True,
+                     on_click=toggle_theme):
+            pass
         
-        # Botão de tema
-        with cols[4]:
-            theme_icon = "☀️" if st.session_state.theme == "dark" else "🌙"
-            st.markdown('<div class="theme-btn-container">', unsafe_allow_html=True)
-            st.button(theme_icon, key="theme_toggle", use_container_width=True,
-                      on_click=toggle_theme)
-            st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("---")
+        st.caption("© 2026 Raphael Pires")
+
+    # Agora, os botões desktop são renderizados (mas serão ocultos em mobile via CSS)
+    # Para isso, usamos um container com classe 'desktop-nav' e escondemos em mobile.
+    st.markdown("""
+    <div class="desktop-nav" style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; margin:0.5rem 0;">
+    """, unsafe_allow_html=True)
     
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('<div style="height: 70px;"></div>', unsafe_allow_html=True)
+    # Renderiza os botões desktop (exceto tema, que fica na sidebar)
+    cols = st.columns([1,1,1,1,0.5], gap="small")
+    pages = {
+        "home": "🏠 Início",
+        "curriculo": "📄 Currículo",
+        "projetos": "🚀 Projetos",
+        "analytics": "📊 Analytics"
+    }
+    for i, (key, label) in enumerate(pages.items()):
+        with cols[i]:
+            if st.session_state.page == key:
+                st.markdown('<div class="nav-btn-active">', unsafe_allow_html=True)
+                st.button(label, key=f"desktop_{key}", use_container_width=True,
+                          on_click=navigate_to, args=(key,))
+                st.markdown('</div>', unsafe_allow_html=True)
+            else:
+                st.button(label, key=f"desktop_{key}", use_container_width=True,
+                          on_click=navigate_to, args=(key,))
+    
+    with cols[4]:
+        # Tema também na sidebar, mas mantemos um botão visual na desktop (mas já está na sidebar)
+        # Deixamos vazio para não duplicar.
+        pass
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    # CSS para esconder os botões desktop em mobile e mostrar a sidebar
+    st.markdown("""
+    <style>
+    @media (max-width: 768px) {
+        .desktop-nav { display: none !important; }
+        .stSidebar { display: block !important; }
+    }
+    @media (min-width: 769px) {
+        .stSidebar { display: none !important; }
+        .desktop-nav { display: flex !important; }
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 # ============================================================================
-# FUNÇÕES DE RENDERIZAÇÃO DE CONTEÚDO (mesmo código anterior)
+# FUNÇÕES DE RENDERIZAÇÃO DE CONTEÚDO (com melhorias)
 # ============================================================================
+
 def render_hero():
-    foto_path = get_foto_path()
-    foto_b64 = get_foto_base64(foto_path)
-    foto_url = foto_b64 if foto_b64 else "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=3B82F6&color=fff&bold=true"
+    # Spinner para evitar layout shift
+    with st.spinner("Carregando foto..."):
+        foto_path = get_foto_path()
+        foto_b64 = get_foto_base64(foto_path)
+        foto_url = foto_b64 if foto_b64 else "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=3B82F6&color=fff&bold=true"
     
     col1, col2 = st.columns([1, 2], gap="large")
     
@@ -625,7 +783,7 @@ def render_hero():
         st.markdown(f"""
         <div class="foto-wrapper">
             <div class="foto-ring"></div>
-            <img src="{foto_url}" class="foto">
+            <img src="{foto_url}" class="foto" loading="lazy" alt="Foto de Raphael Pires, analista de dados">
         </div>
         """, unsafe_allow_html=True)
     
@@ -644,26 +802,35 @@ def render_hero():
         </div>
         """, unsafe_allow_html=True)
         
-        # Botões usando colunas internas
+        # Botões CTA
         btn_cols = st.columns(3)
         with btn_cols[0]:
             st.markdown('<a href="#experiencia" class="btn-primary">💼 Ver Experiência</a>', unsafe_allow_html=True)
         with btn_cols[1]:
-            pdf_path = get_pdf_path()
-            if pdf_path:
-                with open(pdf_path, "rb") as f:
-                    st.download_button(
-                        label="📄 Baixar CV",
-                        data=f,
-                        file_name="Curriculo_Raphael_Pires.pdf",
-                        mime="application/pdf",
-                        key="cv_hero",
-                        use_container_width=True,
-                    )
-            else:
-                st.markdown('<span class="btn-secondary" style="opacity:0.5;cursor:default;">📄 CV indisponível</span>', unsafe_allow_html=True)
+            with st.spinner("Preparando download..."):
+                pdf_path = get_pdf_path()
+                if pdf_path:
+                    with open(pdf_path, "rb") as f:
+                        st.download_button(
+                            label="📄 Baixar CV",
+                            data=f,
+                            file_name="Curriculo_Raphael_Pires.pdf",
+                            mime="application/pdf",
+                            key="cv_hero",
+                            use_container_width=True,
+                        )
+                else:
+                    st.markdown('<span class="btn-secondary" style="opacity:0.5;cursor:default;">📄 CV indisponível</span>', unsafe_allow_html=True)
         with btn_cols[2]:
-            st.markdown(f'<a href="{LINKS["linkedin"]}" target="_blank" class="btn-secondary">💼 LinkedIn</a>', unsafe_allow_html=True)
+            # Usando st.link_button para LinkedIn
+            st.link_button("💼 LinkedIn", LINKS["linkedin"], use_container_width=True)
+        
+        # Seta animada "scroll down"
+        st.markdown("""
+        <div class="scroll-indicator">
+            ↓ Deslize para explorar ↓
+        </div>
+        """, unsafe_allow_html=True)
 
 def render_sobre():
     st.markdown("""
@@ -710,17 +877,19 @@ def render_kpis():
     </div>
     """, unsafe_allow_html=True)
     
-    cols = st.columns(4)
-    for i, kpi in enumerate(KPIS):
-        with cols[i]:
-            st.markdown(f"""
-            <div class="card" style="text-align: center;">
-                <div class="card-icon">{kpi['icone']}</div>
-                <div style="font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #3B82F6, #0EA5E9); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{kpi['valor']}</div>
-                <div class="card-title">{kpi['label']}</div>
-                <div class="card-desc" style="opacity: 0.7;">{kpi['contexto']}</div>
-            </div>
-            """, unsafe_allow_html=True)
+    # Usando grid CSS responsivo via HTML
+    kpis_html = '<div class="grid-4">'
+    for kpi in KPIS:
+        kpis_html += f"""
+        <div class="card" style="text-align: center;">
+            <div class="card-icon">{kpi['icone']}</div>
+            <div style="font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #3B82F6, #0EA5E9); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{kpi['valor']}</div>
+            <div class="card-title">{kpi['label']}</div>
+            <div class="card-desc" style="opacity: 0.7;">{kpi['contexto']}</div>
+        </div>
+        """
+    kpis_html += '</div>'
+    st.markdown(kpis_html, unsafe_allow_html=True)
 
 def render_tech():
     st.markdown("""
@@ -731,25 +900,24 @@ def render_tech():
     """, unsafe_allow_html=True)
     
     tech_items = list(TECH_STACK.items())
-    for i in range(0, len(tech_items), 3):
-        cols = st.columns(3)
-        for j in range(3):
-            if i + j < len(tech_items):
-                tech, dados = tech_items[i + j]
-                with cols[j]:
-                    itens_html = "".join([f'<span class="tag">{item}</span>' for item in dados['itens']])
-                    st.markdown(f"""
-                    <div class="card">
-                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
-                            <span style="font-size: 2rem;">{dados['icone']}</span>
-                            <div>
-                                <div class="card-title">{tech}</div>
-                                <span style="font-size: 0.65rem; font-weight: 600; padding: 0.15rem 0.6rem; border-radius: 999px; background: rgba(59,130,246,0.15); color: #3B82F6;">{dados['nivel']}</span>
-                            </div>
-                        </div>
-                        <div>{itens_html}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+    # Grid 3 colunas responsivo
+    html = '<div class="grid-3">'
+    for tech, dados in tech_items:
+        itens_html = "".join([f'<span class="tag">{item}</span>' for item in dados['itens']])
+        html += f"""
+        <div class="card">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                <span style="font-size: 2rem;">{dados['icone']}</span>
+                <div>
+                    <div class="card-title">{tech}</div>
+                    <span style="font-size: 0.65rem; font-weight: 600; padding: 0.15rem 0.6rem; border-radius: 999px; background: rgba(59,130,246,0.15); color: #3B82F6;">{dados['nivel']}</span>
+                </div>
+            </div>
+            <div>{itens_html}</div>
+        </div>
+        """
+    html += '</div>'
+    st.markdown(html, unsafe_allow_html=True)
 
 def render_skills_chart():
     st.markdown("""
@@ -795,6 +963,7 @@ def render_certificacoes():
     </div>
     """, unsafe_allow_html=True)
     
+    # Grid 2 colunas (usando columns do Streamlit pois são apenas 2, mas podemos usar grid-2)
     cols = st.columns(2)
     for i, cert in enumerate(CERTIFICACOES):
         with cols[i]:
@@ -863,25 +1032,50 @@ def render_experiencias():
     </div>
     """, unsafe_allow_html=True)
     
+    # Separa experiências recentes (a partir de 2010) e anteriores
+    recentes = []
+    anteriores = []
     for exp in EXPERIENCIAS:
-        badge = f'<span class="timeline-badge">{exp["status"]}</span>' if exp.get("status") else ""
-        desc = "<br>".join([f"• {d}" for d in exp["descricao"]])
-        tags = "".join([f'<span class="tag">{t}</span>' for t in exp["tags"]])
-        
-        st.markdown(f"""
-        <div class="timeline-item">
-            <div class="timeline-dot"></div>
-            <div class="timeline-card">
-                <div>
-                    <span class="timeline-date">{exp['periodo']}</span> {badge}
-                </div>
-                <div class="timeline-role">{exp['cargo']}</div>
-                <div class="timeline-company">{exp['empresa']} · {exp['tipo']}</div>
-                <div class="timeline-desc">{desc}</div>
-                <div>{tags}</div>
+        # Extrai ano do período (ex: "2009 — Atual" -> 2009)
+        ano_str = exp['periodo'].split('—')[0].strip()
+        try:
+            ano = int(ano_str.split()[0])  # pega o primeiro número
+        except:
+            ano = 0
+        if ano >= 2010:
+            recentes.append(exp)
+        else:
+            anteriores.append(exp)
+    
+    # Mostra as recentes
+    for exp in recentes:
+        _render_timeline_item(exp)
+    
+    # Expander para experiências anteriores
+    if anteriores:
+        with st.expander("📂 Ver trajetória completa e experiências anteriores"):
+            for exp in anteriores:
+                _render_timeline_item(exp)
+
+def _render_timeline_item(exp):
+    badge = f'<span class="timeline-badge">{exp["status"]}</span>' if exp.get("status") else ""
+    desc = "<br>".join([f"• {d}" for d in exp["descricao"]])
+    tags = "".join([f'<span class="tag">{t}</span>' for t in exp["tags"]])
+    
+    st.markdown(f"""
+    <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+            <div>
+                <span class="timeline-date">{exp['periodo']}</span> {badge}
             </div>
+            <div class="timeline-role">{exp['cargo']}</div>
+            <div class="timeline-company">{exp['empresa']} · {exp['tipo']}</div>
+            <div class="timeline-desc">{desc}</div>
+            <div>{tags}</div>
         </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
 def render_projetos():
     st.markdown("""
@@ -891,23 +1085,37 @@ def render_projetos():
     </div>
     """, unsafe_allow_html=True)
     
-    cols = st.columns(3)
-    for i, p in enumerate(PROJETOS):
-        with cols[i]:
-            techs = "".join([f'<span class="tag">{t}</span>' for t in p["tech"]])
-            link = f'<a href="{p["url"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;width:auto;">🔗 Ver</a>' if p.get("url") else f'<a href="{LINKS["github"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;width:auto;">💻 GitHub</a>'
-            
-            st.markdown(f"""
-            <div class="card">
-                <div style="font-size: 2.5rem;">{p['icone']}</div>
-                <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: 0.15rem;">{p['nome']}</h3>
-                <div style="font-size: 0.85rem; color: var(--text-muted); font-style: italic; margin-bottom: 0.5rem;">{p['subtitulo']}</div>
-                <p style="color: var(--text-muted); line-height: 1.6; font-size: 0.88rem;">{p['descricao']}</p>
-                <div style="font-size: 0.8rem; color: var(--primary); font-style: italic; margin-bottom: 0.75rem; padding-left: 0.75rem; border-left: 2px solid var(--primary);">💡 {p['contexto']}</div>
-                <div>{techs}</div>
-                <div style="margin-top: 1rem;">{link}</div>
+    # Grid 3 colunas responsivo
+    html = '<div class="grid-3">'
+    for p in PROJETOS:
+        # Thumbnail placeholder
+        thumbnail_html = ""
+        if p.get("thumbnail"):
+            thumbnail_html = f'<img src="{p["thumbnail"]}" style="width:100%; height:150px; object-fit:cover; border-radius:12px; margin-bottom:0.75rem;" loading="lazy" alt="Thumbnail do projeto {p["nome"]}">'
+        else:
+            # Placeholder gradiente com ícone
+            thumbnail_html = f"""
+            <div style="width:100%; height:150px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius:12px; margin-bottom:0.75rem; display:flex; align-items:center; justify-content:center; font-size:3rem; color:white;">
+                {p['icone']}
             </div>
-            """, unsafe_allow_html=True)
+            """
+        
+        techs = "".join([f'<span class="tag">{t}</span>' for t in p["tech"]])
+        link = f'<a href="{p["url"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;width:auto;">🔗 Ver</a>' if p.get("url") else f'<a href="{LINKS["github"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;width:auto;">💻 GitHub</a>'
+        
+        html += f"""
+        <div class="card">
+            {thumbnail_html}
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: 0.15rem;">{p['nome']}</h3>
+            <div style="font-size: 0.85rem; color: var(--text-muted); font-style: italic; margin-bottom: 0.5rem;">{p['subtitulo']}</div>
+            <p style="color: var(--text-muted); line-height: 1.6; font-size: 0.88rem;">{p['descricao']}</p>
+            <div style="font-size: 0.8rem; color: var(--primary); font-style: italic; margin-bottom: 0.75rem; padding-left: 0.75rem; border-left: 2px solid var(--primary);">💡 {p['contexto']}</div>
+            <div>{techs}</div>
+            <div style="margin-top: 1rem;">{link}</div>
+        </div>
+        """
+    html += '</div>'
+    st.markdown(html, unsafe_allow_html=True)
 
 def render_footer():
     tel = DADOS['contato']['telefone1'].replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
@@ -936,7 +1144,11 @@ def render_footer():
     
     for i, (url, label) in enumerate(links):
         with cols[i]:
-            st.markdown(f'<a href="{url}" target="_blank" class="footer-link">{label}</a>', unsafe_allow_html=True)
+            # Usar st.link_button para os links externos (exceto telefone)
+            if url.startswith("tel:"):
+                st.markdown(f'<a href="{url}" class="footer-link">{label}</a>', unsafe_allow_html=True)
+            else:
+                st.link_button(label, url, use_container_width=True)
     
     # Footer - Download PDF nativo
     pdf_path = get_pdf_path()
@@ -956,7 +1168,7 @@ def render_footer():
     """, unsafe_allow_html=True)
 
 # ============================================================================
-# ANALYTICS COM CACHE
+# ANALYTICS COM CACHE E MELHORIAS (delta, botão limpar)
 # ============================================================================
 @st.cache_data(ttl=3600)
 def generate_analytics_data():
@@ -988,20 +1200,29 @@ def render_analytics():
         
         col1, col2 = st.columns(2)
         with col1:
-            reg = st.multiselect("Região", regioes, default=regioes)
+            reg = st.multiselect("Região", regioes, default=regioes, key="reg_filter")
         with col2:
-            stat = st.multiselect("Status", status, default=status)
+            stat = st.multiselect("Status", status, default=status, key="status_filter")
+        
+        # Botão limpar filtros
+        col3, col4 = st.columns([1, 4])
+        with col3:
+            if st.button("🔄 Limpar Filtros", use_container_width=True):
+                st.session_state.reg_filter = regioes
+                st.session_state.status_filter = status
+                st.rerun()
         
         filtro = df[df["Região"].isin(reg) & df["Status"].isin(stat)]
         
         if not filtro.empty:
             k1, k2, k3 = st.columns(3)
             with k1:
-                st.metric("Contratos", f"{len(filtro):,}")
+                # Delta fictício para demonstrar
+                st.metric("Contratos", f"{len(filtro):,}", delta="↑ 12%", delta_color="inverse")
             with k2:
-                st.metric("Valor Total", f"R$ {filtro['Valor'].sum()/1e6:.1f} M")
+                st.metric("Valor Total", f"R$ {filtro['Valor'].sum()/1e6:.1f} M", delta="↑ 8%", delta_color="inverse")
             with k3:
-                st.metric("Sucesso", f"{(filtro['Status']=='Renegociado').mean()*100:.1f}%")
+                st.metric("Sucesso", f"{(filtro['Status']=='Renegociado').mean()*100:.1f}%", delta="↓ 2%", delta_color="normal")
             
             col_a, col_b = st.columns(2)
             with col_a:
@@ -1016,16 +1237,35 @@ def render_analytics():
                 st.plotly_chart(fig2, use_container_width=True, config={'displayModeBar': False})
 
 # ============================================================================
+# BACK TO TOP - Injeção de HTML/JS
+# ============================================================================
+def render_back_to_top():
+    st.markdown("""
+    <div class="back-to-top" id="backToTop">
+        <a href="#topo">↑</a>
+    </div>
+    <script>
+        window.addEventListener('scroll', function() {
+            var btn = document.getElementById('backToTop');
+            if (window.scrollY > 500) {
+                btn.classList.add('visible');
+            } else {
+                btn.classList.remove('visible');
+            }
+        });
+    </script>
+    """, unsafe_allow_html=True)
+
+# ============================================================================
 # MAIN
 # ============================================================================
 def main():
     st.markdown(get_css(), unsafe_allow_html=True)
     
-    # Sincroniza página a partir da URL (se houver)
+    # Sincroniza página a partir da URL
     if "page" in st.query_params:
         st.session_state.page = st.query_params["page"]
     
-    # Renderiza a navbar (que já trata os cliques)
     render_navbar()
     st.markdown('<div id="topo"></div>', unsafe_allow_html=True)
     
@@ -1076,6 +1316,7 @@ def main():
         render_analytics()
     
     render_footer()
+    render_back_to_top()  # Adiciona o botão flutuante
 
 if __name__ == "__main__":
     main()
