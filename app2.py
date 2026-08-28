@@ -1,16 +1,16 @@
 """
 app.py - Portfólio Raphael Pires - Streamlit
-Versão Refatorada - Componentes Nativos
+Versão Refatorada com melhorias de caminho e robustez
 """
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import os
 import base64
+from pathlib import Path
 
 # ============================================================================
-# CONFIGURAÇÃO
+# CONFIGURAÇÃO DA PÁGINA (pode ser movida para config.py)
 # ============================================================================
 st.set_page_config(
     page_title="Raphael Pires · Analista de Dados & BI",
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================================
-# ESTADO
+# ESTADO INICIAL
 # ============================================================================
 if "theme" not in st.session_state:
     st.session_state.theme = "dark"
@@ -28,56 +28,78 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # ============================================================================
-# FUNÇÕES AUXILIARES
+# FUNÇÕES AUXILIARES (podem ser movidas para utils.py)
 # ============================================================================
-def get_foto_path():
+def get_base_dir() -> Path:
+    """Retorna o diretório onde este script está."""
+    return Path(__file__).parent
+
+def find_file(candidates: list) -> Path | None:
+    """
+    Procura um arquivo em uma lista de caminhos (relativos ou absolutos).
+    Retorna o primeiro que existir, ou None.
+    """
+    base = get_base_dir()
+    for candidate in candidates:
+        p = Path(candidate)
+        if not p.is_absolute():
+            p = base / p
+        if p.exists() and p.is_file():
+            return p
+    return None
+
+def get_foto_path() -> Path | None:
+    """Retorna o caminho da foto do perfil."""
     candidatos = [
-        "assets/rapha.jpeg", "assets/rapha.jpg",
-        "rapha.jpeg", "rapha.jpg",
-        "foto.jpeg", "foto.jpg",
-        "perfil.jpeg", "perfil.jpg"
+        "assets/rapha.jpeg",
+        "assets/rapha.jpg",
+        "rapha.jpeg",
+        "rapha.jpg",
+        "foto.jpeg",
+        "foto.jpg",
+        "perfil.jpeg",
+        "perfil.jpg",
     ]
-    for caminho in candidatos:
-        if os.path.exists(caminho):
-            return caminho
-    return None
+    return find_file(candidatos)
 
-def get_foto_base64(foto_path):
-    if foto_path and os.path.exists(foto_path):
-        try:
-            with open(foto_path, "rb") as f:
-                data = f.read()
-                encoded = base64.b64encode(data).decode()
-                ext = foto_path.split('.')[-1].lower()
-                mime = "image/jpeg" if ext in ["jpg", "jpeg"] else "image/png"
-                return f"data:{mime};base64,{encoded}"
-        except:
-            pass
-    return None
+def get_foto_base64(foto_path: Path | None) -> str | None:
+    """Codifica a foto em base64 para uso em HTML."""
+    if foto_path is None:
+        return None
+    try:
+        data = foto_path.read_bytes()
+        encoded = base64.b64encode(data).decode()
+        ext = foto_path.suffix.lower()
+        mime = "image/jpeg" if ext in [".jpg", ".jpeg"] else "image/png"
+        return f"data:{mime};base64,{encoded}"
+    except Exception:
+        return None
 
-def get_pdf_path():
+def get_pdf_path() -> Path | None:
+    """Retorna o caminho do currículo em PDF."""
     candidatos = [
         "Curriculo_Raphael_v2.pdf",
         "Curriculo_Raphael.pdf",
         "cv.pdf",
         "assets/Curriculo_Raphael_v2.pdf",
+        "pages/Curriculo_Raphael_v2.pdf",   # ← nova localização
     ]
-    for caminho in candidatos:
-        if os.path.exists(caminho):
-            return caminho
-    return None
+    return find_file(candidatos)
 
-def ler_pdf_base64(caminho):
-    if caminho and os.path.exists(caminho):
-        with open(caminho, "rb") as f:
-            return base64.b64encode(f.read()).decode()
-    return None
+def ler_pdf_base64(pdf_path: Path | None) -> str | None:
+    """Codifica o PDF em base64 para download inline."""
+    if pdf_path is None:
+        return None
+    try:
+        return base64.b64encode(pdf_path.read_bytes()).decode()
+    except Exception:
+        return None
 
 def toggle_theme():
     st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
 
 # ============================================================================
-# DADOS
+# DADOS (podem ser movidos para data.py)
 # ============================================================================
 DADOS = {
     "nome": "Raphael Fernando S. Pires",
@@ -247,7 +269,7 @@ LINKS = {
 }
 
 # ============================================================================
-# CSS SIMPLIFICADO
+# CSS (pode ser movido para components.py)
 # ============================================================================
 def get_css():
     theme = st.session_state.theme
@@ -502,7 +524,7 @@ def get_css():
     """
 
 # ============================================================================
-# RENDERIZAÇÃO
+# RENDERIZAÇÃO (componentes de UI)
 # ============================================================================
 
 def render_navbar():
@@ -640,7 +662,6 @@ def render_tech():
             if i + j < len(tech_items):
                 tech, dados = tech_items[i + j]
                 with cols[j]:
-                    nivel_class = dados['nivel'].lower().replace('í', 'i').replace('á', 'a')
                     itens_html = "".join([f'<span class="tag">{item}</span>' for item in dados['itens']])
                     st.markdown(f"""
                     <div class="card">
@@ -911,13 +932,18 @@ def render_analytics():
 def main():
     st.markdown(get_css(), unsafe_allow_html=True)
     
+    # Gerencia alternância de tema via query params sem limpar todos os parâmetros
     if "theme_toggle" in st.query_params:
         toggle_theme()
         page = st.query_params.get("page", "home")
+        # Remove apenas o parâmetro de toggle, mantendo os demais
+        new_params = {k: v for k, v in st.query_params.items() if k != "theme_toggle"}
         st.query_params.clear()
-        st.query_params["page"] = page
+        for k, v in new_params.items():
+            st.query_params[k] = v
         st.rerun()
     
+    # Atualiza a página a partir da URL
     if "page" in st.query_params:
         st.session_state.page = st.query_params["page"]
     
