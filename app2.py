@@ -1,6 +1,6 @@
 """
 app.py - Portfólio Raphael Pires - Streamlit
-Versão Refatorada com melhorias de caminho e robustez
+Versão com caching para evitar throttling
 """
 import streamlit as st
 import pandas as pd
@@ -10,7 +10,7 @@ import base64
 from pathlib import Path
 
 # ============================================================================
-# CONFIGURAÇÃO DA PÁGINA (pode ser movida para config.py)
+# CONFIGURAÇÃO DA PÁGINA
 # ============================================================================
 st.set_page_config(
     page_title="Raphael Pires · Analista de Dados & BI",
@@ -28,17 +28,14 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # ============================================================================
-# FUNÇÕES AUXILIARES (podem ser movidas para utils.py)
+# FUNÇÕES AUXILIARES COM CACHE
 # ============================================================================
 def get_base_dir() -> Path:
-    """Retorna o diretório onde este script está."""
     return Path(__file__).parent
 
+@st.cache_data(ttl=3600)  # cache por 1 hora
 def find_file(candidates: list) -> Path | None:
-    """
-    Procura um arquivo em uma lista de caminhos (relativos ou absolutos).
-    Retorna o primeiro que existir, ou None.
-    """
+    """Procura um arquivo em lista de caminhos (com cache)."""
     base = get_base_dir()
     for candidate in candidates:
         p = Path(candidate)
@@ -48,22 +45,18 @@ def find_file(candidates: list) -> Path | None:
             return p
     return None
 
+@st.cache_data(ttl=3600)
 def get_foto_path() -> Path | None:
-    """Retorna o caminho da foto do perfil."""
     candidatos = [
-        "assets/rapha.jpeg",
-        "assets/rapha.jpg",
-        "rapha.jpeg",
-        "rapha.jpg",
-        "foto.jpeg",
-        "foto.jpg",
-        "perfil.jpeg",
-        "perfil.jpg",
+        "assets/rapha.jpeg", "assets/rapha.jpg",
+        "rapha.jpeg", "rapha.jpg",
+        "foto.jpeg", "foto.jpg",
+        "perfil.jpeg", "perfil.jpg",
     ]
     return find_file(candidatos)
 
+@st.cache_data(ttl=3600)
 def get_foto_base64(foto_path: Path | None) -> str | None:
-    """Codifica a foto em base64 para uso em HTML."""
     if foto_path is None:
         return None
     try:
@@ -75,19 +68,19 @@ def get_foto_base64(foto_path: Path | None) -> str | None:
     except Exception:
         return None
 
+@st.cache_data(ttl=3600)
 def get_pdf_path() -> Path | None:
-    """Retorna o caminho do currículo em PDF."""
     candidatos = [
         "Curriculo_Raphael_v2.pdf",
         "Curriculo_Raphael.pdf",
         "cv.pdf",
         "assets/Curriculo_Raphael_v2.pdf",
-        "pages/Curriculo_Raphael_v2.pdf",   # ← nova localização
+        "pages/Curriculo_Raphael_v2.pdf",   # ← importante para o seu caso
     ]
     return find_file(candidatos)
 
+@st.cache_data(ttl=3600)
 def ler_pdf_base64(pdf_path: Path | None) -> str | None:
-    """Codifica o PDF em base64 para download inline."""
     if pdf_path is None:
         return None
     try:
@@ -99,7 +92,7 @@ def toggle_theme():
     st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
 
 # ============================================================================
-# DADOS (podem ser movidos para data.py)
+# DADOS ESTÁTICOS (não precisam de cache, são literais)
 # ============================================================================
 DADOS = {
     "nome": "Raphael Fernando S. Pires",
@@ -269,8 +262,9 @@ LINKS = {
 }
 
 # ============================================================================
-# CSS (pode ser movido para components.py)
+# CSS COM CACHE (estático)
 # ============================================================================
+@st.cache_resource
 def get_css():
     theme = st.session_state.theme
     if theme == "dark":
@@ -524,7 +518,7 @@ def get_css():
     """
 
 # ============================================================================
-# RENDERIZAÇÃO (componentes de UI)
+# FUNÇÕES DE RENDERIZAÇÃO (sem cache, pois são UI)
 # ============================================================================
 
 def render_navbar():
@@ -877,6 +871,22 @@ def render_footer():
     <p style="text-align: center; color: var(--text-muted); font-size: 0.75rem; margin-top: 1rem;">© 2026 {DADOS['nome']} · Feito com ❤️ e Streamlit</p>
     """, unsafe_allow_html=True)
 
+# ============================================================================
+# ANALYTICS COM CACHE DE DADOS
+# ============================================================================
+@st.cache_data(ttl=3600)
+def generate_analytics_data():
+    """Gera o DataFrame de exemplo uma única vez e o reutiliza."""
+    np.random.seed(42)
+    regioes = ["Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte"]
+    status = ["Renegociado", "Em Negociação", "Inadimplente"]
+    df = pd.DataFrame({
+        "Região": np.random.choice(regioes, 400, p=[.45, .28, .15, .07, .05]),
+        "Valor": np.random.lognormal(8.5, 1.2, 400),
+        "Status": np.random.choice(status, 400, p=[.65, .25, .10])
+    })
+    return df
+
 def render_analytics():
     st.markdown("""
     <div style="padding: 1rem 0 2rem; text-align: center;">
@@ -885,17 +895,13 @@ def render_analytics():
     </div>
     """, unsafe_allow_html=True)
     
+    df = generate_analytics_data()  # ← cacheado!
+    
     tabs = st.tabs(["🇧🇷 Desenrola Brasil", "⛽ ANP", "📈 Impacto"])
     
     with tabs[0]:
-        np.random.seed(42)
-        regioes = ["Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte"]
-        status = ["Renegociado", "Em Negociação", "Inadimplente"]
-        df = pd.DataFrame({
-            "Região": np.random.choice(regioes, 400, p=[.45, .28, .15, .07, .05]),
-            "Valor": np.random.lognormal(8.5, 1.2, 400),
-            "Status": np.random.choice(status, 400, p=[.65, .25, .10])
-        })
+        regioes = df["Região"].unique().tolist()
+        status = df["Status"].unique().tolist()
         
         col1, col2 = st.columns(2)
         with col1:
@@ -932,18 +938,16 @@ def render_analytics():
 def main():
     st.markdown(get_css(), unsafe_allow_html=True)
     
-    # Gerencia alternância de tema via query params sem limpar todos os parâmetros
+    # Gerencia alternância de tema
     if "theme_toggle" in st.query_params:
         toggle_theme()
         page = st.query_params.get("page", "home")
-        # Remove apenas o parâmetro de toggle, mantendo os demais
         new_params = {k: v for k, v in st.query_params.items() if k != "theme_toggle"}
         st.query_params.clear()
         for k, v in new_params.items():
             st.query_params[k] = v
         st.rerun()
     
-    # Atualiza a página a partir da URL
     if "page" in st.query_params:
         st.session_state.page = st.query_params["page"]
     
