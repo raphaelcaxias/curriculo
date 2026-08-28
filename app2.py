@@ -1,6 +1,6 @@
 """
 app.py - Portfólio Raphael Pires - Streamlit
-Versão com caching para evitar throttling
+Versão com Download Nativo e Links Otimizados
 """
 import streamlit as st
 import pandas as pd
@@ -33,9 +33,8 @@ if "page" not in st.session_state:
 def get_base_dir() -> Path:
     return Path(__file__).parent
 
-@st.cache_data(ttl=3600)  # cache por 1 hora
+@st.cache_data(ttl=3600)
 def find_file(candidates: list) -> Path | None:
-    """Procura um arquivo em lista de caminhos (com cache)."""
     base = get_base_dir()
     for candidate in candidates:
         p = Path(candidate)
@@ -75,24 +74,15 @@ def get_pdf_path() -> Path | None:
         "Curriculo_Raphael.pdf",
         "cv.pdf",
         "assets/Curriculo_Raphael_v2.pdf",
-        "pages/Curriculo_Raphael_v2.pdf",   # ← importante para o seu caso
+        "pages/Curriculo_Raphael_v2.pdf",   # importante!
     ]
     return find_file(candidatos)
-
-@st.cache_data(ttl=3600)
-def ler_pdf_base64(pdf_path: Path | None) -> str | None:
-    if pdf_path is None:
-        return None
-    try:
-        return base64.b64encode(pdf_path.read_bytes()).decode()
-    except Exception:
-        return None
 
 def toggle_theme():
     st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
 
 # ============================================================================
-# DADOS ESTÁTICOS (não precisam de cache, são literais)
+# DADOS ESTÁTICOS
 # ============================================================================
 DADOS = {
     "nome": "Raphael Fernando S. Pires",
@@ -262,7 +252,7 @@ LINKS = {
 }
 
 # ============================================================================
-# CSS COM CACHE (estático)
+# CSS COMPLETO (com estilos para o download button)
 # ============================================================================
 @st.cache_resource
 def get_css():
@@ -414,21 +404,48 @@ def get_css():
         box-shadow: 0 25px 80px var(--shadow);
     }}
     
-    /* BOTÕES */
+    /* BOTÕES PADRÃO (HTML) */
     .btn-primary {{
         background: linear-gradient(135deg, var(--primary), var(--secondary));
         color: white !important; padding: 0.65rem 1.5rem; border-radius: 12px;
         font-weight: 600; text-decoration: none; display: inline-flex;
-        align-items: center; gap: 0.5rem; transition: all 0.25s ease;
+        align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.25s ease;
+        width: 100%;
     }}
     .btn-primary:hover {{ transform: translateY(-2px); box-shadow: 0 8px 28px rgba(59,130,246,0.45); }}
     .btn-secondary {{
         background: var(--card-bg); border: 1px solid var(--border);
         padding: 0.65rem 1.5rem; border-radius: 12px;
         font-weight: 600; color: var(--text) !important; text-decoration: none;
-        display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.25s ease;
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; 
+        transition: all 0.25s ease; width: 100%;
     }}
     .btn-secondary:hover {{ border-color: var(--primary); transform: translateY(-2px); }}
+    
+    /* BOTÃO DE DOWNLOAD NATIVO (Streamlit) */
+    .stDownloadButton > button {{
+        background: var(--card-bg) !important;
+        border: 1px solid var(--border) !important;
+        padding: 0.65rem 1.5rem !important;
+        border-radius: 12px !important;
+        font-weight: 600 !important;
+        color: var(--text) !important;
+        transition: all 0.25s ease !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 0.9rem !important;
+        height: auto !important;
+        line-height: normal !important;
+        width: 100% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.5rem !important;
+    }}
+    .stDownloadButton > button:hover {{
+        border-color: var(--primary) !important;
+        transform: translateY(-2px) !important;
+        background: var(--card-bg) !important;
+    }}
     
     /* SEÇÕES */
     .section {{ padding: 4rem 2rem; border-top: 1px solid var(--border); }}
@@ -518,7 +535,7 @@ def get_css():
     """
 
 # ============================================================================
-# FUNÇÕES DE RENDERIZAÇÃO (sem cache, pois são UI)
+# FUNÇÕES DE RENDERIZAÇÃO
 # ============================================================================
 
 def render_navbar():
@@ -547,13 +564,6 @@ def render_hero():
     foto_b64 = get_foto_base64(foto_path)
     foto_url = foto_b64 if foto_b64 else "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=3B82F6&color=fff&bold=true"
     
-    pdf_path = get_pdf_path()
-    cv_button = ""
-    if pdf_path:
-        pdf_b64 = ler_pdf_base64(pdf_path)
-        if pdf_b64:
-            cv_button = f'<a href="data:application/pdf;base64,{pdf_b64}" download="Curriculo_Raphael_Pires.pdf" class="btn-secondary">📄 Baixar CV</a>'
-    
     col1, col2 = st.columns([1, 2], gap="large")
     
     with col1:
@@ -576,13 +586,29 @@ def render_hero():
                 <span class="badge">🏠 {DADOS['modalidades'][0]}</span>
                 <span class="badge">✈️ {DADOS['modalidades'][1]}</span>
             </div>
-            <div style="margin-top: 2rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                <a href="#experiencia" class="btn-primary">💼 Ver Experiência</a>
-                {cv_button}
-                <a href="{LINKS['linkedin']}" target="_blank" class="btn-secondary">💼 LinkedIn</a>
-            </div>
         </div>
         """, unsafe_allow_html=True)
+        
+        # Botões usando colunas internas para alinhamento
+        btn_cols = st.columns(3)
+        with btn_cols[0]:
+            st.markdown('<a href="#experiencia" class="btn-primary">💼 Ver Experiência</a>', unsafe_allow_html=True)
+        with btn_cols[1]:
+            pdf_path = get_pdf_path()
+            if pdf_path:
+                with open(pdf_path, "rb") as f:
+                    st.download_button(
+                        label="📄 Baixar CV",
+                        data=f,
+                        file_name="Curriculo_Raphael_Pires.pdf",
+                        mime="application/pdf",
+                        key="cv_hero",
+                        use_container_width=True,
+                    )
+            else:
+                st.markdown('<span class="btn-secondary" style="opacity:0.5;cursor:default;">📄 CV indisponível</span>', unsafe_allow_html=True)
+        with btn_cols[2]:
+            st.markdown(f'<a href="{LINKS["linkedin"]}" target="_blank" class="btn-secondary">💼 LinkedIn</a>', unsafe_allow_html=True)
 
 def render_sobre():
     st.markdown("""
@@ -814,7 +840,7 @@ def render_projetos():
     for i, p in enumerate(PROJETOS):
         with cols[i]:
             techs = "".join([f'<span class="tag">{t}</span>' for t in p["tech"]])
-            link = f'<a href="{p["url"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">🔗 Ver</a>' if p.get("url") else f'<a href="{LINKS["github"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">💻 GitHub</a>'
+            link = f'<a href="{p["url"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;width:auto;">🔗 Ver</a>' if p.get("url") else f'<a href="{LINKS["github"]}" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;width:auto;">💻 GitHub</a>'
             
             st.markdown(f"""
             <div class="card">
@@ -857,26 +883,28 @@ def render_footer():
         with cols[i]:
             st.markdown(f'<a href="{url}" target="_blank" class="footer-link">{label}</a>', unsafe_allow_html=True)
     
+    # Footer - Download PDF nativo
     pdf_path = get_pdf_path()
     if pdf_path:
-        pdf_b64 = ler_pdf_base64(pdf_path)
-        if pdf_b64:
-            st.markdown(f"""
-            <div style="text-align: center; margin: 0.5rem 0 1rem;">
-                <a href="data:application/pdf;base64,{pdf_b64}" download="Curriculo_Raphael_Pires.pdf" class="footer-link">📄 Baixar Currículo (PDF)</a>
-            </div>
-            """, unsafe_allow_html=True)
+        with open(pdf_path, "rb") as f:
+            st.download_button(
+                label="📄 Baixar Currículo (PDF)",
+                data=f,
+                file_name="Curriculo_Raphael_Pires.pdf",
+                mime="application/pdf",
+                key="cv_footer",
+                use_container_width=False,
+            )
     
     st.markdown(f"""
     <p style="text-align: center; color: var(--text-muted); font-size: 0.75rem; margin-top: 1rem;">© 2026 {DADOS['nome']} · Feito com ❤️ e Streamlit</p>
     """, unsafe_allow_html=True)
 
 # ============================================================================
-# ANALYTICS COM CACHE DE DADOS
+# ANALYTICS COM CACHE
 # ============================================================================
 @st.cache_data(ttl=3600)
 def generate_analytics_data():
-    """Gera o DataFrame de exemplo uma única vez e o reutiliza."""
     np.random.seed(42)
     regioes = ["Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte"]
     status = ["Renegociado", "Em Negociação", "Inadimplente"]
@@ -895,7 +923,7 @@ def render_analytics():
     </div>
     """, unsafe_allow_html=True)
     
-    df = generate_analytics_data()  # ← cacheado!
+    df = generate_analytics_data()
     
     tabs = st.tabs(["🇧🇷 Desenrola Brasil", "⛽ ANP", "📈 Impacto"])
     
