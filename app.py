@@ -1,1949 +1,796 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import plotly.express as px
+import base64
 import os
 from datetime import datetime, timedelta
-import base64
+
+import numpy as np
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import streamlit as st
 
 # ============================================================================
 # CONFIGURAÇÃO DA PÁGINA
 # ============================================================================
 st.set_page_config(
-    page_title="Raphael Pires · Analista de Dados & BI",
+    page_title="Raphael Pires · Analista Administrativo | Dados & BI",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="collapsed",
 )
 
 # ============================================================================
-# TEMA (DARK / LIGHT)
+# DADOS DO CURRÍCULO — fonte única de verdade
+# Atualize aqui e o site inteiro acompanha.
 # ============================================================================
-if "theme" not in st.session_state:
-    st.session_state.theme = "dark"
-
-def toggle_theme():
-    st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
-
-def get_colors():
-    dark = st.session_state.theme == "dark"
-    if dark:
-        return {
-            "primary": "#3B82F6",
-            "primary_hover": "#2563EB",
-            "secondary": "#0EA5E9",
-            "accent": "#8B5CF6",
-            "success": "#22C55E",
-            "warning": "#F59E0B",
-            "bg": "#0B0F1A",
-            "bg_elevated": "#111827",
-            "text": "#F1F5F9",
-            "text_muted": "#94A3B8",
-            "text_subtle": "#64748B",
-            "card_bg": "rgba(255,255,255,0.04)",
-            "card_bg_hover": "rgba(255,255,255,0.07)",
-            "border": "rgba(255,255,255,0.08)",
-            "border_hover": "rgba(59,130,246,0.4)",
-            "tag_bg": "rgba(59,130,246,0.12)",
-            "tag_border": "rgba(59,130,246,0.25)",
-            "primary_light": "rgba(59,130,246,0.15)",
-            "navbar_bg": "rgba(11,15,26,0.85)",
-            "navbar_border": "rgba(255,255,255,0.06)",
-            "nav_hover": "rgba(255,255,255,0.06)",
-            "hero_bg": "radial-gradient(ellipse at 50% 30%, rgba(59,130,246,0.1) 0%, transparent 70%)",
-            "hero_glow": "radial-gradient(ellipse at 70% 20%, rgba(59,130,246,0.18) 0%, transparent 60%)",
-            "section_bg": "rgba(11,15,26,0.6)",
-            "section_alt_bg": "rgba(255,255,255,0.02)",
-            "shadow": "0 8px 32px rgba(0,0,0,0.4)",
-            "shadow_hover": "0 16px 48px rgba(59,130,246,0.25)",
-            "shadow_glow": "0 0 40px rgba(59,130,246,0.15)",
-            "plotly_template": "plotly_dark",
-            "chart_colors": ["#3B82F6","#0EA5E9","#8B5CF6","#22C55E","#F59E0B"],
-            "gradient_primary": "linear-gradient(135deg, #3B82F6 0%, #0EA5E9 100%)",
-            "gradient_accent": "linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%)",
-            "gradient_text": "linear-gradient(135deg, #3B82F6 0%, #0EA5E9 50%, #8B5CF6 100%)"
-        }
-    else:
-        return {
-            "primary": "#1D4ED8",
-            "primary_hover": "#1E40AF",
-            "secondary": "#0EA5E9",
-            "accent": "#7C3AED",
-            "success": "#16A34A",
-            "warning": "#D97706",
-            "bg": "#F8FAFC",
-            "bg_elevated": "#FFFFFF",
-            "text": "#0F172A",
-            "text_muted": "#475569",
-            "text_subtle": "#94A3B8",
-            "card_bg": "rgba(255,255,255,0.8)",
-            "card_bg_hover": "rgba(255,255,255,0.95)",
-            "border": "rgba(0,0,0,0.06)",
-            "border_hover": "rgba(29,78,216,0.3)",
-            "tag_bg": "#DBEAFE",
-            "tag_border": "#93C5FD",
-            "primary_light": "#DBEAFE",
-            "navbar_bg": "rgba(248,250,252,0.9)",
-            "navbar_border": "rgba(0,0,0,0.06)",
-            "nav_hover": "rgba(0,0,0,0.04)",
-            "hero_bg": "radial-gradient(ellipse at 50% 30%, rgba(29,78,216,0.06) 0%, transparent 70%)",
-            "hero_glow": "radial-gradient(ellipse at 70% 20%, rgba(29,78,216,0.1) 0%, transparent 60%)",
-            "section_bg": "rgba(255,255,255,0.6)",
-            "section_alt_bg": "rgba(0,0,0,0.01)",
-            "shadow": "0 8px 32px rgba(0,0,0,0.08)",
-            "shadow_hover": "0 16px 48px rgba(29,78,216,0.12)",
-            "shadow_glow": "0 0 40px rgba(29,78,216,0.08)",
-            "plotly_template": "plotly_white",
-            "chart_colors": ["#1D4ED8","#0EA5E9","#7C3AED","#16A34A","#D97706"],
-            "gradient_primary": "linear-gradient(135deg, #1D4ED8 0%, #0EA5E9 100%)",
-            "gradient_accent": "linear-gradient(135deg, #7C3AED 0%, #1D4ED8 100%)",
-            "gradient_text": "linear-gradient(135deg, #1D4ED8 0%, #0EA5E9 50%, #7C3AED 100%)"
-        }
+CV = {
+    "nome": "Raphael Fernando S. Pires",
+    "nome_curto": "Raphael Pires",
+    "cargo": "Analista Administrativo · Dados & BI",
+    "cidade": "Volta Redonda – RJ",
+    "perfil": (
+        "Analista com formação em Sistemas de Informação e 17 anos conduzindo a gestão "
+        "administrativa de negócios próprios no varejo. Organizo processos, controles e "
+        "indicadores e transformo dados em relatórios e dashboards que apoiam decisões, "
+        "usando Excel, Power BI, SQL e Python."
+    ),
+    "contato": {
+        "email": "raphael_caxias@hotmail.com",
+        "celular": "(24) 99278-9637",
+        "whatsapp": "5524992789637",
+        "fixo": "(24) 3018-1303",
+        "linkedin": "https://www.linkedin.com/in/raphael-pires-caxias",
+        "github": "https://github.com/raphaelcaxias",
+    },
+    "modalidades": ["📍 Presencial", "🏢 Híbrido", "🏠 Remoto", "✈️ Disponível para viagens"],
+    "kpis": [
+        ("⚡", "87,5%", "menos tempo operacional com automação VBA no Banco do Brasil"),
+        ("🏦", "20", "agências usando as macros desenvolvidas"),
+        ("📊", "213 mil+", "registros tratados no projeto CNPq Analytics"),
+        ("💰", "R$ 1,2 bi", "em investimentos públicos analisados"),
+        ("🗂️", "17 anos", "de gestão administrativa de negócios próprios"),
+    ],
+    "experiencias": [
+        {
+            "periodo": "out/2026",
+            "cargo": "Analista Administrativo",
+            "empresa": "Santa Casa de Misericórdia de Barra Mansa",
+            "itens": [
+                "Atuação na área administrativa com foco em processos, controles, "
+                "indicadores e suporte às atividades de gestão.",
+            ],
+            "tags": ["Processos", "Controles", "Indicadores", "Gestão"],
+        },
+        {
+            "periodo": "2014 – mai/2026",
+            "cargo": "Sócio-administrador · Indicadores e KPIs",
+            "empresa": "J Sintonía — Varejo especializado",
+            "itens": [
+                "Acompanhamento de vendas, margem e rentabilidade com relatórios estruturados, "
+                "trocando decisões intuitivas por dados.",
+                "Análise de viabilidade econômica (projeções, cenários e tendências) que embasou "
+                "o encerramento planejado da operação em maio/2026, evitando prejuízo.",
+            ],
+            "tags": ["KPIs", "Rentabilidade", "Viabilidade econômica", "Relatórios"],
+        },
+        {
+            "periodo": "2009 – 2026",
+            "cargo": "Sócio-administrador · Dados e BI",
+            "empresa": "Jardim do Éden — Varejo de moda",
+            "itens": [
+                "Estruturação, limpeza e integração da base de dados do negócio; dashboards "
+                "gerenciais em Power BI e Looker Studio com SQL e Python.",
+                "Automação de relatórios operacionais com Python e uso de IA Generativa na "
+                "exploração de dados e documentação de processos.",
+            ],
+            "tags": ["Power BI", "Looker Studio", "SQL", "Python", "IA Generativa"],
+        },
+        {
+            "periodo": "2008 – 2010",
+            "cargo": "Estagiário de Automação e Dados",
+            "empresa": "Banco do Brasil S.A.",
+            "itens": [
+                "Macros VBA usadas em 20 agências, reduzindo o tempo operacional em 87,5% "
+                "(de 2h para 15 min).",
+                "Saneamento e padronização de bases de dados gerenciais internas.",
+            ],
+            "tags": ["VBA", "Excel", "Automação", "Qualidade de dados"],
+        },
+    ],
+    "projetos": [
+        {
+            "icone": "🔬",
+            "nome": "CNPq Analytics",
+            "desc": "ETL e análise de mais de 213 mil bolsas e R$ 1,2 bi em investimentos públicos "
+                    "em pesquisa, com painel interativo de distribuição regional.",
+            "tags": ["Python", "Pandas", "Plotly", "Streamlit", "PostgreSQL"],
+            "link": "https://cnpq-analytics.streamlit.app",
+            "cta": "Abrir app",
+        },
+        {
+            "icone": "🇧🇷",
+            "nome": "Desenrola Brasil",
+            "desc": "Painel executivo com dados do Banco Central: KPIs, séries temporais, "
+                    "concentração de mercado (HHI) e segmentação de perfis por clusterização.",
+            "tags": ["Python", "Scikit-learn", "Statsmodels", "Plotly", "Streamlit"],
+            "link": "https://desenrolabrasil.streamlit.app",
+            "cta": "Abrir app",
+        },
+        {
+            "icone": "🍯",
+            "nome": "MelShape",
+            "desc": "Plataforma de análise de negócios com módulos de vendas, estoque e "
+                    "rentabilidade, autenticação, banco em nuvem e insights gerados por APIs de LLM.",
+            "tags": ["Python", "Streamlit", "Supabase", "PostgreSQL", "IA Generativa"],
+            "link": "https://github.com/raphaelcaxias",
+            "cta": "Ver no GitHub",
+        },
+        {
+            "icone": "⛽",
+            "nome": "Análise de Combustíveis (ANP)",
+            "desc": "Dashboard com filtros temporais e regionais sobre preços de combustíveis "
+                    "a partir de dados abertos da ANP.",
+            "tags": ["Python", "Plotly", "Séries temporais"],
+            "link": "https://github.com/raphaelcaxias",
+            "cta": "Ver no GitHub",
+        },
+    ],
+    "competencias": [
+        ("🗂️", "Gestão administrativa", ["Processos", "Controles", "Indicadores", "Relatórios gerenciais", "Viabilidade econômica"]),
+        ("📊", "Power BI", ["Dashboards", "KPIs", "DAX", "Power Query"]),
+        ("📗", "Planilhas", ["Excel avançado", "VBA", "Google Planilhas"]),
+        ("🗄️", "SQL", ["PostgreSQL", "Supabase", "Consultas", "Modelagem"]),
+        ("🐍", "Python", ["Pandas", "NumPy", "Scikit-learn", "Statsmodels"]),
+        ("📈", "Visualização & ETL", ["Plotly", "Streamlit", "Looker Studio", "Limpeza e carga"]),
+        ("🤖", "IA aplicada", ["IA Generativa", "Engenharia de prompt", "APIs de LLM"]),
+    ],
+    "formacao": [
+        ("🎓", "Bacharelado em Sistemas de Informação", "UniFOA · 2010"),
+        ("💻", "Técnico em Informática", "CIBA · 2005"),
+    ],
+    "cursos": [
+        ("Analista Administrativo", "Adequa Cursos · 60h", "Concluído"),
+        ("SQL Avançado · Power BI · Python para Análise de Dados · Git e GitHub", "Hashtag Treinamentos", "Concluído"),
+        ("IA Generativa (Claude) · Algoritmos e IA Aplicada", "Hashtag Treinamentos", "Concluído"),
+        ("AWS Educate — 8 módulos (Cloud 101, Console, Storage, ML Foundations, Cloud Support, Sustainability)", "AWS", "Concluído"),
+        ("AWS Cloud Practitioner", "Hashtag Treinamentos", "40%"),
+    ],
+    "idiomas": [("Português", "Nativo"), ("Inglês", "Leitura técnica")],
+}
 
 # ============================================================================
-# FUNÇÕES AUXILIARES (FOTO, PDF)
+# TEMA — guardado na URL (?theme=dark|light) para sobreviver à navegação
 # ============================================================================
-def get_foto_path():
-    candidatos = [
-        "assets/rapha.jpeg", "assets/rapha.jpg",
-        "rapha.jpeg", "rapha.jpg",
-        "foto.jpeg", "foto.jpg",
-        "perfil.jpeg", "perfil.jpg"
-    ]
-    for caminho in candidatos:
-        if os.path.exists(caminho):
-            return caminho
+PALETTES = {
+    "dark": {
+        "bg": "#0A1517", "bg2": "#0F1F22", "text": "#EAF2F0", "muted": "#9DB3AF", "subtle": "#6E8682",
+        "primary": "#2BB3A3", "primary_strong": "#1F9488", "accent": "#F2B544",
+        "card": "rgba(255,255,255,0.035)", "card_hover": "rgba(255,255,255,0.06)",
+        "border": "rgba(255,255,255,0.08)", "border_hover": "rgba(43,179,163,0.45)",
+        "tint": "rgba(43,179,163,0.14)", "tint_border": "rgba(43,179,163,0.30)",
+        "nav": "rgba(10,21,23,0.82)", "shadow": "0 10px 34px rgba(0,0,0,0.35)",
+        "glow": "rgba(43,179,163,0.16)",
+        "plotly": "plotly_dark",
+        "chart": ["#2BB3A3", "#F2B544", "#7CC6E8", "#E07A5F", "#A3B18A"],
+    },
+    "light": {
+        "bg": "#F5F8F7", "bg2": "#FFFFFF", "text": "#13282B", "muted": "#4D6366", "subtle": "#7A8E8C",
+        "primary": "#0F766E", "primary_strong": "#0F3D3E", "accent": "#B7791F",
+        "card": "#FFFFFF", "card_hover": "#FFFFFF",
+        "border": "rgba(15,61,62,0.10)", "border_hover": "rgba(15,118,110,0.40)",
+        "tint": "#E3F1EE", "tint_border": "#B9DCD6",
+        "nav": "rgba(245,248,247,0.88)", "shadow": "0 10px 30px rgba(15,61,62,0.08)",
+        "glow": "rgba(15,118,110,0.10)",
+        "plotly": "plotly_white",
+        "chart": ["#0F766E", "#D69E2E", "#2B6CB0", "#C05621", "#6B8E23"],
+    },
+}
+
+theme = st.query_params.get("theme", "dark")
+if theme not in PALETTES:
+    theme = "dark"
+page = st.query_params.get("page", "home")
+if page not in ("home", "analytics", "dashboard"):
+    page = "home"
+C = PALETTES[theme]
+
+
+def url(page_name=None, theme_name=None):
+    return f"?page={page_name or page}&theme={theme_name or theme}"
+
+
+# ============================================================================
+# ARQUIVOS (FOTO E PDF)
+# ============================================================================
+def first_existing(paths):
+    for p in paths:
+        if os.path.exists(p):
+            return p
     return None
 
-def get_foto_base64(foto_path):
-    if foto_path and os.path.exists(foto_path):
-        with open(foto_path, "rb") as f:
-            data = f.read()
-            encoded = base64.b64encode(data).decode()
-            ext = foto_path.split('.')[-1].lower()
-            mime = "image/jpeg" if ext in ["jpg", "jpeg"] else "image/png"
-            return f"data:{mime};base64,{encoded}"
-    return None
 
-def get_pdf_path():
-    candidatos = [
-        "Curriculo_Raphael_v2.pdf",
-        "Curriculo_Raphael.pdf",
-        "cv.pdf",
-        "assets/Curriculo_Raphael_v2.pdf",
-        "assets/Curriculo_Raphael.pdf",
-    ]
-    for caminho in candidatos:
-        if os.path.exists(caminho):
-            return caminho
-    return None
+@st.cache_data
+def file_to_data_uri(path, mime):
+    with open(path, "rb") as f:
+        return f"data:{mime};base64,{base64.b64encode(f.read()).decode()}"
 
-def get_pdf_base64(pdf_path):
-    if pdf_path and os.path.exists(pdf_path):
-        with open(pdf_path, "rb") as f:
-            data = f.read()
-            encoded = base64.b64encode(data).decode()
-            return f"data:application/pdf;base64,{encoded}"
-    return None
+
+foto_path = first_existing([
+    "assets/rapha.jpeg", "assets/rapha.jpg", "assets/rapha.png",
+    "rapha.jpeg", "rapha.jpg", "foto.jpeg", "foto.jpg", "perfil.jpeg", "perfil.jpg",
+])
+pdf_path = first_existing([
+    "assets/Curriculo_Raphael_Pires.pdf", "Curriculo_Raphael_Pires.pdf",
+    "assets/Curriculo_Raphael_v7.pdf", "Curriculo_Raphael_v7.pdf", "cv.pdf",
+])
+
 
 # ============================================================================
-# CSS PROFISSIONAL
+# CSS
 # ============================================================================
 def load_css():
-    colors = get_colors()
     st.markdown(f"""
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+:root {{
+  --bg:{C['bg']}; --bg2:{C['bg2']}; --text:{C['text']}; --muted:{C['muted']}; --subtle:{C['subtle']};
+  --primary:{C['primary']}; --primary-strong:{C['primary_strong']}; --accent:{C['accent']};
+  --card:{C['card']}; --card-hover:{C['card_hover']}; --border:{C['border']}; --border-hover:{C['border_hover']};
+  --tint:{C['tint']}; --tint-border:{C['tint_border']}; --nav:{C['nav']}; --shadow:{C['shadow']}; --glow:{C['glow']};
+}}
+html, body, [class*="css"], .stApp {{ font-family:'Inter',-apple-system,sans-serif; background:var(--bg); color:var(--text); }}
+.stApp {{ background:var(--bg); }}
+#MainMenu, footer:not(.footer), header[data-testid="stHeader"], .stDeployButton, [data-testid="stToolbar"] {{ display:none !important; }}
+.block-container {{ padding:0 0 2rem !important; max-width:100% !important; }}
+[data-testid="stVerticalBlock"] {{ gap:0; }}
+a {{ color:var(--primary); }}
+p, li {{ color:inherit; }}
 
-        :root {{
-            --primary: {colors['primary']};
-            --primary-hover: {colors['primary_hover']};
-            --secondary: {colors['secondary']};
-            --accent: {colors['accent']};
-            --success: {colors['success']};
-            --warning: {colors['warning']};
-            --bg: {colors['bg']};
-            --bg-elevated: {colors['bg_elevated']};
-            --text: {colors['text']};
-            --text-muted: {colors['text_muted']};
-            --text-subtle: {colors['text_subtle']};
-            --card-bg: {colors['card_bg']};
-            --card-bg-hover: {colors['card_bg_hover']};
-            --border: {colors['border']};
-            --border-hover: {colors['border_hover']};
-            --tag-bg: {colors['tag_bg']};
-            --tag-border: {colors['tag_border']};
-            --primary-light: {colors['primary_light']};
-            --navbar-bg: {colors['navbar_bg']};
-            --navbar-border: {colors['navbar_border']};
-            --nav-hover: {colors['nav_hover']};
-            --shadow: {colors['shadow']};
-            --shadow-hover: {colors['shadow_hover']};
-            --shadow-glow: {colors['shadow_glow']};
-            --gradient-primary: {colors['gradient_primary']};
-            --gradient-accent: {colors['gradient_accent']};
-            --gradient-text: {colors['gradient_text']};
-        }}
+/* NAVBAR */
+.navbar {{ position:fixed; top:0; left:0; right:0; z-index:999; display:flex; align-items:center; justify-content:space-between;
+  padding:.8rem 2.5rem; background:var(--nav); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border); }}
+.brand {{ font-weight:800; font-size:1.15rem; letter-spacing:-.02em; color:var(--text) !important; text-decoration:none !important;
+  display:flex; align-items:center; gap:.55rem; }}
+.brand-dot {{ width:10px; height:10px; border-radius:50%; background:var(--primary); box-shadow:0 0 0 4px var(--tint); }}
+.brand b {{ color:var(--primary); font-weight:800; }}
+.nav-links {{ display:flex; gap:.35rem; align-items:center; }}
+.nav-link {{ padding:.45rem 1rem; border-radius:999px; font-size:.86rem; font-weight:600; color:var(--muted) !important;
+  text-decoration:none !important; transition:all .2s; }}
+.nav-link:hover {{ background:var(--tint); color:var(--text) !important; }}
+.nav-link.active {{ background:var(--primary); color:#fff !important; }}
+.theme-btn {{ width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-left:.4rem;
+  border:1px solid var(--border); background:var(--card); text-decoration:none !important; font-size:1rem; transition:all .2s; }}
+.theme-btn:hover {{ border-color:var(--primary); transform:rotate(15deg); }}
 
-        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-        html {{ scroll-behavior: smooth; }}
-        html, body, [class*="css"] {{
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-        }}
-        
-        /* Esconder elementos padrão Streamlit */
-        #MainMenu, header, footer, .stDeployButton {{ display: none !important; }}
-        .stApp {{ background: var(--bg); }}
-        .block-container {{ padding: 0 !important; max-width: 100%; }}
-        
-        /* Esconder botões do Streamlit que interferem */
-        .stButton > button {{ 
-            background: transparent !important; 
-            border: none !important; 
-            color: inherit !important;
-            padding: 0 !important;
-            font-size: inherit !important;
-        }}
-        .stButton > button:hover {{ background: transparent !important; }}
-        .stButton > button:focus {{ outline: none !important; box-shadow: none !important; }}
+/* LAYOUT */
+.section {{ padding:4.5rem 2rem; border-top:1px solid var(--border); }}
+.section.alt {{ background:var(--bg2); }}
+.container {{ max-width:1160px; margin:0 auto; }}
+.section-head {{ text-align:center; margin-bottom:2.75rem; }}
+.eyebrow {{ display:inline-block; font-size:.72rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--primary);
+  background:var(--tint); border:1px solid var(--tint-border); padding:.3rem 1rem; border-radius:999px; }}
+.section-head h2 {{ font-size:2.2rem; font-weight:800; letter-spacing:-.03em; margin:.8rem 0 .4rem; color:var(--text); }}
+.section-head p {{ color:var(--muted); max-width:620px; margin:0 auto; font-size:1rem; line-height:1.6; }}
 
-        /* ============ NAVBAR PREMIUM ============ */
-        .navbar {{
-            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-            background: var(--navbar-bg);
-            backdrop-filter: blur(20px) saturate(200%);
-            -webkit-backdrop-filter: blur(20px) saturate(200%);
-            border-bottom: 1px solid var(--navbar-border);
-            padding: 0.875rem 2.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.3s ease;
-        }}
-        .navbar-brand {{ 
-            font-weight: 800; font-size: 1.3rem; 
-            letter-spacing: -0.03em; 
-            color: var(--text); 
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }}
-        .navbar-brand .brand-dot {{
-            width: 10px; height: 10px; border-radius: 50%;
-            background: var(--gradient-primary);
-            box-shadow: 0 0 12px var(--primary);
-            animation: pulse-dot 2s infinite;
-        }}
-        @keyframes pulse-dot {{
-            0%, 100% {{ transform: scale(1); opacity: 1; }}
-            50% {{ transform: scale(1.2); opacity: 0.7; }}
-        }}
-        .navbar-brand span {{ 
-            background: var(--gradient-text);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }}
-        .navbar-links {{ 
-            display: flex; gap: 0.5rem; align-items: center; 
-        }}
-        .nav-link {{
-            padding: 0.5rem 1.1rem; border-radius: 999px; font-size: 0.875rem;
-            font-weight: 500; text-decoration: none; transition: all 0.25s ease;
-            color: var(--text-muted); background: transparent;
-            cursor: pointer; position: relative;
-        }}
-        .nav-link:hover {{ 
-            background: var(--nav-hover); 
-            color: var(--text);
-            transform: translateY(-1px);
-        }}
-        .nav-link.active {{
-            background: var(--gradient-primary); 
-            color: white !important;
-            box-shadow: 0 4px 16px rgba(59,130,246,0.35);
-        }}
-        .theme-toggle {{
-            width: 40px; height: 40px; border-radius: 50%;
-            background: var(--card-bg); border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.25s ease;
-            font-size: 1.1rem; margin-left: 0.5rem;
-        }}
-        .theme-toggle:hover {{
-            background: var(--nav-hover);
-            border-color: var(--primary);
-            transform: rotate(15deg) scale(1.05);
-            box-shadow: var(--shadow-glow);
-        }}
+/* HERO */
+.hero {{ padding:8rem 2rem 4.5rem; position:relative; overflow:hidden;
+  background:radial-gradient(ellipse at 75% 10%, var(--glow) 0%, transparent 55%), radial-gradient(ellipse at 10% 90%, var(--glow) 0%, transparent 50%); }}
+.hero-grid {{ max-width:1160px; margin:0 auto; display:grid; grid-template-columns:auto 1fr; gap:3.5rem; align-items:center; }}
+.photo-wrap {{ position:relative; width:230px; height:230px; }}
+.photo-wrap::before {{ content:""; position:absolute; inset:-10px; border-radius:50%;
+  background:conic-gradient(from 200deg, var(--primary), var(--accent), var(--primary)); opacity:.75; }}
+.photo {{ position:relative; width:230px; height:230px; border-radius:50%; object-fit:cover; border:5px solid var(--bg); display:block; }}
+.photo-fallback {{ position:relative; width:230px; height:230px; border-radius:50%; border:5px solid var(--bg); background:var(--primary-strong);
+  color:#fff; display:flex; align-items:center; justify-content:center; font-size:4rem; font-weight:800; }}
+.status {{ display:inline-flex; align-items:center; gap:.5rem; font-size:.8rem; font-weight:700; color:var(--primary);
+  background:var(--tint); border:1px solid var(--tint-border); padding:.3rem .9rem; border-radius:999px; }}
+.status i {{ width:8px; height:8px; border-radius:50%; background:#22C55E; box-shadow:0 0 0 3px rgba(34,197,94,.25); }}
+.hero h1 {{ font-size:3.3rem; font-weight:900; letter-spacing:-.04em; line-height:1.05; margin:.9rem 0 .35rem; color:var(--text); }}
+.hero .role {{ font-size:1.05rem; font-weight:700; color:var(--accent); letter-spacing:.02em; }}
+.hero .lead {{ font-size:1.07rem; color:var(--muted); line-height:1.7; max-width:620px; margin:1rem 0 1.4rem; }}
+.chips {{ display:flex; flex-wrap:wrap; gap:.45rem; }}
+.chip {{ font-size:.78rem; font-weight:600; color:var(--text); background:var(--card); border:1px solid var(--border);
+  padding:.35rem .8rem; border-radius:10px; }}
+.cta {{ display:flex; flex-wrap:wrap; gap:.7rem; margin-top:1.8rem; }}
+.btn {{ display:inline-flex; align-items:center; gap:.45rem; padding:.72rem 1.4rem; border-radius:12px; font-weight:700; font-size:.9rem;
+  text-decoration:none !important; transition:all .2s; border:1px solid transparent; }}
+.btn-primary {{ background:var(--primary); color:#fff !important; }}
+.btn-primary:hover {{ background:var(--primary-strong); transform:translateY(-2px); }}
+.btn-ghost {{ background:var(--card); color:var(--text) !important; border-color:var(--border); }}
+.btn-ghost:hover {{ border-color:var(--primary); transform:translateY(-2px); }}
 
-        /* ============ HERO SECTION ============ */
-        .hero-full {{
-            min-height: 85vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 7rem 2rem 3rem;
-            background: var(--hero-bg);
-            position: relative;
-            overflow: hidden;
-        }}
-        .hero-full::before {{
-            content: ''; position: absolute; inset: 0;
-            background: var(--hero-glow);
-            opacity: 0.5; pointer-events: none;
-        }}
-        .hero-full::after {{
-            content: ''; position: absolute; inset: 0;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(139,92,246,0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(14,165,233,0.06) 0%, transparent 50%);
-            pointer-events: none;
-        }}
-        .hero-grid-bg {{
-            position: absolute; inset: 0;
-            background-image: 
-                linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
-            -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
-            pointer-events: none;
-        }}
-        .hero-content {{
-            max-width: 1200px; width: 100%;
-            display: grid; grid-template-columns: auto 1fr;
-            gap: 4rem;
-            align-items: center;
-            position: relative; z-index: 2;
-        }}
-        @media (max-width: 900px) {{
-            .hero-content {{ grid-template-columns: 1fr; text-align: center; gap: 2rem; }}
-            .hero-photo-wrapper {{ margin: 0 auto; }}
-        }}
-        
-        .hero-photo-wrapper {{
-            position: relative;
-            width: 260px; height: 260px;
-        }}
-        .hero-photo-ring {{
-            position: absolute; inset: -12px;
-            border-radius: 50%;
-            background: conic-gradient(from 0deg, var(--primary), var(--secondary), var(--accent), var(--primary));
-            animation: rotate-ring 8s linear infinite;
-            opacity: 0.6;
-        }}
-        .hero-photo-ring::after {{
-            content: ''; position: absolute; inset: 4px;
-            border-radius: 50%;
-            background: var(--bg);
-        }}
-        @keyframes rotate-ring {{
-            to {{ transform: rotate(360deg); }}
-        }}
-        .hero-photo {{
-            position: relative; z-index: 2;
-            width: 260px; height: 260px; border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--bg);
-            box-shadow: 0 25px 80px rgba(59,130,246,0.3);
-        }}
-        .hero-status-badge {{
-            position: absolute; bottom: 10px; right: 10px; z-index: 3;
-            background: var(--success);
-            width: 28px; height: 28px; border-radius: 50%;
-            border: 4px solid var(--bg);
-            box-shadow: 0 0 0 3px var(--success), 0 0 20px var(--success);
-            animation: pulse-status 2s infinite;
-        }}
-        @keyframes pulse-status {{
-            0%, 100% {{ box-shadow: 0 0 0 3px var(--success), 0 0 20px var(--success); }}
-            50% {{ box-shadow: 0 0 0 6px rgba(34,197,94,0.3), 0 0 30px var(--success); }}
-        }}
+/* KPI */
+.kpi-grid {{ display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; }}
+.kpi {{ background:var(--card); border:1px solid var(--border); border-radius:18px; padding:1.4rem 1.1rem; text-align:center;
+  box-shadow:var(--shadow); transition:all .25s; }}
+.kpi:hover {{ transform:translateY(-4px); border-color:var(--border-hover); }}
+.kpi .ico {{ font-size:1.4rem; }}
+.kpi .val {{ font-size:1.9rem; font-weight:900; letter-spacing:-.03em; color:var(--primary); margin:.35rem 0 .2rem; }}
+.kpi .lbl {{ font-size:.8rem; color:var(--muted); line-height:1.4; }}
 
-        .hero-text h1 {{ 
-            font-size: 3.5rem; font-weight: 900; 
-            letter-spacing: -0.04em; line-height: 1.05; 
-            color: var(--text); 
-            margin-bottom: 0.5rem;
-        }}
-        .hero-text h1 .gradient-name {{ 
-            background: var(--gradient-text);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }}
-        .hero-text .role-tag {{
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--primary-light);
-            border: 1px solid var(--tag-border);
-            padding: 0.35rem 1rem;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }}
-        .hero-text .role-tag .dot {{
-            width: 6px; height: 6px; border-radius: 50%;
-            background: var(--primary);
-        }}
-        .hero-text .subtitle {{ 
-            font-size: 1.15rem; 
-            color: var(--text-muted); 
-            margin: 0.5rem 0 1.5rem; 
-            line-height: 1.7; 
-            max-width: 540px;
-        }}
-        .hero-text .badge-group {{ 
-            display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; 
-        }}
-        @media (max-width: 900px) {{
-            .hero-text .badge-group {{ justify-content: center; }}
-            .hero-text .subtitle {{ margin-left: auto; margin-right: auto; }}
-        }}
-        .hero-text .badge {{
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 0.4rem 0.9rem; border-radius: 10px;
-            font-size: 0.78rem; font-weight: 500; color: var(--text);
-            transition: all 0.2s ease;
-            backdrop-filter: blur(8px);
-        }}
-        .hero-text .badge:hover {{
-            border-color: var(--primary);
-            background: var(--primary-light);
-            transform: translateY(-2px);
-        }}
-        .hero-text .cta-group {{ 
-            display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 2rem; 
-        }}
-        @media (max-width: 900px) {{
-            .hero-text .cta-group {{ justify-content: center; }}
-        }}
-        .btn-primary {{
-            background: var(--gradient-primary); 
-            color: white !important;
-            padding: 0.75rem 1.75rem; border-radius: 12px;
-            font-weight: 600; text-decoration: none; transition: all 0.25s ease;
-            display: inline-flex; align-items: center; gap: 0.5rem;
-            border: none; cursor: pointer; font-size: 0.9rem;
-            box-shadow: 0 4px 16px rgba(59,130,246,0.3);
-        }}
-        .btn-primary:hover {{ 
-            transform: translateY(-2px); 
-            box-shadow: 0 8px 28px rgba(59,130,246,0.45);
-        }}
-        .btn-secondary {{
-            background: var(--card-bg); 
-            border: 1px solid var(--border);
-            padding: 0.75rem 1.75rem; border-radius: 12px;
-            font-weight: 600; color: var(--text) !important; 
-            text-decoration: none; transition: all 0.25s ease; 
-            display: inline-flex; align-items: center; gap: 0.5rem;
-            backdrop-filter: blur(8px);
-            font-size: 0.9rem;
-        }}
-        .btn-secondary:hover {{ 
-            background: var(--card-bg-hover);
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }}
+/* TIMELINE */
+.timeline {{ position:relative; max-width:900px; margin:0 auto; }}
+.timeline::before {{ content:""; position:absolute; left:15px; top:6px; bottom:6px; width:2px;
+  background:linear-gradient(var(--primary), var(--accent), transparent); }}
+.t-item {{ position:relative; padding-left:52px; margin-bottom:1.4rem; }}
+.t-dot {{ position:absolute; left:7px; top:22px; width:18px; height:18px; border-radius:50%; background:var(--primary);
+  border:4px solid var(--bg2); box-shadow:0 0 0 2px var(--primary); }}
+.t-card {{ background:var(--card); border:1px solid var(--border); border-radius:18px; padding:1.4rem 1.6rem; box-shadow:var(--shadow); transition:all .25s; }}
+.t-card:hover {{ border-color:var(--border-hover); transform:translateX(4px); }}
+.t-top {{ display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap; }}
+.t-role {{ font-size:1.12rem; font-weight:800; color:var(--text); }}
+.t-org {{ font-size:.92rem; font-weight:600; color:var(--primary); margin-top:.15rem; }}
+.t-date {{ font-size:.75rem; font-weight:800; color:var(--primary); background:var(--tint); border:1px solid var(--tint-border);
+  padding:.25rem .8rem; border-radius:999px; white-space:nowrap; }}
+.t-card ul {{ margin:.8rem 0 .8rem 1.1rem; padding:0; }}
+.t-card li {{ color:var(--muted); font-size:.93rem; line-height:1.6; margin-bottom:.25rem; }}
+.tag {{ display:inline-block; font-size:.72rem; font-weight:700; color:var(--primary); background:var(--tint);
+  border:1px solid var(--tint-border); padding:.2rem .6rem; border-radius:7px; margin:.15rem .25rem .15rem 0; }}
 
-        /* ============ SEÇÕES ============ */
-        .section-glass {{
-            padding: 5rem 2rem;
-            background: var(--section-bg);
-            backdrop-filter: blur(8px);
-            border-top: 1px solid var(--border);
-            position: relative;
-        }}
-        .section-glass.alt {{
-            background: var(--section-alt-bg);
-        }}
-        .container {{ max-width: 1200px; margin: 0 auto; }}
-        .section-header {{ text-align: center; margin-bottom: 3.5rem; }}
-        .section-header .label {{
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--primary-light);
-            border: 1px solid var(--tag-border);
-            padding: 0.35rem 1.1rem; border-radius: 999px;
-            font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.1em; color: var(--primary);
-            margin-bottom: 1rem;
-        }}
-        .section-header h2 {{ 
-            font-size: 2.5rem; font-weight: 800; 
-            margin-top: 0.5rem; color: var(--text); 
-            letter-spacing: -0.03em; 
-            line-height: 1.15;
-        }}
-        .section-header p {{ 
-            color: var(--text-muted); 
-            max-width: 600px; 
-            margin: 1rem auto 0; 
-            font-size: 1.05rem;
-            line-height: 1.6;
-        }}
+/* PROJETOS */
+.grid-2 {{ display:grid; grid-template-columns:repeat(2,1fr); gap:1.25rem; }}
+.card {{ background:var(--card); border:1px solid var(--border); border-radius:20px; padding:1.7rem; box-shadow:var(--shadow);
+  transition:all .25s; display:flex; flex-direction:column; }}
+.card:hover {{ transform:translateY(-5px); border-color:var(--border-hover); }}
+.card .p-ico {{ width:52px; height:52px; border-radius:14px; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:1.6rem; }}
+.card h3 {{ font-size:1.18rem; font-weight:800; margin:1rem 0 .5rem; color:var(--text); }}
+.card p {{ color:var(--muted); font-size:.93rem; line-height:1.65; margin-bottom:1rem; flex:1; }}
+.card .btn {{ align-self:flex-start; margin-top:1rem; padding:.5rem 1.1rem; font-size:.84rem; }}
 
-        /* ============ KPI CARDS ============ */
-        .kpi-grid {{
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 1.25rem;
-        }}
-        @media (max-width: 1024px) {{ .kpi-grid {{ grid-template-columns: repeat(3, 1fr); }} }}
-        @media (max-width: 640px) {{ .kpi-grid {{ grid-template-columns: repeat(2, 1fr); }} }}
-        
-        .kpi-card {{
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 1.75rem 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }}
-        .kpi-card::before {{
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--gradient-primary);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }}
-        .kpi-card:hover {{
-            transform: translateY(-6px);
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-hover);
-        }}
-        .kpi-card:hover::before {{ opacity: 1; }}
-        .kpi-icon {{
-            width: 48px; height: 48px;
-            border-radius: 14px;
-            background: var(--primary-light);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 1.4rem;
-        }}
-        .kpi-value {{
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            background: var(--gradient-text);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.1;
-            margin-bottom: 0.35rem;
-        }}
-        .kpi-label {{
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }}
+/* COMPETÊNCIAS */
+.grid-skills {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1rem; }}
+.skill {{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1.2rem 1.3rem; }}
+.skill h4 {{ font-size:1rem; font-weight:800; color:var(--text); margin-bottom:.6rem; display:flex; gap:.5rem; align-items:center; }}
 
-        /* ============ GLASS CARDS ============ */
-        .glass-card {{
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 1.75rem;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }}
-        .glass-card::before {{
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: var(--gradient-primary);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }}
-        .glass-card:hover {{ 
-            transform: translateY(-8px); 
-            border-color: var(--border-hover); 
-            box-shadow: var(--shadow-hover);
-        }}
-        .glass-card:hover::before {{ opacity: 1; }}
-        
-        .glass-card h3 {{
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 0.75rem;
-            color: var(--text);
-            letter-spacing: -0.01em;
-        }}
-        .glass-card p {{
-            color: var(--text-muted);
-            line-height: 1.65;
-            font-size: 0.92rem;
-        }}
-        .glass-card .card-icon {{
-            width: 56px; height: 56px;
-            border-radius: 16px;
-            background: var(--primary-light);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.6rem;
-            margin-bottom: 1rem;
-        }}
+/* FORMAÇÃO */
+.edu-grid {{ display:grid; grid-template-columns:1fr 1.4fr; gap:1.25rem; }}
+.edu-item {{ display:flex; gap:.9rem; align-items:flex-start; padding:.9rem 0; border-bottom:1px solid var(--border); }}
+.edu-item:last-child {{ border-bottom:none; }}
+.edu-item .e-ico {{ font-size:1.3rem; }}
+.edu-item b {{ display:block; color:var(--text); font-size:.95rem; }}
+.edu-item span {{ color:var(--muted); font-size:.84rem; }}
+.course {{ display:flex; justify-content:space-between; gap:1rem; align-items:center; padding:.75rem 0; border-bottom:1px solid var(--border); }}
+.course:last-child {{ border-bottom:none; }}
+.course b {{ display:block; color:var(--text); font-size:.9rem; font-weight:600; }}
+.course span {{ color:var(--muted); font-size:.8rem; }}
+.pill {{ font-size:.72rem; font-weight:800; padding:.2rem .7rem; border-radius:999px; white-space:nowrap; }}
+.pill.ok {{ color:var(--primary); background:var(--tint); }}
+.pill.wip {{ color:var(--accent); background:rgba(242,181,68,.14); }}
+.bar {{ width:90px; height:6px; border-radius:999px; background:var(--border); overflow:hidden; margin-top:.35rem; }}
+.bar i {{ display:block; height:100%; background:var(--accent); }}
 
-        /* ============ PROJECT GRID ============ */
-        .project-grid {{
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-        }}
-        @media (max-width: 768px) {{ .project-grid {{ grid-template-columns: 1fr; }} }}
-        
-        .project-card {{
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }}
-        .project-card::before {{
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--gradient-primary);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.4s ease;
-        }}
-        .project-card:hover {{
-            transform: translateY(-8px);
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-hover);
-        }}
-        .project-card:hover::before {{ transform: scaleX(1); }}
-        .project-card .project-icon {{
-            width: 64px; height: 64px;
-            border-radius: 18px;
-            background: var(--gradient-primary);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.8rem;
-            margin-bottom: 1.25rem;
-            box-shadow: 0 8px 24px rgba(59,130,246,0.25);
-        }}
-        .project-card h3 {{
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 0.75rem;
-            color: var(--text);
-        }}
-        .project-card p {{
-            color: var(--text-muted);
-            line-height: 1.65;
-            font-size: 0.92rem;
-            margin-bottom: 1.25rem;
-        }}
-        .project-card .project-tags {{
-            display: flex; flex-wrap: wrap; gap: 0.4rem;
-            margin-bottom: 1.25rem;
-        }}
-        .project-card .project-tag {{
-            font-size: 0.7rem;
-            background: var(--tag-bg);
-            border: 1px solid var(--tag-border);
-            padding: 0.2rem 0.6rem;
-            border-radius: 6px;
-            color: var(--primary);
-            font-weight: 600;
-        }}
+/* FOOTER */
+.footer {{ padding:4rem 2rem 2.5rem; text-align:center; border-top:1px solid var(--border); background:var(--bg2); }}
+.footer h3 {{ font-size:2rem; font-weight:900; letter-spacing:-.03em; color:var(--text); margin:1rem 0 .4rem; }}
+.footer .sub {{ color:var(--muted); margin-bottom:1.4rem; }}
+.links {{ display:flex; justify-content:center; flex-wrap:wrap; gap:.6rem; margin:1.6rem 0; }}
+.copy {{ text-align:center; color:var(--subtle); font-size:.8rem; padding-top:1.4rem; border-top:1px solid var(--border); max-width:700px; margin:0 auto; }}
 
-        /* ============ TIMELINE ============ */
-        .timeline {{ position: relative; padding: 2rem 0; }}
-        .timeline::before {{
-            content: ''; position: absolute; left: 28px; top: 0; bottom: 0;
-            width: 2px; 
-            background: linear-gradient(to bottom, var(--primary), var(--secondary), var(--accent), transparent);
-        }}
-        .timeline-item {{ 
-            position: relative; padding-left: 80px; margin-bottom: 2.5rem; 
-            animation: fadeInUp 0.6s ease backwards;
-        }}
-        .timeline-item:nth-child(1) {{ animation-delay: 0.1s; }}
-        .timeline-item:nth-child(2) {{ animation-delay: 0.2s; }}
-        .timeline-item:nth-child(3) {{ animation-delay: 0.3s; }}
-        .timeline-item:nth-child(4) {{ animation-delay: 0.4s; }}
-        
-        @keyframes fadeInUp {{
-            from {{ opacity: 0; transform: translateY(20px); }}
-            to {{ opacity: 1; transform: translateY(0); }}
-        }}
-        
-        .timeline-dot {{
-            position: absolute; left: 20px; top: 8px; width: 18px; height: 18px;
-            border-radius: 50%; 
-            background: var(--gradient-primary);
-            border: 3px solid var(--bg); 
-            box-shadow: 0 0 0 4px var(--primary), 0 0 20px rgba(59,130,246,0.4);
-            z-index: 2;
-        }}
-        .timeline-card {{
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 20px; padding: 1.75rem;
-            transition: all 0.3s ease;
-        }}
-        .timeline-card:hover {{ 
-            border-color: var(--border-hover); 
-            transform: translateX(8px); 
-            box-shadow: var(--shadow-hover);
-        }}
-        .timeline-date {{
-            display: inline-block; font-size: 0.72rem; font-weight: 700;
-            background: var(--primary-light); color: var(--primary);
-            padding: 0.25rem 0.9rem; border-radius: 999px;
-            letter-spacing: 0.02em;
-        }}
-        .timeline-badge {{
-            background: var(--gradient-primary); color: white;
-            font-size: 0.62rem; font-weight: 800; padding: 0.2rem 0.7rem;
-            border-radius: 999px; margin-left: 0.5rem; display: inline-block;
-            text-transform: uppercase; letter-spacing: 0.05em;
-            box-shadow: 0 2px 8px rgba(59,130,246,0.3);
-            animation: pulse-badge 2s infinite;
-        }}
-        @keyframes pulse-badge {{
-            0%, 100% {{ box-shadow: 0 2px 8px rgba(59,130,246,0.3); }}
-            50% {{ box-shadow: 0 2px 16px rgba(59,130,246,0.5); }}
-        }}
-        .timeline-role {{ 
-            font-size: 1.2rem; font-weight: 700; margin: 0.5rem 0 0.2rem; 
-            letter-spacing: -0.01em;
-        }}
-        .timeline-company {{ 
-            color: var(--secondary); font-weight: 600; font-size: 0.95rem;
-            margin-bottom: 0.75rem;
-        }}
-        .timeline-desc {{ 
-            color: var(--text-muted); line-height: 1.7; font-size: 0.92rem;
-            margin-bottom: 0.75rem;
-        }}
-        .timeline-tag {{
-            font-size: 0.72rem; background: var(--tag-bg);
-            border: 1px solid var(--tag-border); padding: 0.25rem 0.7rem;
-            border-radius: 8px; display: inline-block; margin: 0.2rem;
-            color: var(--primary); font-weight: 600;
-        }}
+/* PÁGINAS DE ANÁLISE */
+.page-head {{ padding:7.5rem 2rem 1.5rem; text-align:center;
+  background:radial-gradient(ellipse at 50% 0%, var(--glow) 0%, transparent 65%); }}
+.page-head h1 {{ font-size:2.4rem; font-weight:900; letter-spacing:-.03em; color:var(--text); }}
+.page-head p {{ color:var(--muted); margin-top:.4rem; }}
+.note {{ display:inline-block; margin-top:.9rem; font-size:.78rem; font-weight:700; color:var(--accent);
+  background:rgba(242,181,68,.12); border:1px solid rgba(242,181,68,.3); padding:.3rem .9rem; border-radius:999px; }}
+.metric-row {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin:1rem 0 1.5rem; }}
+.metric {{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1.1rem 1.2rem; }}
+.metric .m-lbl {{ font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }}
+.metric .m-val {{ font-size:1.65rem; font-weight:900; color:var(--text); margin-top:.3rem; letter-spacing:-.02em; }}
+.metric .m-sub {{ font-size:.78rem; color:var(--primary); font-weight:600; margin-top:.2rem; }}
+.chart-title {{ font-size:1.05rem; font-weight:800; color:var(--text); margin:1rem 0 .3rem; }}
+.chart-desc {{ font-size:.88rem; color:var(--muted); margin-bottom:.6rem; }}
+div[data-testid="stTabs"] button p {{ font-weight:700; color:var(--muted); }}
+[data-testid="stSelectbox"] [class*="ComboBox"] > div, [data-testid="stMultiSelect"] [class*="react-aria"] > div,
+[data-baseweb="select"] > div {{ background:var(--card) !important; border:1px solid var(--border) !important; }}
+[data-testid="stSelectbox"] input, [data-testid="stSelectbox"] button, [data-testid="stMultiSelect"] input,
+[data-testid="stMultiSelect"] button, [data-testid="stSelectbox"] svg, [data-testid="stMultiSelect"] svg {{ color:var(--text) !important; }}
+div[data-testid="stTabs"] button {{ opacity:1 !important; }}
+[data-testid="stCaptionContainer"], .stSlider [data-testid="stTickBarMin"], .stSlider [data-testid="stTickBarMax"] {{ color:var(--muted) !important; }}
+[data-testid="stExpander"] summary p {{ color:var(--text); }}
+div[data-testid="stTabs"] [aria-selected="true"] p {{ color:var(--primary) !important; }}
+label, .stSelectbox label p, .stMultiSelect label p {{ color:var(--muted) !important; font-weight:600; }}
+[data-testid="stExpander"] {{ border:1px solid var(--border) !important; border-radius:14px !important; background:var(--card); }}
 
-        /* ============ CERTIFICAÇÕES ============ */
-        .cert-grid {{
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-        }}
-        @media (max-width: 768px) {{ .cert-grid {{ grid-template-columns: 1fr; }} }}
-        
-        .cert-card {{
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-        }}
-        .cert-card:hover {{
-            transform: translateY(-6px);
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-hover);
-        }}
-        .cert-icon {{
-            width: 72px; height: 72px;
-            border-radius: 20px;
-            background: var(--primary-light);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 1.25rem;
-            font-size: 2rem;
-        }}
-        .cert-card h4 {{
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text);
-        }}
-        .cert-card p {{
-            color: var(--text-muted);
-            font-size: 0.88rem;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }}
-        .progress-bar {{
-            width: 100%;
-            height: 8px;
-            background: var(--border);
-            border-radius: 999px;
-            overflow: hidden;
-            margin-top: 0.75rem;
-        }}
-        .progress-fill {{
-            height: 100%;
-            background: var(--gradient-primary);
-            border-radius: 999px;
-            transition: width 1s ease;
-            box-shadow: 0 0 12px var(--primary);
-        }}
-
-        /* ============ AWS JOURNEY ============ */
-        .aws-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            text-align: center;
-        }}
-        .aws-card {{
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 1.5rem 1rem;
-            transition: all 0.3s ease;
-        }}
-        .aws-card:hover {{
-            transform: translateY(-4px);
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-hover);
-        }}
-        .aws-card .aws-icon {{
-            font-size: 2.2rem;
-            margin-bottom: 0.75rem;
-        }}
-        .aws-card .aws-label {{
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: var(--text);
-        }}
-        .aws-card .aws-status {{
-            font-size: 0.7rem;
-            color: var(--success);
-            font-weight: 600;
-            margin-top: 0.35rem;
-        }}
-
-        /* ============ TESTIMONIALS ============ */
-        .testimonial-grid {{ 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 1.5rem; 
-        }}
-        @media (max-width: 768px) {{ .testimonial-grid {{ grid-template-columns: 1fr; }} }}
-        
-        .testimonial-card {{
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-            position: relative;
-        }}
-        .testimonial-card::before {{
-            content: '"';
-            position: absolute;
-            top: 1rem; right: 1.5rem;
-            font-size: 4rem;
-            font-weight: 900;
-            color: var(--primary);
-            opacity: 0.15;
-            line-height: 1;
-            font-family: Georgia, serif;
-        }}
-        .testimonial-card:hover {{
-            transform: translateY(-6px);
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-hover);
-        }}
-        .testimonial-text {{
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.7;
-            font-style: italic;
-            margin-bottom: 1.25rem;
-        }}
-        .testimonial-author {{
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }}
-        .testimonial-avatar {{
-            width: 44px; height: 44px;
-            border-radius: 50%;
-            background: var(--gradient-primary);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 700; font-size: 1rem;
-        }}
-        .testimonial-name {{
-            font-weight: 700;
-            font-size: 0.92rem;
-            color: var(--text);
-        }}
-        .testimonial-role {{
-            font-size: 0.78rem;
-            color: var(--text-subtle);
-        }}
-
-        /* ============ FOOTER ============ */
-        .footer {{
-            padding: 4rem 2rem 2.5rem; 
-            text-align: center;
-            border-top: 1px solid var(--border);
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            position: relative;
-        }}
-        .footer::before {{
-            content: '';
-            position: absolute;
-            top: 0; left: 50%;
-            transform: translateX(-50%);
-            width: 200px; height: 1px;
-            background: var(--gradient-primary);
-        }}
-        .footer .status {{
-            display: inline-flex; align-items: center; gap: 0.6rem;
-            background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25);
-            padding: 0.4rem 1.2rem; border-radius: 999px;
-            font-size: 0.82rem; font-weight: 600; color: var(--success);
-            margin-bottom: 1.5rem;
-        }}
-        .footer .status-dot {{
-            width: 8px; height: 8px; border-radius: 50%;
-            background: var(--success); 
-            box-shadow: 0 0 12px var(--success);
-            animation: pulse 2s infinite;
-        }}
-        @keyframes pulse {{ 0%,100% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} }}
-        
-        .footer h3 {{
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            margin-bottom: 0.5rem;
-            background: var(--gradient-text);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }}
-        .footer .footer-subtitle {{
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            margin-bottom: 2rem;
-        }}
-        .footer-modes {{
-            display: flex; justify-content: center; flex-wrap: wrap; 
-            gap: 0.5rem; margin-bottom: 2rem;
-        }}
-        .footer-mode {{
-            background: var(--tag-bg); border: 1px solid var(--tag-border);
-            padding: 0.4rem 1rem; border-radius: 999px;
-            font-size: 0.82rem; font-weight: 500;
-            color: var(--text);
-            transition: all 0.2s ease;
-        }}
-        .footer-mode:hover {{
-            background: var(--primary-light);
-            border-color: var(--primary);
-        }}
-        .footer-links {{ 
-            display: flex; justify-content: center; flex-wrap: wrap; 
-            gap: 0.6rem; margin: 2rem 0 1.5rem; 
-        }}
-        .footer-link {{
-            background: var(--card-bg); 
-            border: 1px solid var(--border);
-            padding: 0.6rem 1.25rem; border-radius: 12px;
-            color: var(--text) !important; text-decoration: none;
-            font-size: 0.88rem; font-weight: 500;
-            transition: all 0.25s ease;
-            display: inline-flex; align-items: center; gap: 0.4rem;
-        }}
-        .footer-link:hover {{ 
-            background: var(--gradient-primary); 
-            color: white !important;
-            border-color: transparent;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(59,130,246,0.3);
-        }}
-        .footer-copy {{ 
-            color: var(--text-subtle); 
-            font-size: 0.8rem; 
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border);
-        }}
-
-        /* ============ ANÁLISES / DASHBOARD ============ */
-        .page-header {{
-            padding: 7rem 2rem 2rem;
-            text-align: center;
-            background: var(--hero-bg);
-            position: relative;
-            overflow: hidden;
-        }}
-        .page-header::before {{
-            content: ''; position: absolute; inset: 0;
-            background: var(--hero-glow);
-            opacity: 0.4; pointer-events: none;
-        }}
-        .page-header h1 {{
-            font-size: 2.5rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            margin-bottom: 0.5rem;
-            position: relative; z-index: 2;
-        }}
-        .page-header p {{
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            position: relative; z-index: 2;
-        }}
-        .analytics-container {{
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }}
-        
-        /* Tabs customizados */
-        .custom-tabs {{
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 0.5rem;
-            backdrop-filter: blur(12px);
-            flex-wrap: wrap;
-        }}
-        .custom-tab {{
-            padding: 0.65rem 1.25rem;
-            border-radius: 12px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.25s ease;
-            border: none;
-            background: transparent;
-        }}
-        .custom-tab:hover {{
-            color: var(--text);
-            background: var(--nav-hover);
-        }}
-        .custom-tab.active {{
-            background: var(--gradient-primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
-        }}
-
-        /* Metric cards customizados */
-        .metric-card {{
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-        }}
-        .metric-card:hover {{
-            transform: translateY(-4px);
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-hover);
-        }}
-        .metric-label {{
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
-        }}
-        .metric-value {{
-            font-size: 1.75rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            color: var(--text);
-            line-height: 1.1;
-        }}
-        .metric-delta {{
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--success);
-            margin-top: 0.35rem;
-        }}
-
-        /* Chart containers */
-        .chart-container {{
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 1.75rem;
-            margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
-        }}
-        .chart-container:hover {{
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-hover);
-        }}
-        .chart-title {{
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }}
-
-        /* ============ SCROLL TO TOP ============ */
-        .scroll-top {{
-            position: fixed;
-            bottom: 2rem; right: 2rem;
-            width: 48px; height: 48px;
-            border-radius: 50%;
-            background: var(--gradient-primary);
-            color: white;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            box-shadow: 0 8px 24px rgba(59,130,246,0.35);
-            transition: all 0.25s ease;
-            z-index: 999;
-            text-decoration: none;
-        }}
-        .scroll-top:hover {{
-            transform: translateY(-4px);
-            box-shadow: 0 12px 32px rgba(59,130,246,0.5);
-        }}
-
-        /* ============ ANIMAÇÕES GLOBAIS ============ */
-        @keyframes fadeIn {{
-            from {{ opacity: 0; }}
-            to {{ opacity: 1; }}
-        }}
-        @keyframes slideUp {{
-            from {{ opacity: 0; transform: translateY(30px); }}
-            to {{ opacity: 1; transform: translateY(0); }}
-        }}
-        .fade-in {{ animation: fadeIn 0.6s ease backwards; }}
-        .slide-up {{ animation: slideUp 0.6s ease backwards; }}
-
-        /* ============ RESPONSIVIDADE ============ */
-        @media (max-width: 768px) {{
-            .navbar {{ padding: 0.75rem 1rem; }}
-            .navbar-brand {{ font-size: 1.1rem; }}
-            .navbar-links {{ gap: 0.25rem; }}
-            .nav-link {{ padding: 0.4rem 0.75rem; font-size: 0.8rem; }}
-            .theme-toggle {{ width: 36px; height: 36px; font-size: 1rem; }}
-            .hero-full {{ padding: 6rem 1rem 2rem; min-height: auto; }}
-            .hero-text h1 {{ font-size: 2.2rem; }}
-            .hero-photo-wrapper {{ width: 200px; height: 200px; }}
-            .hero-photo {{ width: 200px; height: 200px; }}
-            .section-glass {{ padding: 3rem 1rem; }}
-            .section-header h2 {{ font-size: 1.8rem; }}
-            .kpi-value {{ font-size: 1.5rem; }}
-            .footer h3 {{ font-size: 1.5rem; }}
-        }}
-
-        /* ============ CUSTOMIZAÇÃO STREAMLIT ============ */
-        .stSelectbox > div > div {{
-            background: var(--card-bg) !important;
-            border: 1px solid var(--border) !important;
-            border-radius: 12px !important;
-            color: var(--text) !important;
-        }}
-        .stMultiSelect > div > div {{
-            background: var(--card-bg) !important;
-            border: 1px solid var(--border) !important;
-            border-radius: 12px !important;
-        }}
-        .stDataFrame {{
-            border: 1px solid var(--border) !important;
-            border-radius: 16px !important;
-            overflow: hidden !important;
-        }}
-        .stExpander {{
-            background: var(--card-bg) !important;
-            border: 1px solid var(--border) !important;
-            border-radius: 16px !important;
-        }}
-    </style>
-    """, unsafe_allow_html=True)
-
-# ============================================================================
-# RENDERIZAÇÃO DAS PÁGINAS
-# ============================================================================
-
-def render_home():
-    colors = get_colors()
-    foto_path = get_foto_path()
-    foto_b64 = get_foto_base64(foto_path)
-    foto_url = foto_b64 if foto_b64 else "https://ui-avatars.com/api/?name=Raphael+Pires&size=280&background=1D4ED8&color=fff&bold=true"
-    pdf_path = get_pdf_path()
-    pdf_b64 = get_pdf_base64(pdf_path)
-
-    # HERO
-    st.markdown(f"""
-    <section class="hero-full" id="topo">
-        <div class="hero-grid-bg"></div>
-        <div class="hero-content">
-            <div class="hero-photo-wrapper">
-                <div class="hero-photo-ring"></div>
-                <img src="{foto_url}" alt="Raphael Pires" class="hero-photo">
-                <div class="hero-status-badge" title="Disponível"></div>
-            </div>
-            <div class="hero-text">
-                <div class="role-tag"><span class="dot"></span> Analista de Dados & BI</div>
-                <h1>Raphael <span class="gradient-name">Pires</span></h1>
-                <p class="subtitle">
-                    Mais de <strong>16 anos</strong> transformando dados brutos em decisões estratégicas. 
-                    Especialista em <strong>Power BI, Python e Cloud</strong>, com foco em automação, 
-                    governança de dados e dashboards que geram impacto real no negócio.
-                </p>
-                <div class="badge-group">
-                    <span class="badge">📊 Power BI</span>
-                    <span class="badge">🐍 Python</span>
-                    <span class="badge">🗄️ SQL</span>
-                    <span class="badge">☁️ AWS</span>
-                    <span class="badge">🤖 IA Generativa</span>
-                    <span class="badge">📈 Dashboards</span>
-                    <span class="badge">🔄 ETL</span>
-                </div>
-                <div class="cta-group">
-                    <a href="#experiencia" class="btn-primary">Ver trajetória ↓</a>
-                    {'<a href="' + pdf_b64 + '" download="Curriculo_Raphael_Pires.pdf" class="btn-secondary">📄 Baixar CV</a>' if pdf_b64 else ''}
-                    <a href="#contato" class="btn-secondary">💬 Contato</a>
-                </div>
-            </div>
-        </div>
-    </section>
-    """, unsafe_allow_html=True)
-
-    # KPIs
-    st.markdown("""
-    <div class="section-glass">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">📈 Impacto Mensurável</span>
-                <h2>Números que contam histórias</h2>
-                <p>Resultados concretos de mais de uma década transformando dados em valor</p>
-            </div>
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <div class="kpi-icon">⏱️</div>
-                    <div class="kpi-value">16+</div>
-                    <div class="kpi-label">Anos de experiência</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon">⚡</div>
-                    <div class="kpi-value">70%</div>
-                    <div class="kpi-label">Redução operacional</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon">📊</div>
-                    <div class="kpi-value">213k</div>
-                    <div class="kpi-label">Registros processados</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon">🚀</div>
-                    <div class="kpi-value">2h→15m</div>
-                    <div class="kpi-label">Tempo de análise</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon">💰</div>
-                    <div class="kpi-value">R$50bi</div>
-                    <div class="kpi-label">Dados analisados</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Experiência
-    st.markdown("""
-    <div class="section-glass alt" id="experiencia">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">💼 Trajetória</span>
-                <h2>Experiência profissional</h2>
-                <p>Uma jornada de evolução contínua em dados, BI e automação</p>
-            </div>
-            <div class="timeline">
-    """, unsafe_allow_html=True)
-
-    experiences = [
-        {"date":"2014 – Presente · 10+ anos","role":"Analista de Dados & BI","company":"NSM Comércio","desc":"Centralização de dados, construção de indicadores estratégicos, automação de relatórios e governança. Redução de 70% do tempo operacional com implementação de pipelines automatizados.","tags":["Dados","Governança","Indicadores","Automação","Power BI"],"badge":"Atual"},
-        {"date":"2012 – Presente · 12+ anos","role":"Fundador & Analista de Dados","company":"Jardim do Éden (Varejo de Moda)","desc":"Estruturação da base de dados, modelagem, limpeza, integração e desenvolvimento de dashboards gerenciais com SQL, Python, Power BI e Looker Studio — reduzindo ciclo de análise de 2h para 15 min.","tags":["Power BI","Python","SQL","IA Generativa","Looker"],"badge":""},
-        {"date":"2010 – 2014 · 4 anos","role":"Fundador & Analista de KPIs","company":"J Sintonía (Varejo Especializado)","desc":"Monitoramento de KPIs de vendas, margem e rentabilidade com relatórios automatizados. Análise de viabilidade econômica que fundamentou encerramento estratégico planejado em 2026, evitando prejuízo.","tags":["BI","KPIs","Dashboards","SQL"],"badge":""},
-        {"date":"2009 – 2010 · 1 ano","role":"Estagiário de Automação e Dados","company":"Banco do Brasil S.A.","desc":"Desenvolvimento de macros VBA em 20 agências, reduzindo 70% do tempo operacional. Saneou e padronizou bases de dados gerenciais internas.","tags":["VBA","Automação","Eficiência","SQL"],"badge":""}
-    ]
-
-    for exp in experiences:
-        tags = "".join([f'<span class="timeline-tag">{t}</span>' for t in exp["tags"]])
-        badge = f'<span class="timeline-badge">{exp["badge"]}</span>' if exp["badge"] else ""
-        st.markdown(f"""
-        <div class="timeline-item">
-            <div class="timeline-dot"></div>
-            <div class="timeline-card">
-                <span class="timeline-date">{exp["date"]}</span> {badge}
-                <div class="timeline-role">{exp["role"]}</div>
-                <div class="timeline-company">{exp["company"]}</div>
-                <div class="timeline-desc">{exp["desc"]}</div>
-                <div>{tags}</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("</div></div></div>", unsafe_allow_html=True)
-
-    # Projetos
-    st.markdown("""
-    <div class="section-glass">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">🚀 Portfólio</span>
-                <h2>Projetos de Analytics</h2>
-                <p>Aplicações reais construídas com Python, Streamlit e visualizações interativas</p>
-            </div>
-            <div class="project-grid">
-                <div class="project-card">
-                    <div class="project-icon">🇧🇷</div>
-                    <h3>Desenrola Brasil</h3>
-                    <p>Painel analítico executivo com Python, Pandas, Plotly e Streamlit. Processamento de dados oficiais do Banco Central com KPIs, séries temporais e análise de concentração de mercado (HHI).</p>
-                    <div class="project-tags">
-                        <span class="project-tag">Python</span>
-                        <span class="project-tag">Pandas</span>
-                        <span class="project-tag">Plotly</span>
-                        <span class="project-tag">Streamlit</span>
-                    </div>
-                    <a href="https://desenrolabrasil.streamlit.app" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">🔗 Ver App</a>
-                </div>
-                <div class="project-card">
-                    <div class="project-icon">🔬</div>
-                    <h3>CNPq Analytics</h3>
-                    <p>ETL e análise de mais de 213 mil bolsas e R$ 1,2 bi em investimentos públicos, evidenciando desigualdades regionais. Dashboard interativo com filtros dinâmicos.</p>
-                    <div class="project-tags">
-                        <span class="project-tag">ETL</span>
-                        <span class="project-tag">Python</span>
-                        <span class="project-tag">Dashboards</span>
-                        <span class="project-tag">BI</span>
-                    </div>
-                    <a href="https://cnpa-analytics.streamlit.app" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">🔗 Ver App</a>
-                </div>
-                <div class="project-card">
-                    <div class="project-icon">⛽</div>
-                    <h3>Análise de Combustíveis (ANP)</h3>
-                    <p>Dashboard interativo com filtros temporais e regionais utilizando dados oficiais da Agência Nacional do Petróleo. Monitoramento de preços em tempo real.</p>
-                    <div class="project-tags">
-                        <span class="project-tag">ANP</span>
-                        <span class="project-tag">Plotly</span>
-                        <span class="project-tag">Time Series</span>
-                    </div>
-                    <a href="https://github.com/raphaelcaxias" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">📊 Ver Projeto</a>
-                </div>
-                <div class="project-card">
-                    <div class="project-icon">💎</div>
-                    <h3>Portfólio Premium</h3>
-                    <p>Este portfólio construído em Streamlit com design premium, glassmorphism, dark/light mode e navegação fixa. Código aberto no GitHub.</p>
-                    <div class="project-tags">
-                        <span class="project-tag">Streamlit</span>
-                        <span class="project-tag">CSS</span>
-                        <span class="project-tag">Design</span>
-                        <span class="project-tag">UX</span>
-                    </div>
-                    <a href="https://github.com/raphaelcaxias" target="_blank" class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">💻 Ver Código</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Certificações
-    st.markdown(f"""
-    <div class="section-glass alt">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">🎓 Certificações</span>
-                <h2>Formação contínua</h2>
-                <p>Aprendizado constante em tecnologias de ponta</p>
-            </div>
-            <div class="cert-grid">
-                <div class="cert-card">
-                    <div class="cert-icon">📘</div>
-                    <h4>Hashtag Treinamentos</h4>
-                    <p>SQL Avançado · Power BI · Python para Análise de Dados · Algoritmos e IA Aplicada</p>
-                    <div style="display:inline-block;background:{colors['success']};color:white;padding:0.25rem 0.9rem;border-radius:999px;font-size:0.75rem;font-weight:700;">✓ Concluído</div>
-                </div>
-                <div class="cert-card">
-                    <div class="cert-icon">☁️</div>
-                    <h4>AWS Educate</h4>
-                    <p>8 módulos: Cloud Computing, Console, Storage, ML Foundations, Sustainability, Cloud Support</p>
-                    <div class="progress-bar"><div class="progress-fill" style="width:40%;"></div></div>
-                    <div style="font-size:0.78rem;color:{colors['text_muted']};margin-top:0.5rem;font-weight:600;">40% concluído</div>
-                </div>
-                <div class="cert-card">
-                    <div class="cert-icon">🎯</div>
-                    <h4>Meta 2026</h4>
-                    <p>Certificação AWS Cloud Practitioner — em preparação ativa com foco em arquitetura de dados</p>
-                    <div style="display:inline-block;background:{colors['warning']};color:white;padding:0.25rem 0.9rem;border-radius:999px;font-size:0.75rem;font-weight:700;">🔄 Em progresso</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # AWS Journey
-    st.markdown(f"""
-    <div class="section-glass">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">☁️ Cloud Journey</span>
-                <h2>AWS em progresso</h2>
-                <p>Atualmente em trilha de certificação, com foco em arquitetura de dados e machine learning na nuvem</p>
-            </div>
-            <div class="aws-grid">
-                <div class="aws-card">
-                    <div class="aws-icon">📘</div>
-                    <div class="aws-label">Cloud 101</div>
-                    <div class="aws-status">✓ Completo</div>
-                </div>
-                <div class="aws-card">
-                    <div class="aws-icon">🖥️</div>
-                    <div class="aws-label">AWS Console</div>
-                    <div class="aws-status">✓ Completo</div>
-                </div>
-                <div class="aws-card">
-                    <div class="aws-icon">💾</div>
-                    <div class="aws-label">Storage</div>
-                    <div class="aws-status">✓ Completo</div>
-                </div>
-                <div class="aws-card">
-                    <div class="aws-icon">🤖</div>
-                    <div class="aws-label">ML Foundations</div>
-                    <div class="aws-status">✓ Completo</div>
-                </div>
-                <div class="aws-card">
-                    <div class="aws-icon">🌱</div>
-                    <div class="aws-label">Sustainability</div>
-                    <div class="aws-status">✓ Completo</div>
-                </div>
-                <div class="aws-card">
-                    <div class="aws-icon">🛡️</div>
-                    <div class="aws-label">Cloud Support</div>
-                    <div class="aws-status">✓ Completo</div>
-                </div>
-            </div>
-            <div style="text-align:center;margin-top:2rem;">
-                <span style="background:{colors['primary_light']};color:{colors['primary']};padding:0.4rem 1.4rem;border-radius:999px;font-size:0.85rem;font-weight:700;border:1px solid {colors['tag_border']};">🎯 Meta 2026: AWS Cloud Practitioner</span>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Testimonials
-    st.markdown("""
-    <div class="section-glass alt">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">💬 Recomendações</span>
-                <h2>O que dizem sobre meu trabalho</h2>
-                <p>Feedback de colegas e líderes com quem tive o prazer de colaborar</p>
-            </div>
-            <div class="testimonial-grid">
-                <div class="testimonial-card">
-                    <p class="testimonial-text">Raphael transformou completamente nossa forma de analisar dados. Os dashboards que ele criou reduziram drasticamente o tempo de tomada de decisão.</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">GM</div>
-                        <div>
-                            <div class="testimonial-name">Gestor de Operações</div>
-                            <div class="testimonial-role">NSM Comércio</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <p class="testimonial-text">Profissional excepcional com capacidade única de traduzir necessidades de negócio em soluções técnicas elegantes. Sua automação VBA economizou centenas de horas.</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">CB</div>
-                        <div>
-                            <div class="testimonial-name">Coordenador Bancário</div>
-                            <div class="testimonial-role">Banco do Brasil</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <p class="testimonial-text">A visão estratégica do Raphael sobre dados é impressionante. Ele não apenas constrói relatórios, mas conta histórias que orientam decisões importantes.</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">DV</div>
-                        <div>
-                            <div class="testimonial-name">Diretor de Varejo</div>
-                            <div class="testimonial-role">Jardim do Éden</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Skills
-    st.markdown("""
-    <div class="section-glass">
-        <div class="container">
-            <div class="section-header">
-                <span class="label">⚡ Competências</span>
-                <h2>Domínio tecnológico</h2>
-                <p>Stack tecnológica refinada ao longo de 16+ anos de atuação</p>
-            </div>
-    """, unsafe_allow_html=True)
-    render_skills_chart()
-    st.markdown("</div></div>", unsafe_allow_html=True)
+.st-key-conteudo {{ max-width:1160px; margin:0 auto; padding:0 1.5rem; }}
+/* RESPONSIVO */
+@media (max-width: 1000px) {{ .kpi-grid {{ grid-template-columns:repeat(3,1fr); }} .edu-grid {{ grid-template-columns:1fr; }} }}
+@media (max-width: 820px) {{
+  .navbar {{ padding:.7rem 1rem; }} .nav-link {{ padding:.4rem .65rem; font-size:.8rem; }} .brand {{ font-size:1rem; }}
+  .hero {{ padding:6.5rem 1.2rem 3rem; }} .hero-grid {{ grid-template-columns:1fr; text-align:center; gap:2rem; }}
+  .photo-wrap {{ margin:0 auto; width:180px; height:180px; }} .photo, .photo-fallback {{ width:180px; height:180px; }}
+  .hero h1 {{ font-size:2.3rem; }} .hero .lead {{ margin-left:auto; margin-right:auto; }}
+  .chips, .cta {{ justify-content:center; }}
+  .section {{ padding:3rem 1.1rem; }} .section-head h2 {{ font-size:1.7rem; }}
+  .kpi-grid {{ grid-template-columns:repeat(2,1fr); }} .grid-2 {{ grid-template-columns:1fr; }}
+  .t-item {{ padding-left:40px; }} .timeline::before {{ left:9px; }} .t-dot {{ left:1px; }}
+}}
+@media (max-width: 520px) {{ .nav-links .hide-sm {{ display:none; }} }}
+</style>
+""", unsafe_allow_html=True)
 
 
-def render_skills_chart():
-    colors = get_colors()
-    df = pd.DataFrame({
-        "Tecnologia": ["Power BI", "SQL/PostgreSQL", "Python", "Excel/VBA", "Streamlit", "Plotly", "AWS"],
-        "Proficiência": [95, 92, 88, 95, 85, 82, 60],
-        "Categoria": ["BI", "Dados", "Dados", "Automação", "BI", "BI", "Cloud"]
-    })
-    fig = px.bar(
-        df,
-        x="Proficiência",
-        y="Tecnologia",
-        color="Categoria",
-        orientation="h",
-        color_discrete_sequence=colors["chart_colors"],
-        template=colors["plotly_template"],
-        text="Proficiência"
-    )
+def br(v, casas=0):
+    """Formata número no padrão brasileiro: 1.234,5"""
+    return f"{v:,.{casas}f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def brl(v, casas=0):
+    return f"R$ {br(v, casas)}"
+
+
+def html(markup):
+    """Renderiza um bloco HTML completo de uma vez (Streamlit fecha tags abertas entre chamadas)."""
+    st.markdown(markup, unsafe_allow_html=True)
+
+
+def style_fig(fig, height=380):
     fig.update_layout(
-        height=420,
-        margin=dict(l=20, r=60, t=20, b=40),
-        xaxis=dict(range=[0, 110], showgrid=True, gridcolor="rgba(148,163,184,0.12)", zeroline=False),
-        yaxis=dict(showgrid=False, categoryorder='total ascending'),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        font=dict(family="Inter", color=colors["text"], size=12),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        showlegend=True
+        template=C["plotly"], height=height, margin=dict(l=10, r=10, t=10, b=10),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter", color=C["text"], size=12),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title_text=""),
     )
-    fig.update_traces(
-        textposition="outside", 
-        textfont=dict(color=colors["text"], size=12, family="Inter"),
-        marker=dict(cornerradius=6)
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    fig.update_xaxes(gridcolor=C["border"], zeroline=False)
+    fig.update_yaxes(gridcolor=C["border"], zeroline=False)
+    return fig
 
 
-def render_analytics():
-    colors = get_colors()
-    
-    st.markdown(f"""
-    <div class="page-header">
-        <h1>📊 Analytics Interativo</h1>
-        <p>Demonstrações construídas em Streamlit + Plotly com dados simulados</p>
+# ============================================================================
+# NAVBAR
+# ============================================================================
+def render_nav():
+    other = "light" if theme == "dark" else "dark"
+    icon = "☀️" if theme == "dark" else "🌙"
+    items = [("home", "Início", ""), ("analytics", "Análises", ""), ("dashboard", "Dashboard", "hide-sm")]
+    links = "".join(
+        f'<a href="{url(p)}" target="_self" class="nav-link {cls} {"active" if page == p else ""}">{label}</a>'
+        for p, label, cls in items
+    )
+    html(f"""
+<nav class="navbar">
+  <a href="{url('home')}" target="_self" class="brand"><span class="brand-dot"></span>Raphael <b>Pires</b></a>
+  <div class="nav-links">{links}
+    <a href="{url(theme_name=other)}" target="_self" class="theme-btn" title="Alternar tema">{icon}</a>
+  </div>
+</nav>""")
+
+
+# ============================================================================
+# PÁGINA INICIAL
+# ============================================================================
+def render_home():
+    ct = CV["contato"]
+    if foto_path:
+        mime = "image/png" if foto_path.endswith(".png") else "image/jpeg"
+        foto = f'<img class="photo" src="{file_to_data_uri(foto_path, mime)}" alt="Foto de {CV["nome_curto"]}">'
+    else:
+        foto = '<div class="photo-fallback">RP</div>'
+    cv_btn = ""
+    if pdf_path:
+        cv_btn = (f'<a class="btn btn-ghost" href="{file_to_data_uri(pdf_path, "application/pdf")}" '
+                  f'download="Curriculo_Raphael_Pires.pdf">📄 Baixar currículo</a>')
+    chips = "".join(f'<span class="chip">{c}</span>' for c in
+                    ["Power BI", "Excel / VBA", "SQL", "Python", "Indicadores", "Processos", "Dashboards", "IA Generativa"])
+
+    html(f"""
+<section class="hero" id="topo">
+  <div class="hero-grid">
+    <div class="photo-wrap">{foto}</div>
+    <div>
+      <span class="status"><i></i>Disponível para novas oportunidades</span>
+      <h1>{CV['nome']}</h1>
+      <div class="role">{CV['cargo']}</div>
+      <p class="lead">{CV['perfil']}</p>
+      <div class="chips">{chips}</div>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://wa.me/{ct['whatsapp']}" target="_blank">💬 Falar no WhatsApp</a>
+        {cv_btn}
+        <a class="btn btn-ghost" href="#experiencia" target="_self">Ver trajetória ↓</a>
+      </div>
     </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown('<div class="analytics-container">', unsafe_allow_html=True)
-    
-    tabs = st.tabs(["🇧🇷 Desenrola Brasil", "⛽ ANP Combustíveis", "📈 Impacto Operacional"])
+  </div>
+</section>""")
 
-    with tabs[0]:
-        st.markdown("""
-        <div class="chart-container">
-            <div class="chart-title">🇧🇷 Análise de Renegociação de Dívidas</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        np.random.seed(42)
-        regioes = ["Sudeste","Nordeste","Sul","Centro-Oeste","Norte"]
-        status = ["Renegociado","Em Negociação","Inadimplente"]
-        df = pd.DataFrame({
-            "Região": np.random.choice(regioes, 400, p=[.45,.28,.15,.07,.05]),
-            "Valor": np.random.lognormal(8.5, 1.2, 400),
-            "Status": np.random.choice(status, 400, p=[.65,.25,.10])
-        })
-        
-        col1, col2 = st.columns(2)
-        reg = col1.multiselect("Região", regioes, default=regioes)
-        stat = col2.multiselect("Status", status, default=status)
-        filtro = df[df["Região"].isin(reg) & df["Status"].isin(stat)]
-        
-        if filtro.empty:
-            st.info("Nenhum registro encontrado.")
+    kpis = "".join(
+        f'<div class="kpi"><div class="ico">{i}</div><div class="val">{v}</div><div class="lbl">{l}</div></div>'
+        for i, v, l in CV["kpis"]
+    )
+    html(f"""
+<section class="section">
+  <div class="container">
+    <div class="section-head"><span class="eyebrow">Resultados</span><h2>Números da trajetória</h2>
+      <p>Resultados registrados no currículo, de automação bancária a projetos com dados públicos.</p></div>
+    <div class="kpi-grid">{kpis}</div>
+  </div>
+</section>""")
+
+    items = ""
+    for e in CV["experiencias"]:
+        bullets = "".join(f"<li>{b}</li>" for b in e["itens"])
+        tags = "".join(f'<span class="tag">{t}</span>' for t in e["tags"])
+        items += f"""
+<div class="t-item"><div class="t-dot"></div><div class="t-card">
+  <div class="t-top"><div><div class="t-role">{e['cargo']}</div><div class="t-org">{e['empresa']}</div></div>
+  <span class="t-date">{e['periodo']}</span></div>
+  <ul>{bullets}</ul><div>{tags}</div>
+</div></div>"""
+    html(f"""
+<section class="section alt" id="experiencia">
+  <div class="container">
+    <div class="section-head"><span class="eyebrow">Trajetória</span><h2>Experiência profissional</h2>
+      <p>Gestão administrativa, indicadores e automação aplicados a negócios reais.</p></div>
+    <div class="timeline">{items}</div>
+  </div>
+</section>""")
+
+    cards = ""
+    for p in CV["projetos"]:
+        tags = "".join(f'<span class="tag">{t}</span>' for t in p["tags"])
+        cards += f"""
+<div class="card"><div class="p-ico">{p['icone']}</div><h3>{p['nome']}</h3><p>{p['desc']}</p>
+  <div>{tags}</div><a class="btn btn-primary" href="{p['link']}" target="_blank">🔗 {p['cta']}</a></div>"""
+    html(f"""
+<section class="section" id="projetos">
+  <div class="container">
+    <div class="section-head"><span class="eyebrow">Portfólio</span><h2>Projetos de análise de dados</h2>
+      <p>Aplicações publicadas com dados públicos reais, construídas em Python e Streamlit.</p></div>
+    <div class="grid-2">{cards}</div>
+  </div>
+</section>""")
+
+    skills = "".join(
+        f'<div class="skill"><h4>{i} {t}</h4><div>{"".join(f"<span class=tag>{x}</span>" for x in xs)}</div></div>'
+        for i, t, xs in CV["competencias"]
+    )
+    html(f"""
+<section class="section alt" id="competencias">
+  <div class="container">
+    <div class="section-head"><span class="eyebrow">Competências</span><h2>O que eu uso no dia a dia</h2>
+      <p>Da rotina administrativa à análise de dados.</p></div>
+    <div class="grid-skills">{skills}</div>
+  </div>
+</section>""")
+
+    edu = "".join(f'<div class="edu-item"><span class="e-ico">{i}</span><div><b>{t}</b><span>{s}</span></div></div>'
+                  for i, t, s in CV["formacao"])
+    edu += "".join(f'<div class="edu-item"><span class="e-ico">🗣️</span><div><b>{l}</b><span>{n}</span></div></div>'
+                   for l, n in CV["idiomas"])
+    courses = ""
+    for nome, inst, status in CV["cursos"]:
+        if status == "Concluído":
+            right = '<span class="pill ok">✓ Concluído</span>'
         else:
-            st.markdown(f"""
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0;">
-                <div class="metric-card">
-                    <div class="metric-label">Contratos</div>
-                    <div class="metric-value">{len(filtro):,}</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label">Valor Total</div>
-                    <div class="metric-value">R$ {filtro['Valor'].sum()/1e6:.1f}M</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label">Taxa de Sucesso</div>
-                    <div class="metric-value">{(filtro['Status']=='Renegociado').mean()*100:.1f}%</div>
-                    <div class="metric-delta">↑ Acima da meta</div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            a, b = st.columns(2)
-            fig1 = px.pie(filtro, names="Região", values="Valor", hole=.6, 
-                         template=colors["plotly_template"],
-                         color_discrete_sequence=colors["chart_colors"])
-            fig1.update_layout(margin=dict(l=20,r=20,t=20,b=20), height=380,
-                              paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                              font=dict(color=colors["text"]))
-            fig2 = px.histogram(filtro, x="Status", color="Status", 
-                               template=colors["plotly_template"],
-                               color_discrete_sequence=colors["chart_colors"])
-            fig2.update_layout(margin=dict(l=20,r=20,t=20,b=20), height=380,
-                              paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                              font=dict(color=colors["text"]), showlegend=False)
-            a.plotly_chart(fig1, use_container_width=True)
-            b.plotly_chart(fig2, use_container_width=True)
+            right = f'<div style="text-align:right"><span class="pill wip">Em andamento · {status}</span><div class="bar"><i style="width:{status}"></i></div></div>'
+        courses += f'<div class="course"><div><b>{nome}</b><span>{inst}</span></div>{right}</div>'
+    html(f"""
+<section class="section" id="formacao">
+  <div class="container">
+    <div class="section-head"><span class="eyebrow">Formação</span><h2>Formação e cursos</h2></div>
+    <div class="edu-grid">
+      <div class="card">{edu}</div>
+      <div class="card">{courses}</div>
+    </div>
+  </div>
+</section>""")
 
-    with tabs[1]:
-        st.markdown("""
-        <div class="chart-container">
-            <div class="chart-title">⛽ Evolução de Preços de Combustíveis</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        estados = ["SP","RJ","MG","PR"]
-        meses = ["Jan","Fev","Mar","Abr","Mai","Jun"]
-        dados = []
-        np.random.seed(1)
-        for e in estados:
-            preco = 5.4
-            for m in meses:
-                preco += np.random.normal(0, .10)
-                dados.append([e, m, preco])
-        df = pd.DataFrame(dados, columns=["Estado","Mês","Preço"])
-        estado = st.selectbox("Estado", estados)
-        f = df[df["Estado"] == estado]
-        
-        st.markdown(f"""
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0;">
-            <div class="metric-card">
-                <div class="metric-label">Preço Médio</div>
-                <div class="metric-value">R$ {f['Preço'].mean():.2f}</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Preço Mínimo</div>
-                <div class="metric-value">R$ {f['Preço'].min():.2f}</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Preço Máximo</div>
-                <div class="metric-value">R$ {f['Preço'].max():.2f}</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        fig = px.line(f, x="Mês", y="Preço", markers=True, 
-                     template=colors["plotly_template"],
-                     color_discrete_sequence=[colors["chart_colors"][0]])
-        fig.update_layout(height=400, margin=dict(l=20,r=20,t=20,b=20),
-                         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                         font=dict(color=colors["text"]))
-        fig.update_traces(line=dict(width=3))
-        st.plotly_chart(fig, use_container_width=True)
 
-    with tabs[2]:
-        st.markdown("""
-        <div class="chart-container">
-            <div class="chart-title">📈 Impacto da Automação em Horas Operacionais</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        antes = [120,125,118,130,122,128,126,124,129,127,125,130]
-        depois = [95,70,55,45,38,35,33,32,30,29,28,27]
-        meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"]
-        df = pd.DataFrame({
-            "Mês": meses*2,
-            "Horas": antes + depois,
-            "Período": ["Antes"]*12 + ["Depois"]*12
-        })
-        fig = px.area(df, x="Mês", y="Horas", color="Período", 
-                     template=colors["plotly_template"],
-                     color_discrete_sequence=[colors["chart_colors"][0], colors["chart_colors"][3]])
-        fig.update_layout(height=400, margin=dict(l=20,r=20,t=20,b=20),
-                         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                         font=dict(color=colors["text"]))
-        st.plotly_chart(fig, use_container_width=True)
-        
-        st.markdown(f"""
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0;">
-            <div class="metric-card">
-                <div class="metric-label">Horas Economizadas</div>
-                <div class="metric-value">1.108 h</div>
-                <div class="metric-delta">↑ 93% de eficiência</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Custo Evitado</div>
-                <div class="metric-value">R$ 185 mil</div>
-                <div class="metric-delta">↑ Economia anual</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Projetos Entregues</div>
-                <div class="metric-value">24</div>
-                <div class="metric-delta">↑ 60% vs. ano anterior</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+# ============================================================================
+# ANÁLISES
+# ============================================================================
+def render_analytics():
+    html("""
+<div class="page-head"><h1>📊 Análises interativas</h1>
+<p>Demonstrações em Streamlit + Plotly</p></div>""")
+    with st.container(key="conteudo"):
+        tabs = st.tabs(["⚡ Caso real: automação no BB", "🇧🇷 Renegociação de dívidas", "⛽ Preços de combustíveis"])
+
+        with tabs[0]:
+            html("""<div class="chart-title">Macros VBA no Banco do Brasil</div>
+<div class="chart-desc">Números do currículo: a rotina que levava 2h passou a levar 15 min, em 20 agências.</div>""")
+            html("""<div class="metric-row">
+<div class="metric"><div class="m-lbl">Antes</div><div class="m-val">120 min</div><div class="m-sub">por execução da rotina</div></div>
+<div class="metric"><div class="m-lbl">Depois</div><div class="m-val">15 min</div><div class="m-sub">com as macros VBA</div></div>
+<div class="metric"><div class="m-lbl">Redução</div><div class="m-val">87,5%</div><div class="m-sub">do tempo operacional</div></div>
+<div class="metric"><div class="m-lbl">Alcance</div><div class="m-val">20</div><div class="m-sub">agências atendidas</div></div></div>""")
+            execs = st.slider("Simule: quantas vezes por mês cada agência executa a rotina?", 1, 30, 4)
+            horas_antes = 20 * execs * 2.0
+            horas_depois = 20 * execs * 0.25
+            fig = go.Figure(go.Bar(
+                x=[horas_antes, horas_depois], y=["Antes", "Depois"], orientation="h",
+                marker_color=[C["chart"][1], C["chart"][0]],
+                text=[f"{br(horas_antes)} h", f"{br(horas_depois)} h"],
+                textposition="outside", cliponaxis=False,
+            ))
+            style_fig(fig, 240)
+            fig.update_layout(showlegend=False, xaxis_title="horas por mês (20 agências)",
+                              xaxis_range=[0, horas_antes * 1.18], margin=dict(l=10, r=30, t=10, b=10))
+            st.plotly_chart(fig, width="stretch", config={"displayModeBar": False}, theme=None)
+            st.caption(f"Com {execs} execução(ões) por mês, a economia estimada é de "
+                       f"{br(horas_antes - horas_depois)} horas por mês nas 20 agências.")
+
+        with tabs[1]:
+            html("""<div class="chart-desc"><span class="note">Dados simulados para demonstração</span> —
+a versão com dados reais do Banco Central está no app <a href="https://desenrolabrasil.streamlit.app" target="_blank">Desenrola Brasil</a>.</div>""")
+            rng = np.random.default_rng(42)
+            regioes = ["Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte"]
+            status = ["Renegociado", "Em negociação", "Inadimplente"]
+            df = pd.DataFrame({
+                "Região": rng.choice(regioes, 400, p=[.45, .28, .15, .07, .05]),
+                "Valor": rng.lognormal(8.5, 1.2, 400),
+                "Status": rng.choice(status, 400, p=[.65, .25, .10]),
+            })
+            c1, c2 = st.columns(2)
+            reg = c1.multiselect("Região", regioes, default=regioes)
+            stt = c2.multiselect("Status", status, default=status)
+            f = df[df["Região"].isin(reg) & df["Status"].isin(stt)]
+            if f.empty:
+                st.info("Nenhum registro com esses filtros.")
+            else:
+                html(f"""<div class="metric-row">
+<div class="metric"><div class="m-lbl">Contratos</div><div class="m-val">{br(len(f))}</div></div>
+<div class="metric"><div class="m-lbl">Valor total</div><div class="m-val">{brl(f['Valor'].sum() / 1e6, 1)} mi</div></div>
+<div class="metric"><div class="m-lbl">Renegociados</div><div class="m-val">{br((f['Status'] == 'Renegociado').mean() * 100, 1)}%</div></div></div>""")
+                a, b = st.columns(2)
+                with a:
+                    html('<div class="chart-title">Valor por região</div>')
+                    g = f.groupby("Região", as_index=False)["Valor"].sum().sort_values("Valor")
+                    fig1 = px.bar(g, x="Valor", y="Região", orientation="h", color_discrete_sequence=[C["chart"][0]])
+                    st.plotly_chart(style_fig(fig1, 340), width="stretch", config={"displayModeBar": False}, theme=None)
+                with b:
+                    html('<div class="chart-title">Contratos por status</div>')
+                    s = f["Status"].value_counts().reindex(status).dropna().reset_index()
+                    s.columns = ["Status", "Contratos"]
+                    fig2 = px.bar(s, x="Status", y="Contratos", color="Status", color_discrete_sequence=C["chart"])
+                    fig2.update_layout(showlegend=False)
+                    st.plotly_chart(style_fig(fig2, 340), width="stretch", config={"displayModeBar": False}, theme=None)
+
+        with tabs[2]:
+            html('<div class="chart-desc"><span class="note">Dados simulados para demonstração</span></div>')
+            estados = ["RJ", "SP", "MG", "PR"]
+            meses = pd.date_range("2026-01-01", periods=9, freq="MS")
+            rng = np.random.default_rng(1)
+            rows = []
+            for e in estados:
+                preco = 5.9 + rng.normal(0, .15)
+                for m in meses:
+                    preco += rng.normal(0.01, .08)
+                    rows.append([e, m, preco])
+            df = pd.DataFrame(rows, columns=["Estado", "Mês", "Preço"])
+            sel = st.multiselect("Estados", estados, default=["RJ", "SP"])
+            f = df[df["Estado"].isin(sel)]
+            if f.empty:
+                st.info("Escolha ao menos um estado.")
+            else:
+                html(f"""<div class="metric-row">
+<div class="metric"><div class="m-lbl">Preço médio</div><div class="m-val">{brl(f['Preço'].mean(), 2)}</div></div>
+<div class="metric"><div class="m-lbl">Mínimo</div><div class="m-val">{brl(f['Preço'].min(), 2)}</div></div>
+<div class="metric"><div class="m-lbl">Máximo</div><div class="m-val">{brl(f['Preço'].max(), 2)}</div></div></div>""")
+                fig = px.line(f, x="Mês", y="Preço", color="Estado", markers=True, color_discrete_sequence=C["chart"])
+                fig.update_traces(line=dict(width=3))
+                fig.update_yaxes(title="R$ / litro")
+                st.plotly_chart(style_fig(fig, 400), width="stretch", config={"displayModeBar": False}, theme=None)
+
+
+# ============================================================================
+# DASHBOARD
+# ============================================================================
+@st.cache_data
+def dados_dashboard():
+    rng = np.random.default_rng(42)
+    fim = pd.Timestamp(datetime.now().date())
+    datas = pd.date_range(fim - timedelta(days=729), fim, freq="D")
+    categorias = ["Moda feminina", "Moda masculina", "Acessórios", "Calçados", "Infantil"]
+    canais = ["Loja física", "WhatsApp", "Instagram", "Site"]
+    n = 3000
+    df = pd.DataFrame({
+        "Data": rng.choice(datas, n),
+        "Categoria": rng.choice(categorias, n, p=[.34, .2, .18, .18, .1]),
+        "Canal": rng.choice(canais, n, p=[.5, .22, .18, .1]),
+        "Receita": rng.lognormal(5.2, .55, n).round(2),
+    })
+    df["Margem %"] = (rng.normal(42, 6, n)).clip(20, 65).round(1)
+    df["Lucro"] = (df["Receita"] * df["Margem %"] / 100).round(2)
+    df["Data"] = pd.to_datetime(df["Data"])
+    df["Mês"] = df["Data"].dt.to_period("M").dt.to_timestamp()
+    return df
+
+
 
 
 def render_dashboard():
-    colors = get_colors()
-    
-    st.markdown(f"""
-    <div class="page-header">
-        <h1>📊 Dashboard Executivo</h1>
-        <p>Simulação de indicadores de negócio com dados aleatórios</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown('<div class="analytics-container">', unsafe_allow_html=True)
+    html("""
+<div class="page-head"><h1>📈 Dashboard de varejo</h1>
+<p>Modelo de painel gerencial no estilo dos que montei para meus negócios</p>
+<span class="note">Dados simulados para demonstração</span></div>""")
+    df = dados_dashboard()
+    with st.container(key="conteudo"):
+        c1, c2, c3 = st.columns(3)
+        periodo = c1.selectbox("Período", ["Últimos 6 meses", "Últimos 12 meses", "Últimos 24 meses"], index=1)
+        cat = c2.selectbox("Categoria", ["Todas"] + sorted(df["Categoria"].unique()))
+        canal = c3.selectbox("Canal", ["Todos"] + sorted(df["Canal"].unique()))
+        dias = {"Últimos 6 meses": 180, "Últimos 12 meses": 365, "Últimos 24 meses": 730}[periodo]
+        f = df[df["Data"] >= df["Data"].max() - timedelta(days=dias)]
+        if cat != "Todas":
+            f = f[f["Categoria"] == cat]
+        if canal != "Todos":
+            f = f[f["Canal"] == canal]
+        if f.empty:
+            st.info("Nenhuma venda com esses filtros.")
+            return
 
-    np.random.seed(42)
-    end_date = datetime.now()
-    start_date = end_date - timedelta(days=365)
-    dates = pd.date_range(start=start_date, end=end_date, freq='D')
-    projetos = ["Análise de Churn","Dashboard de Vendas","Otimização de Preços","Segmentação de Clientes","Previsão de Demanda","Análise de Sentimento","Modelo de Propensão","Automação de Relatórios","Análise de ROI","Monitoramento de KPIs"]
-    regioes = ["Sudeste","Sul","Nordeste","Centro-Oeste","Norte"]
-    status_opts = ["Concluído","Em Andamento","Planejado"]
-    data=[]
-    for i in range(150):
-        data.append({
-            "Projeto": np.random.choice(projetos),
-            "Data": np.random.choice(dates),
-            "Região": np.random.choice(regioes, p=[0.45,0.20,0.18,0.10,0.07]),
-            "Status": np.random.choice(status_opts, p=[0.55,0.30,0.15]),
-            "Valor": round(np.random.lognormal(9,0.8),2),
-            "Horas": np.random.randint(20,400),
-            "Satisfacao": np.random.randint(60,100),
-            "Complexidade": np.random.choice(["Baixa","Média","Alta"], p=[0.2,0.5,0.3])
-        })
-    df = pd.DataFrame(data)
-    df["Data"] = pd.to_datetime(df["Data"])
-    df["Mes"] = df["Data"].dt.strftime("%Y-%m")
+        html(f"""<div class="metric-row">
+<div class="metric"><div class="m-lbl">Receita</div><div class="m-val">{brl(f['Receita'].sum())}</div></div>
+<div class="metric"><div class="m-lbl">Vendas</div><div class="m-val">{br(len(f))}</div></div>
+<div class="metric"><div class="m-lbl">Ticket médio</div><div class="m-val">{brl(f['Receita'].mean())}</div></div>
+<div class="metric"><div class="m-lbl">Margem média</div><div class="m-val">{br(f['Lucro'].sum() / f['Receita'].sum() * 100, 1)}%</div></div>
+</div>""")
 
-    st.markdown("""
-    <div class="chart-container">
-        <div class="chart-title">🔍 Filtros</div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        periodo = st.selectbox("Período", ["Últimos 6 meses","Últimos 12 meses","Últimos 24 meses"], index=1)
-    with col2:
-        regiao = st.selectbox("Região", ["Todas"] + sorted(df["Região"].unique().tolist()), index=0)
-    with col3:
-        status_filtro = st.selectbox("Status", ["Todos"] + sorted(df["Status"].unique().tolist()), index=0)
+        a, b = st.columns([1.5, 1])
+        with a:
+            html('<div class="chart-title">Receita e lucro por mês</div>')
+            m = f.groupby("Mês", as_index=False)[["Receita", "Lucro"]].sum()
+            # mostra só meses completos (o primeiro e o atual ficam parciais)
+            mes_atual = pd.Timestamp(datetime.now().date()).to_period("M").to_timestamp()
+            m = m[(m["Mês"] > m["Mês"].min()) & (m["Mês"] < mes_atual)]
+            fig = px.line(m.melt("Mês", var_name="Indicador", value_name="R$"), x="Mês", y="R$", color="Indicador",
+                          markers=True, color_discrete_sequence=C["chart"])
+            fig.update_traces(line=dict(width=3))
+            st.plotly_chart(style_fig(fig, 360), width="stretch", config={"displayModeBar": False}, theme=None)
+        with b:
+            html('<div class="chart-title">Receita por canal</div>')
+            g = f.groupby("Canal", as_index=False)["Receita"].sum().sort_values("Receita")
+            fig = px.bar(g, x="Receita", y="Canal", orientation="h", color_discrete_sequence=[C["chart"][0]])
+            st.plotly_chart(style_fig(fig, 360), width="stretch", config={"displayModeBar": False}, theme=None)
 
-    df_filtrado = df.copy()
-    ultima_data = df["Data"].max()
-    if periodo == "Últimos 6 meses":
-        data_corte = ultima_data - timedelta(days=180)
-    elif periodo == "Últimos 12 meses":
-        data_corte = ultima_data - timedelta(days=365)
-    else:
-        data_corte = ultima_data - timedelta(days=730)
-    df_filtrado = df_filtrado[df_filtrado["Data"] >= data_corte]
-    if regiao != "Todas":
-        df_filtrado = df_filtrado[df_filtrado["Região"] == regiao]
-    if status_filtro != "Todos":
-        df_filtrado = df_filtrado[df_filtrado["Status"] == status_filtro]
+        a, b = st.columns(2)
+        with a:
+            html('<div class="chart-title">Receita por categoria</div>')
+            g = f.groupby("Categoria", as_index=False)["Receita"].sum().sort_values("Receita")
+            fig = px.bar(g, x="Receita", y="Categoria", orientation="h", color_discrete_sequence=[C["chart"][1]])
+            st.plotly_chart(style_fig(fig, 320), width="stretch", config={"displayModeBar": False}, theme=None)
+        with b:
+            html('<div class="chart-title">Margem média por categoria</div>')
+            g = f.groupby("Categoria").apply(lambda x: x["Lucro"].sum() / x["Receita"].sum() * 100, include_groups=False)
+            g = g.reset_index(name="Margem %").sort_values("Margem %")
+            fig = px.bar(g, x="Margem %", y="Categoria", orientation="h", color_discrete_sequence=[C["chart"][2]])
+            st.plotly_chart(style_fig(fig, 320), width="stretch", config={"displayModeBar": False}, theme=None)
 
-    st.markdown(f"""
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin:1.5rem 0;">
-        <div class="metric-card">
-            <div class="metric-label">Total de Projetos</div>
-            <div class="metric-value">{len(df_filtrado):,}</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-label">Receita Total</div>
-            <div class="metric-value">R$ {df_filtrado['Valor'].sum()/1e6:.1f}M</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-label">Ticket Médio</div>
-            <div class="metric-value">R$ {df_filtrado['Valor'].mean():,.0f}</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-label">Satisfação Média</div>
-            <div class="metric-value">{df_filtrado['Satisfacao'].mean():.1f}%</div>
-            <div class="metric-delta">↑ Excelente</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    fig1 = px.bar(df_filtrado.groupby("Mes").size().reset_index(name="Quantidade").sort_values("Mes"), 
-                 x="Mes", y="Quantidade", title="Projetos por Mês", 
-                 color_discrete_sequence=[colors["chart_colors"][0]], 
-                 template=colors["plotly_template"])
-    fig1.update_layout(height=380, margin=dict(l=20,r=20,t=40,b=40), 
-                      paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                      font=dict(color=colors["text"], family="Inter"))
-    
-    fig2 = px.pie(df_filtrado.groupby("Região")["Valor"].sum().reset_index(), 
-                 names="Região", values="Valor", title="Receita por Região", hole=0.4, 
-                 color_discrete_sequence=colors["chart_colors"], 
-                 template=colors["plotly_template"])
-    fig2.update_layout(height=380, margin=dict(l=10,r=10,t=40,b=20), 
-                      paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                      font=dict(color=colors["text"], family="Inter"))
-    
-    fig3 = px.line(df_filtrado.groupby("Mes")["Valor"].sum().reset_index().sort_values("Mes"), 
-                  x="Mes", y="Valor", title="Evolução da Receita", markers=True, 
-                  color_discrete_sequence=[colors["chart_colors"][1]], 
-                  template=colors["plotly_template"])
-    fig3.update_layout(height=380, margin=dict(l=20,r=20,t=40,b=40), 
-                      paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                      font=dict(color=colors["text"], family="Inter"))
-    fig3.update_traces(line=dict(width=3))
-    
-    fig4 = px.scatter(df_filtrado, x="Horas", y="Valor", color="Complexidade", 
-                     size="Satisfacao", title="Esforço vs. Retorno", 
-                     color_discrete_sequence=colors["chart_colors"], 
-                     template=colors["plotly_template"])
-    fig4.update_layout(height=380, margin=dict(l=20,r=20,t=40,b=40), 
-                      paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                      font=dict(color=colors["text"], family="Inter"))
-    
-    fig5 = px.bar(df_filtrado["Status"].value_counts().reset_index(), 
-                 x="count", y="Status", orientation="h", title="Status dos Projetos", 
-                 color="Status", color_discrete_sequence=colors["chart_colors"][2:], 
-                 template=colors["plotly_template"])
-    fig5.update_layout(height=320, margin=dict(l=20,r=20,t=40,b=20), showlegend=False, 
-                      paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                      font=dict(color=colors["text"], family="Inter"))
-
-    c1, c2 = st.columns(2)
-    c1.plotly_chart(fig1, use_container_width=True)
-    c2.plotly_chart(fig2, use_container_width=True)
-    c1, c2 = st.columns(2)
-    c1.plotly_chart(fig3, use_container_width=True)
-    c2.plotly_chart(fig4, use_container_width=True)
-    st.plotly_chart(fig5, use_container_width=True)
-
-    with st.expander("📋 Dados detalhados"):
-        st.dataframe(df_filtrado.sort_values("Data", ascending=False), use_container_width=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+        with st.expander("📋 Ver dados detalhados"):
+            st.dataframe(f.sort_values("Data", ascending=False).drop(columns="Mês"), width="stretch", hide_index=True)
 
 
+# ============================================================================
+# RODAPÉ / CONTATO
+# ============================================================================
 def render_footer():
-    st.markdown("""
-    <div class="footer" id="contato">
-        <div class="status">
-            <span class="status-dot"></span>
-            Disponível para novas oportunidades
-        </div>
-        <h3>Vamos conversar sobre dados?</h3>
-        <p class="footer-subtitle">Aberto a projetos em Dados, BI e Cloud Computing</p>
-        <div class="footer-modes">
-            <span class="footer-mode">🏠 Remoto</span>
-            <span class="footer-mode">🏢 Híbrido</span>
-            <span class="footer-mode">📍 Presencial</span>
-            <span class="footer-mode">✈️ Viagens</span>
-        </div>
-        <div class="footer-links">
-            <a href="https://www.linkedin.com/in/raphaelpires" target="_blank" class="footer-link">💼 LinkedIn</a>
-            <a href="https://github.com/raphaelcaxias" target="_blank" class="footer-link">💻 GitHub</a>
-            <a href="mailto:contato@raphaelpires.com" class="footer-link">✉️ E-mail</a>
-            <a href="tel:+5511999999999" class="footer-link">📱 Telefone</a>
-        </div>
-        <p class="footer-copy">© 2026 Raphael Fernando da Silva Pires · Construído com ❤️ usando Streamlit</p>
-    </div>
-    <a href="#topo" class="scroll-top" title="Voltar ao topo">↑</a>
-    """, unsafe_allow_html=True)
+    ct = CV["contato"]
+    modos = "".join(f'<span class="chip">{m}</span>' for m in CV["modalidades"])
+    html(f"""
+<div class="footer" id="contato">
+  <span class="status"><i></i>Disponível para novas oportunidades</span>
+  <h3>Vamos conversar?</h3>
+  <p class="sub">Vagas administrativas, de análise de dados e BI · {CV['cidade']}</p>
+  <div class="chips" style="justify-content:center">{modos}</div>
+  <div class="links">
+    <a class="btn btn-primary" href="https://wa.me/{ct['whatsapp']}" target="_blank">💬 WhatsApp {ct['celular']}</a>
+    <a class="btn btn-ghost" href="mailto:{ct['email']}">✉️ {ct['email']}</a>
+    <a class="btn btn-ghost" href="{ct['linkedin']}" target="_blank">💼 LinkedIn</a>
+    <a class="btn btn-ghost" href="{ct['github']}" target="_blank">💻 GitHub</a>
+  </div>
+  <p class="copy">© {datetime.now().year} {CV['nome']} · Feito com Python e Streamlit</p>
+</div>""")
 
 
 # ============================================================================
 # MAIN
 # ============================================================================
-def main():
-    load_css()
-
-    # Navbar com botão de tema integrado
-    page = st.query_params.get("page", "home")
-    theme_label = "☀️" if st.session_state.theme == "dark" else "🌙"
-    
-    st.markdown(f"""
-    <nav class="navbar">
-        <a href="/?page=home" class="navbar-brand">
-            <span class="brand-dot"></span>
-            Raphael <span>Pires</span>
-        </a>
-        <div class="navbar-links">
-            <a href="/?page=home" class="nav-link {'active' if page == 'home' else ''}">Início</a>
-            <a href="/?page=analytics" class="nav-link {'active' if page == 'analytics' else ''}">Análises</a>
-            <a href="/?page=dashboard" class="nav-link {'active' if page == 'dashboard' else ''}">Dashboard</a>
-            <a href="#contato" class="nav-link">Contato</a>
-            <div class="theme-toggle" onclick="window.location.href='?theme_toggle=1&page={page}'" title="Alternar tema">
-                {theme_label}
-            </div>
-        </div>
-    </nav>
-    """, unsafe_allow_html=True)
-
-    # Handle theme toggle via query params
-    if "theme_toggle" in st.query_params:
-        toggle_theme()
-        # Remove the param to avoid re-toggling
-        params = dict(st.query_params)
-        params.pop("theme_toggle", None)
-        st.query_params.clear()
-        st.query_params.update(params)
-        st.rerun()
-
-    # Conteúdo
-    if page == "home":
-        render_home()
-    elif page == "analytics":
-        render_analytics()
-    elif page == "dashboard":
-        render_dashboard()
-    else:
-        render_home()
-
-    render_footer()
-
-if __name__ == "__main__":
-    main()
+load_css()
+render_nav()
+if page == "analytics":
+    render_analytics()
+elif page == "dashboard":
+    render_dashboard()
+else:
+    render_home()
+render_footer()
