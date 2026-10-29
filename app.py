@@ -1,5 +1,6 @@
 import base64
 import os
+from pathlib import Path
 from datetime import datetime, timedelta
 
 import numpy as np
@@ -201,10 +202,15 @@ def url(page_name=None, theme_name=None):
 # ============================================================================
 # ARQUIVOS (FOTO E PDF)
 # ============================================================================
+BASE = Path(__file__).resolve().parent
+
+
 def first_existing(paths):
+    """Procura arquivos a partir da pasta do app (funciona mesmo se o app estiver numa subpasta do repositório)."""
     for p in paths:
-        if os.path.exists(p):
-            return p
+        caminho = BASE / p
+        if caminho.exists():
+            return str(caminho)
     return None
 
 
@@ -218,8 +224,11 @@ foto_path = first_existing([
     "assets/rapha.jpeg", "assets/rapha.jpg", "assets/rapha.png",
     "rapha.jpeg", "rapha.jpg", "foto.jpeg", "foto.jpg", "perfil.jpeg", "perfil.jpg",
 ])
+# Se existir static/Curriculo_Raphael_Pires.pdf (com enableStaticServing no config.toml),
+# o botão usa um link leve em vez de embutir o PDF inteiro na página.
+pdf_static = (BASE / "static" / "Curriculo_Raphael_Pires.pdf").exists()
 pdf_path = first_existing([
-    "assets/Curriculo_Raphael_Pires.pdf", "Curriculo_Raphael_Pires.pdf",
+    "static/Curriculo_Raphael_Pires.pdf", "assets/Curriculo_Raphael_Pires.pdf", "Curriculo_Raphael_Pires.pdf",
     "assets/Curriculo_Raphael_v7.pdf", "Curriculo_Raphael_v7.pdf", "cv.pdf",
 ])
 
@@ -424,6 +433,36 @@ def html(markup):
     st.markdown(markup, unsafe_allow_html=True)
 
 
+# ============================================================================
+# COMPATIBILIDADE ENTRE VERSÕES DO STREAMLIT
+# Versões novas usam width="stretch"; antigas usam use_container_width=True.
+# ============================================================================
+CHART_CONFIG = {"displayModeBar": False}
+
+
+def show_chart(fig):
+    try:
+        st.plotly_chart(fig, width="stretch", config=CHART_CONFIG, theme=None)
+    except TypeError:
+        st.plotly_chart(fig, use_container_width=True, config=CHART_CONFIG, theme=None)
+
+
+def show_table(df):
+    try:
+        st.dataframe(df, width="stretch", hide_index=True)
+    except TypeError:
+        st.dataframe(df, use_container_width=True, hide_index=True)
+
+
+def content_area():
+    """Área central com margens laterais. st.container(key=...) só existe a partir do Streamlit 1.39."""
+    try:
+        return st.container(key="conteudo")
+    except TypeError:
+        _, meio, _ = st.columns([0.03, 0.94, 0.03])
+        return meio
+
+
 def style_fig(fig, height=380):
     fig.update_layout(
         template=C["plotly"], height=height, margin=dict(l=10, r=10, t=10, b=10),
@@ -467,7 +506,10 @@ def render_home():
     else:
         foto = '<div class="photo-fallback">RP</div>'
     cv_btn = ""
-    if pdf_path:
+    if pdf_static:
+        cv_btn = ('<a class="btn btn-ghost" href="app/static/Curriculo_Raphael_Pires.pdf" target="_blank">'
+                  '📄 Baixar currículo</a>')
+    elif pdf_path:
         cv_btn = (f'<a class="btn btn-ghost" href="{file_to_data_uri(pdf_path, "application/pdf")}" '
                   f'download="Curriculo_Raphael_Pires.pdf">📄 Baixar currículo</a>')
     chips = "".join(f'<span class="chip">{c}</span>' for c in
@@ -578,11 +620,38 @@ def render_home():
 # ============================================================================
 # ANÁLISES
 # ============================================================================
+@st.cache_data
+def dados_renegociacao():
+    rng = np.random.default_rng(42)
+    regioes = ["Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte"]
+    status = ["Renegociado", "Em negociação", "Inadimplente"]
+    df = pd.DataFrame({
+        "Região": rng.choice(regioes, 400, p=[.45, .28, .15, .07, .05]),
+        "Valor": rng.lognormal(8.5, 1.2, 400),
+        "Status": rng.choice(status, 400, p=[.65, .25, .10]),
+    })
+    return regioes, status, df
+
+
+@st.cache_data
+def dados_combustiveis():
+    estados = ["RJ", "SP", "MG", "PR"]
+    meses = pd.date_range("2026-01-01", periods=9, freq="MS")
+    rng = np.random.default_rng(1)
+    rows = []
+    for e in estados:
+        preco = 5.9 + rng.normal(0, .15)
+        for m in meses:
+            preco += rng.normal(0.01, .08)
+            rows.append([e, m, preco])
+    return estados, pd.DataFrame(rows, columns=["Estado", "Mês", "Preço"])
+
+
 def render_analytics():
     html("""
 <div class="page-head"><h1>📊 Análises interativas</h1>
 <p>Demonstrações em Streamlit + Plotly</p></div>""")
-    with st.container(key="conteudo"):
+    with content_area():
         tabs = st.tabs(["⚡ Caso real: automação no BB", "🇧🇷 Renegociação de dívidas", "⛽ Preços de combustíveis"])
 
         with tabs[0]:
@@ -605,21 +674,14 @@ def render_analytics():
             style_fig(fig, 240)
             fig.update_layout(showlegend=False, xaxis_title="horas por mês (20 agências)",
                               xaxis_range=[0, horas_antes * 1.18], margin=dict(l=10, r=30, t=10, b=10))
-            st.plotly_chart(fig, width="stretch", config={"displayModeBar": False}, theme=None)
+            show_chart(fig)
             st.caption(f"Com {execs} execução(ões) por mês, a economia estimada é de "
                        f"{br(horas_antes - horas_depois)} horas por mês nas 20 agências.")
 
         with tabs[1]:
             html("""<div class="chart-desc"><span class="note">Dados simulados para demonstração</span> —
 a versão com dados reais do Banco Central está no app <a href="https://desenrolabrasil.streamlit.app" target="_blank">Desenrola Brasil</a>.</div>""")
-            rng = np.random.default_rng(42)
-            regioes = ["Sudeste", "Nordeste", "Sul", "Centro-Oeste", "Norte"]
-            status = ["Renegociado", "Em negociação", "Inadimplente"]
-            df = pd.DataFrame({
-                "Região": rng.choice(regioes, 400, p=[.45, .28, .15, .07, .05]),
-                "Valor": rng.lognormal(8.5, 1.2, 400),
-                "Status": rng.choice(status, 400, p=[.65, .25, .10]),
-            })
+            regioes, status, df = dados_renegociacao()
             c1, c2 = st.columns(2)
             reg = c1.multiselect("Região", regioes, default=regioes)
             stt = c2.multiselect("Status", status, default=status)
@@ -636,27 +698,18 @@ a versão com dados reais do Banco Central está no app <a href="https://desenro
                     html('<div class="chart-title">Valor por região</div>')
                     g = f.groupby("Região", as_index=False)["Valor"].sum().sort_values("Valor")
                     fig1 = px.bar(g, x="Valor", y="Região", orientation="h", color_discrete_sequence=[C["chart"][0]])
-                    st.plotly_chart(style_fig(fig1, 340), width="stretch", config={"displayModeBar": False}, theme=None)
+                    show_chart(style_fig(fig1, 340))
                 with b:
                     html('<div class="chart-title">Contratos por status</div>')
                     s = f["Status"].value_counts().reindex(status).dropna().reset_index()
                     s.columns = ["Status", "Contratos"]
                     fig2 = px.bar(s, x="Status", y="Contratos", color="Status", color_discrete_sequence=C["chart"])
                     fig2.update_layout(showlegend=False)
-                    st.plotly_chart(style_fig(fig2, 340), width="stretch", config={"displayModeBar": False}, theme=None)
+                    show_chart(style_fig(fig2, 340))
 
         with tabs[2]:
             html('<div class="chart-desc"><span class="note">Dados simulados para demonstração</span></div>')
-            estados = ["RJ", "SP", "MG", "PR"]
-            meses = pd.date_range("2026-01-01", periods=9, freq="MS")
-            rng = np.random.default_rng(1)
-            rows = []
-            for e in estados:
-                preco = 5.9 + rng.normal(0, .15)
-                for m in meses:
-                    preco += rng.normal(0.01, .08)
-                    rows.append([e, m, preco])
-            df = pd.DataFrame(rows, columns=["Estado", "Mês", "Preço"])
+            estados, df = dados_combustiveis()
             sel = st.multiselect("Estados", estados, default=["RJ", "SP"])
             f = df[df["Estado"].isin(sel)]
             if f.empty:
@@ -669,7 +722,7 @@ a versão com dados reais do Banco Central está no app <a href="https://desenro
                 fig = px.line(f, x="Mês", y="Preço", color="Estado", markers=True, color_discrete_sequence=C["chart"])
                 fig.update_traces(line=dict(width=3))
                 fig.update_yaxes(title="R$ / litro")
-                st.plotly_chart(style_fig(fig, 400), width="stretch", config={"displayModeBar": False}, theme=None)
+                show_chart(style_fig(fig, 400))
 
 
 # ============================================================================
@@ -684,7 +737,7 @@ def dados_dashboard():
     canais = ["Loja física", "WhatsApp", "Instagram", "Site"]
     n = 3000
     df = pd.DataFrame({
-        "Data": rng.choice(datas, n),
+        "Data": datas[rng.integers(0, len(datas), n)],
         "Categoria": rng.choice(categorias, n, p=[.34, .2, .18, .18, .1]),
         "Canal": rng.choice(canais, n, p=[.5, .22, .18, .1]),
         "Receita": rng.lognormal(5.2, .55, n).round(2),
@@ -704,7 +757,7 @@ def render_dashboard():
 <p>Modelo de painel gerencial no estilo dos que montei para meus negócios</p>
 <span class="note">Dados simulados para demonstração</span></div>""")
     df = dados_dashboard()
-    with st.container(key="conteudo"):
+    with content_area():
         c1, c2, c3 = st.columns(3)
         periodo = c1.selectbox("Período", ["Últimos 6 meses", "Últimos 12 meses", "Últimos 24 meses"], index=1)
         cat = c2.selectbox("Categoria", ["Todas"] + sorted(df["Categoria"].unique()))
@@ -736,28 +789,29 @@ def render_dashboard():
             fig = px.line(m.melt("Mês", var_name="Indicador", value_name="R$"), x="Mês", y="R$", color="Indicador",
                           markers=True, color_discrete_sequence=C["chart"])
             fig.update_traces(line=dict(width=3))
-            st.plotly_chart(style_fig(fig, 360), width="stretch", config={"displayModeBar": False}, theme=None)
+            show_chart(style_fig(fig, 360))
         with b:
             html('<div class="chart-title">Receita por canal</div>')
             g = f.groupby("Canal", as_index=False)["Receita"].sum().sort_values("Receita")
             fig = px.bar(g, x="Receita", y="Canal", orientation="h", color_discrete_sequence=[C["chart"][0]])
-            st.plotly_chart(style_fig(fig, 360), width="stretch", config={"displayModeBar": False}, theme=None)
+            show_chart(style_fig(fig, 360))
 
         a, b = st.columns(2)
         with a:
             html('<div class="chart-title">Receita por categoria</div>')
             g = f.groupby("Categoria", as_index=False)["Receita"].sum().sort_values("Receita")
             fig = px.bar(g, x="Receita", y="Categoria", orientation="h", color_discrete_sequence=[C["chart"][1]])
-            st.plotly_chart(style_fig(fig, 320), width="stretch", config={"displayModeBar": False}, theme=None)
+            show_chart(style_fig(fig, 320))
         with b:
             html('<div class="chart-title">Margem média por categoria</div>')
-            g = f.groupby("Categoria").apply(lambda x: x["Lucro"].sum() / x["Receita"].sum() * 100, include_groups=False)
-            g = g.reset_index(name="Margem %").sort_values("Margem %")
+            g = f.groupby("Categoria", as_index=False)[["Lucro", "Receita"]].sum()
+            g["Margem %"] = (g["Lucro"] / g["Receita"] * 100).round(1)
+            g = g.sort_values("Margem %")
             fig = px.bar(g, x="Margem %", y="Categoria", orientation="h", color_discrete_sequence=[C["chart"][2]])
-            st.plotly_chart(style_fig(fig, 320), width="stretch", config={"displayModeBar": False}, theme=None)
+            show_chart(style_fig(fig, 320))
 
         with st.expander("📋 Ver dados detalhados"):
-            st.dataframe(f.sort_values("Data", ascending=False).drop(columns="Mês"), width="stretch", hide_index=True)
+            show_table(f.sort_values("Data", ascending=False).drop(columns="Mês"))
 
 
 # ============================================================================
